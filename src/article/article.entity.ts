@@ -29,6 +29,9 @@ export class Article {
   @Column({ name: 'author_id' })
   authorId: number;
 
+  @Column({ name: 'view_count', default: 0 })
+  viewCount: number;
+
   @ManyToOne(() => User)
   @JoinColumn({ name: 'author_id' })
   author: User;

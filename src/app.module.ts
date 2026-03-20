@@ -10,6 +10,8 @@ import { UploadModule } from './upload/upload.module';
 import { MenuModule } from './menu/menu.module';
 import { RoleModule } from './role/role.module';
 import { LotteryModule } from './lottery/lottery.module';
+import { OperationLogModule } from './operation-log/operation-log.module';
+import { NoticeModule } from './notice/notice.module';
 
 /**
  * 根模块 - 应用程序的入口模块
@@ -60,6 +62,8 @@ import { LotteryModule } from './lottery/lottery.module';
     MenuModule,
     RoleModule,
     LotteryModule,
+    OperationLogModule,
+    NoticeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

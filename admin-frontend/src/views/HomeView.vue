@@ -67,6 +67,7 @@ import { ElMessageBox, ElMessage } from 'element-plus'
 import { HomeFilled, User, ArrowDown, SwitchButton } from '@element-plus/icons-vue'
 import Sidebar from '@/components/Sidebar.vue'
 import { useMenuStore } from '@/stores/menu'
+import { getActiveNotices } from '@/api/notice'
 
 const router = useRouter()
 const route = useRoute()
@@ -100,11 +101,28 @@ const handleCommand = (command: string) => {
   }
 }
 
+const showNotices = async () => {
+  try {
+    const list: any = await getActiveNotices()
+    if (!list?.length) return
+    const noticeKey = 'noticed_at'
+    const last = localStorage.getItem(noticeKey)
+    const today = new Date().toDateString()
+    if (last === today) return
+    localStorage.setItem(noticeKey, today)
+    const html = list
+      .map((n: any) => `<div style="margin-bottom:10px"><strong>${n.title}</strong><p style="margin:4px 0 0;color:#606266;font-size:13px">${n.content}</p></div>`)
+      .join('')
+    ElMessageBox.alert(html, '系统公告', { dangerouslyUseHTMLString: true, confirmButtonText: '知道了' })
+  } catch {}
+}
+
 onMounted(() => {
   const userInfoStr = localStorage.getItem('userInfo')
   if (userInfoStr) {
     userInfo.value = JSON.parse(userInfoStr)
   }
+  showNotices()
 })
 </script>
 

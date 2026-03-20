@@ -19,6 +19,8 @@ const upload_module_1 = require("./upload/upload.module");
 const menu_module_1 = require("./menu/menu.module");
 const role_module_1 = require("./role/role.module");
 const lottery_module_1 = require("./lottery/lottery.module");
+const operation_log_module_1 = require("./operation-log/operation-log.module");
+const notice_module_1 = require("./notice/notice.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -50,6 +52,8 @@ exports.AppModule = AppModule = __decorate([
             menu_module_1.MenuModule,
             role_module_1.RoleModule,
             lottery_module_1.LotteryModule,
+            operation_log_module_1.OperationLogModule,
+            notice_module_1.NoticeModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

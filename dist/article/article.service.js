@@ -49,6 +49,8 @@ let ArticleService = class ArticleService {
         if (!article) {
             throw new common_1.NotFoundException('文章不存在');
         }
+        await this.articleRepository.increment({ id }, 'viewCount', 1);
+        article.viewCount = (article.viewCount || 0) + 1;
         return article;
     }
     async findByAuthor(authorId, keyword) {

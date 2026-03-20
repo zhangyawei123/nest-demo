@@ -5,6 +5,7 @@ export declare class Article {
     logo: string;
     content: string;
     authorId: number;
+    viewCount: number;
     author: User;
     createdAt: Date;
     updatedAt: Date;

@@ -105,6 +105,8 @@ export class UserController {
       { name: '角色管理', path: '/roles', component: 'role/RoleView', icon: 'UserFilled', sort: 3 },
       { name: '菜单管理', path: '/menus', component: 'menu/MenuView', icon: 'Grid', sort: 4 },
       { name: '幸运转盘', path: '/lottery', component: 'lottery/LotteryView', icon: 'Opportunity', sort: 5 },
+      { name: '通知公告', path: '/notice', component: 'notice/NoticeView', icon: 'Bell', sort: 6 },
+      { name: '操作日志', path: '/operation-log', component: 'operation-log/OperationLogView', icon: 'Memo', sort: 7 },
     ];
 
     const savedMenus: Menu[] = [];

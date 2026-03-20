@@ -46,6 +46,9 @@
                 {{ row.author?.username || '未知' }}
               </template>
             </el-table-column>
+            <el-table-column label="阅读" width="80">
+              <template #default="{ row }">{{ row.viewCount || 0 }}</template>
+            </el-table-column>
             <el-table-column label="发布时间" width="180">
               <template #default="{ row }">
                 {{ formatDate(row.createdAt) }}
@@ -90,6 +93,9 @@
                 />
                 <span v-else style="color: #909399">无封面</span>
               </template>
+            </el-table-column>
+            <el-table-column label="阅读" width="80">
+              <template #default="{ row }">{{ row.viewCount || 0 }}</template>
             </el-table-column>
             <el-table-column label="发布时间" width="180">
               <template #default="{ row }">

@@ -23,6 +23,10 @@
             <el-icon><Clock /></el-icon>
             {{ formatDate(article.createdAt) }}
           </span>
+          <span class="meta-item">
+            <el-icon><View /></el-icon>
+            {{ article.viewCount || 0 }} 阅读
+          </span>
         </div>
       </div>
 
@@ -39,7 +43,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { ArrowLeft, User, Clock } from '@element-plus/icons-vue'
+import { ArrowLeft, User, Clock, View } from '@element-plus/icons-vue'
 import { getArticleDetail, deleteArticle } from '@/api/article'
 
 const router = useRouter()
