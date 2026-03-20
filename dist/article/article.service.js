@@ -29,11 +29,17 @@ let ArticleService = class ArticleService {
         });
         return this.articleRepository.save(article);
     }
-    async findAll() {
-        return this.articleRepository.find({
-            relations: ['author'],
-            order: { createdAt: 'DESC' },
-        });
+    async findAll(keyword) {
+        const queryBuilder = this.articleRepository
+            .createQueryBuilder('article')
+            .leftJoinAndSelect('article.author', 'author')
+            .orderBy('article.createdAt', 'DESC');
+        if (keyword?.trim()) {
+            queryBuilder.andWhere('(article.title LIKE :keyword OR article.content LIKE :keyword)', {
+                keyword: `%${keyword.trim()}%`,
+            });
+        }
+        return queryBuilder.getMany();
     }
     async findOne(id) {
         const article = await this.articleRepository.findOne({
@@ -45,12 +51,18 @@ let ArticleService = class ArticleService {
         }
         return article;
     }
-    async findByAuthor(authorId) {
-        return this.articleRepository.find({
-            where: { authorId },
-            relations: ['author'],
-            order: { createdAt: 'DESC' },
-        });
+    async findByAuthor(authorId, keyword) {
+        const queryBuilder = this.articleRepository
+            .createQueryBuilder('article')
+            .leftJoinAndSelect('article.author', 'author')
+            .where('article.authorId = :authorId', { authorId })
+            .orderBy('article.createdAt', 'DESC');
+        if (keyword?.trim()) {
+            queryBuilder.andWhere('(article.title LIKE :keyword OR article.content LIKE :keyword)', {
+                keyword: `%${keyword.trim()}%`,
+            });
+        }
+        return queryBuilder.getMany();
     }
     async update(id, updateArticleDto, userId) {
         const article = await this.findOne(id);

@@ -8,6 +8,21 @@
       </el-button>
     </div>
 
+    <div class="toolbar">
+      <el-input
+        v-model="searchKeyword"
+        placeholder="搜索标题或内容"
+        clearable
+        style="max-width: 320px"
+        @keyup.enter="handleSearch"
+        @clear="handleSearch"
+      />
+      <div class="toolbar-actions">
+        <el-button @click="handleReset">重置</el-button>
+        <el-button type="primary" @click="handleSearch">搜索</el-button>
+      </div>
+    </div>
+
     <el-card class="article-card">
       <el-tabs v-model="activeTab" @tab-change="handleTabChange">
         <el-tab-pane label="全部文章" name="all">
@@ -110,6 +125,7 @@ const router = useRouter()
 
 const activeTab = ref('all')
 const loading = ref(false)
+const searchKeyword = ref('')
 const articleList = ref<any[]>([])
 const myArticleList = ref<any[]>([])
 
@@ -118,7 +134,9 @@ const currentUserId = ref(0)
 const fetchAllArticles = async () => {
   loading.value = true
   try {
-    const res: any = await getArticleList()
+    const res: any = await getArticleList({
+      keyword: searchKeyword.value.trim() || undefined
+    })
     articleList.value = res || []
   } catch (error) {
     ElMessage.error('获取文章列表失败')
@@ -130,7 +148,9 @@ const fetchAllArticles = async () => {
 const fetchMyArticles = async () => {
   loading.value = true
   try {
-    const res: any = await getMyArticles()
+    const res: any = await getMyArticles({
+      keyword: searchKeyword.value.trim() || undefined
+    })
     myArticleList.value = res || []
   } catch (error) {
     ElMessage.error('获取我的文章失败')
@@ -147,6 +167,19 @@ const handleTabChange = (tab: string) => {
   }
 }
 
+const handleSearch = () => {
+  if (activeTab.value === 'all') {
+    fetchAllArticles()
+  } else {
+    fetchMyArticles()
+  }
+}
+
+const handleReset = () => {
+  searchKeyword.value = ''
+  handleSearch()
+}
+
 const isMyArticle = (article: any) => {
   return article.authorId === currentUserId.value
 }
@@ -161,11 +194,11 @@ const goToCreate = () => {
 }
 
 const viewDetail = (id: number) => {
-  router.push(`/articles/detail/${id}`)
+  router.push({ path: '/articles/detail', query: { id } })
 }
 
 const editArticle = (id: number) => {
-  router.push(`/articles/edit/${id}`)
+  router.push({ path: '/articles/edit', query: { id } })
 }
 
 const handleDelete = async (article: any) => {
@@ -211,6 +244,20 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 12px;
 }
 
 .page-header h2 {

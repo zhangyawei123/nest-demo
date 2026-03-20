@@ -4,6 +4,7 @@ import {
   Post,
   Param,
   Body,
+  Query,
   UseGuards,
   Request,
   ForbiddenException,
@@ -31,6 +32,14 @@ export class UserController {
     @InjectRepository(Menu)
     private readonly menuRepository: Repository<Menu>,
   ) {}
+
+  @ApiOperation({ summary: '获取用户列表' })
+  @ApiBearerAuth('JWT')
+  @UseGuards(JwtAuthGuard)
+  @Get('list')
+  getUserList(@Query('keyword') keyword?: string) {
+    return this.userService.findAll(keyword);
+  }
 
   @ApiOperation({ summary: '查询用户信息' })
   @ApiBearerAuth('JWT')
@@ -64,6 +73,14 @@ export class UserController {
       throw new ForbiddenException('只能修改自己的信息');
     }
     return this.userService.update(userId, updateUserDto);
+  }
+
+  @ApiOperation({ summary: '分配角色给用户' })
+  @ApiBearerAuth('JWT')
+  @UseGuards(JwtAuthGuard)
+  @Post('assign-roles/:id')
+  assignRoles(@Param('id') id: string, @Body('roleIds') roleIds: number[] = []) {
+    return this.userService.assignRoleIds(+id, roleIds);
   }
 
   @ApiOperation({ summary: '重置 admin 密码为 admin（临时接口）' })
@@ -100,13 +117,13 @@ export class UserController {
       savedMenus.push(menu);
     }
 
-    // 文章管理的子菜单
+    // 文章管理的子菜单（嵌套路由）
     const articleMenu = savedMenus.find(m => m.path === '/articles');
     if (articleMenu) {
       const articleSubMenus = [
         { name: '发布文章', path: 'create', component: 'article/ArticleEditView', icon: '', sort: 0, visible: false, parentId: articleMenu.id },
-        { name: '编辑文章', path: 'edit/:id', component: 'article/ArticleEditView', icon: '', sort: 1, visible: false, parentId: articleMenu.id },
-        { name: '文章详情', path: 'detail/:id', component: 'article/ArticleDetailView', icon: '', sort: 2, visible: false, parentId: articleMenu.id },
+        { name: '编辑文章', path: 'edit', component: 'article/ArticleEditView', icon: '', sort: 1, visible: false, parentId: articleMenu.id },
+        { name: '文章详情', path: 'detail', component: 'article/ArticleDetailView', icon: '', sort: 2, visible: false, parentId: articleMenu.id },
       ];
 
       for (const m of articleSubMenus) {

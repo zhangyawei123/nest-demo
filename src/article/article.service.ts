@@ -29,11 +29,19 @@ export class ArticleService {
   /**
    * 获取所有文章列表
    */
-  async findAll(): Promise<Article[]> {
-    return this.articleRepository.find({
-      relations: ['author'],
-      order: { createdAt: 'DESC' },
-    });
+  async findAll(keyword?: string): Promise<Article[]> {
+    const queryBuilder = this.articleRepository
+      .createQueryBuilder('article')
+      .leftJoinAndSelect('article.author', 'author')
+      .orderBy('article.createdAt', 'DESC');
+
+    if (keyword?.trim()) {
+      queryBuilder.andWhere('(article.title LIKE :keyword OR article.content LIKE :keyword)', {
+        keyword: `%${keyword.trim()}%`,
+      });
+    }
+
+    return queryBuilder.getMany();
   }
 
   /**
@@ -55,12 +63,20 @@ export class ArticleService {
   /**
    * 获取当前用户的文章列表
    */
-  async findByAuthor(authorId: number): Promise<Article[]> {
-    return this.articleRepository.find({
-      where: { authorId },
-      relations: ['author'],
-      order: { createdAt: 'DESC' },
-    });
+  async findByAuthor(authorId: number, keyword?: string): Promise<Article[]> {
+    const queryBuilder = this.articleRepository
+      .createQueryBuilder('article')
+      .leftJoinAndSelect('article.author', 'author')
+      .where('article.authorId = :authorId', { authorId })
+      .orderBy('article.createdAt', 'DESC');
+
+    if (keyword?.trim()) {
+      queryBuilder.andWhere('(article.title LIKE :keyword OR article.content LIKE :keyword)', {
+        keyword: `%${keyword.trim()}%`,
+      });
+    }
+
+    return queryBuilder.getMany();
   }
 
   /**

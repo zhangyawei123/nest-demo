@@ -16,7 +16,14 @@ const router = createRouter({
       component: () => import('../views/HomeView.vue'),
       meta: { requiresAuth: true },
       redirect: '/dashboard',
-      children: []
+      children: [
+        {
+          path: 'profile',
+          name: 'profile',
+          component: () => import('../views/user/UsersView.vue'),
+          meta: { requiresAuth: true }
+        }
+      ]
     }
   ]
 })

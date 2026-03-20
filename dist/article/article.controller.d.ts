@@ -5,8 +5,8 @@ export declare class ArticleController {
     private readonly articleService;
     constructor(articleService: ArticleService);
     create(createArticleDto: CreateArticleDto, req: any): Promise<import("./article.entity").Article>;
-    findAll(): Promise<import("./article.entity").Article[]>;
-    findMyArticles(req: any): Promise<import("./article.entity").Article[]>;
+    findAll(keyword?: string): Promise<import("./article.entity").Article[]>;
+    findMyArticles(req: any, keyword?: string): Promise<import("./article.entity").Article[]>;
     findOne(id: string): Promise<import("./article.entity").Article>;
     update(id: string, updateArticleDto: UpdateArticleDto, req: any): Promise<import("./article.entity").Article>;
     remove(id: string, req: any): Promise<void>;

@@ -76,7 +76,7 @@ const goBack = () => {
 }
 
 const editArticle = () => {
-  router.push(`/articles/edit/${article.value.id}`)
+  router.push({ path: '/articles/edit', query: { id: article.value.id } })
 }
 
 const handleDelete = async () => {
@@ -104,7 +104,7 @@ onMounted(() => {
     currentUserId.value = user.id
   }
 
-  const id = route.params.id
+  const id = route.query.id
   if (id) {
     fetchArticleDetail(Number(id))
   }

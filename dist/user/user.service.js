@@ -17,10 +17,13 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const user_entity_1 = require("./user.entity");
+const role_entity_1 = require("../role/role.entity");
 let UserService = class UserService {
     userRepository;
-    constructor(userRepository) {
+    roleRepository;
+    constructor(userRepository, roleRepository) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
     }
     async create(createUserDto) {
         const existingUser = await this.userRepository.findOne({
@@ -42,6 +45,19 @@ let UserService = class UserService {
         }
         return user;
     }
+    async findAll(keyword) {
+        const queryBuilder = this.userRepository
+            .createQueryBuilder('user')
+            .leftJoinAndSelect('user.roles', 'role')
+            .orderBy('user.createdAt', 'DESC');
+        if (keyword?.trim()) {
+            queryBuilder.where('user.username LIKE :keyword', {
+                keyword: `%${keyword.trim()}%`,
+            });
+        }
+        const users = await queryBuilder.getMany();
+        return users.map((user) => this.sanitizeUser(user));
+    }
     async getMenusByUserId(id) {
         const user = await this.findById(id);
         const menuMap = new Map();
@@ -50,14 +66,28 @@ let UserService = class UserService {
                 menuMap.set(menu.id, menu);
             }
         }
-        const menus = Array.from(menuMap.values());
-        menus.sort((a, b) => a.sort - b.sort);
-        return menus;
+        const allMenus = Array.from(menuMap.values());
+        allMenus.sort((a, b) => a.sort - b.sort);
+        return this.buildMenuTree(allMenus);
+    }
+    buildMenuTree(menus, parentId = null) {
+        return menus
+            .filter(menu => menu.parentId === parentId)
+            .map(menu => ({
+            ...menu,
+            children: this.buildMenuTree(menus, menu.id)
+        }));
     }
     async assignRoles(id, roles) {
         const user = await this.findById(id);
         user.roles = roles;
         return this.userRepository.save(user);
+    }
+    async assignRoleIds(id, roleIds) {
+        const user = await this.findById(id);
+        user.roles = roleIds.length ? await this.roleRepository.findBy({ id: (0, typeorm_2.In)(roleIds) }) : [];
+        const savedUser = await this.userRepository.save(user);
+        return this.sanitizeUser(savedUser);
     }
     async update(id, updateUserDto) {
         const user = await this.findById(id);
@@ -67,11 +97,17 @@ let UserService = class UserService {
     async validatePassword(md5Password, storedPassword) {
         return md5Password === storedPassword;
     }
+    sanitizeUser(user) {
+        const { password, ...result } = user;
+        return result;
+    }
 };
 exports.UserService = UserService;
 exports.UserService = UserService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __param(1, (0, typeorm_1.InjectRepository)(role_entity_1.Role)),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository])
 ], UserService);
 //# sourceMappingURL=user.service.js.map

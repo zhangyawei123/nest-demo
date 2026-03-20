@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ArticleService } from './article.service';
 import { CreateArticleDto } from './dto/create-article.dto';
@@ -29,8 +29,8 @@ export class ArticleController {
    */
   @ApiOperation({ summary: '获取所有文章列表' })
   @Get('list')
-  findAll() {
-    return this.articleService.findAll();
+  findAll(@Query('keyword') keyword?: string) {
+    return this.articleService.findAll(keyword);
   }
 
   /**
@@ -40,8 +40,8 @@ export class ArticleController {
   @ApiBearerAuth('JWT')
   @UseGuards(JwtAuthGuard)
   @Get('my-list')
-  findMyArticles(@Request() req) {
-    return this.articleService.findByAuthor(req.user.userId);
+  findMyArticles(@Request() req, @Query('keyword') keyword?: string) {
+    return this.articleService.findByAuthor(req.user.userId, keyword);
   }
 
   /**

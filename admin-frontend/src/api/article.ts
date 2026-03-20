@@ -18,20 +18,22 @@ export function createArticle(data: {
 /**
  * 获取所有文章列表
  */
-export function getArticleList() {
+export function getArticleList(params?: { keyword?: string }) {
   return request({
     url: '/article/list',
-    method: 'get'
+    method: 'get',
+    params
   })
 }
 
 /**
  * 获取我的文章列表
  */
-export function getMyArticles() {
+export function getMyArticles(params?: { keyword?: string }) {
   return request({
     url: '/article/my-list',
-    method: 'get'
+    method: 'get',
+    params
   })
 }
 

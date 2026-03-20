@@ -73,6 +73,9 @@ const route = useRoute()
 const menuStore = useMenuStore()
 
 const currentRouteName = computed(() => {
+  if (route.path === '/profile') {
+    return '个人中心'
+  }
   const matched = menuStore.menus.find((m: any) => m.path === route.path)
   return matched?.name || ''
 })
@@ -93,7 +96,7 @@ const handleCommand = (command: string) => {
       router.push('/login')
     })
   } else if (command === 'profile') {
-    ElMessage.info('个人信息功能待开发')
+    router.push('/profile')
   }
 }
 

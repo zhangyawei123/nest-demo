@@ -27,11 +27,11 @@ let ArticleController = class ArticleController {
     create(createArticleDto, req) {
         return this.articleService.create(createArticleDto, req.user.userId);
     }
-    findAll() {
-        return this.articleService.findAll();
+    findAll(keyword) {
+        return this.articleService.findAll(keyword);
     }
-    findMyArticles(req) {
-        return this.articleService.findByAuthor(req.user.userId);
+    findMyArticles(req, keyword) {
+        return this.articleService.findByAuthor(req.user.userId, keyword);
     }
     findOne(id) {
         return this.articleService.findOne(+id);
@@ -58,8 +58,9 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: '获取所有文章列表' }),
     (0, common_1.Get)('list'),
+    __param(0, (0, common_1.Query)('keyword')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], ArticleController.prototype, "findAll", null);
 __decorate([
@@ -68,8 +69,9 @@ __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Get)('my-list'),
     __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Query)('keyword')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", void 0)
 ], ArticleController.prototype, "findMyArticles", null);
 __decorate([

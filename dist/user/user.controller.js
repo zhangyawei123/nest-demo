@@ -31,6 +31,9 @@ let UserController = class UserController {
         this.roleRepository = roleRepository;
         this.menuRepository = menuRepository;
     }
+    getUserList(keyword) {
+        return this.userService.findAll(keyword);
+    }
     async getUserById(id) {
         const user = await this.userService.findById(+id);
         const { password, ...result } = user;
@@ -45,6 +48,9 @@ let UserController = class UserController {
             throw new common_1.ForbiddenException('只能修改自己的信息');
         }
         return this.userService.update(userId, updateUserDto);
+    }
+    assignRoles(id, roleIds = []) {
+        return this.userService.assignRoleIds(+id, roleIds);
     }
     async resetAdminPassword() {
         const admin = await this.userService.findByUsername('admin');
@@ -76,8 +82,8 @@ let UserController = class UserController {
         if (articleMenu) {
             const articleSubMenus = [
                 { name: '发布文章', path: 'create', component: 'article/ArticleEditView', icon: '', sort: 0, visible: false, parentId: articleMenu.id },
-                { name: '编辑文章', path: 'edit/:id', component: 'article/ArticleEditView', icon: '', sort: 1, visible: false, parentId: articleMenu.id },
-                { name: '文章详情', path: 'detail/:id', component: 'article/ArticleDetailView', icon: '', sort: 2, visible: false, parentId: articleMenu.id },
+                { name: '编辑文章', path: 'edit', component: 'article/ArticleEditView', icon: '', sort: 1, visible: false, parentId: articleMenu.id },
+                { name: '文章详情', path: 'detail', component: 'article/ArticleDetailView', icon: '', sort: 2, visible: false, parentId: articleMenu.id },
             ];
             for (const m of articleSubMenus) {
                 let menu = await this.menuRepository.findOne({ where: { name: m.name } });
@@ -107,6 +113,16 @@ let UserController = class UserController {
     }
 };
 exports.UserController = UserController;
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: '获取用户列表' }),
+    (0, swagger_1.ApiBearerAuth)('JWT'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Get)('list'),
+    __param(0, (0, common_1.Query)('keyword')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "getUserList", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: '查询用户信息' }),
     (0, swagger_1.ApiBearerAuth)('JWT'),
@@ -139,6 +155,17 @@ __decorate([
     __metadata("design:paramtypes", [String, update_user_dto_1.UpdateUserDto, Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "updateUser", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: '分配角色给用户' }),
+    (0, swagger_1.ApiBearerAuth)('JWT'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Post)('assign-roles/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)('roleIds')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Array]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "assignRoles", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: '重置 admin 密码为 admin（临时接口）' }),
     (0, common_1.Post)('reset-admin-password'),

@@ -1,6 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { Controller, Get, Request, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AppService } from './app.service';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 /**
  * 根控制器 - 提供应用健康检查等基础接口
@@ -22,5 +23,13 @@ export class AppController {
   @Get()
   getHello(): string {
     return this.appService.getHello();
+  }
+
+  @ApiOperation({ summary: '获取仪表盘概览' })
+  @ApiBearerAuth('JWT')
+  @UseGuards(JwtAuthGuard)
+  @Get('dashboard/overview')
+  getDashboardOverview(@Request() req) {
+    return this.appService.getDashboardOverview(req.user.userId);
   }
 }

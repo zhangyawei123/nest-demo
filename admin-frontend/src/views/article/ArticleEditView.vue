@@ -155,7 +155,7 @@ const fetchArticleDetail = async (id: number) => {
 }
 
 onMounted(() => {
-  const id = route.params.id
+  const id = route.query.id
   if (id) {
     isEdit.value = true
     articleId.value = Number(id)

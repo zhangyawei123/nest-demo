@@ -3,11 +3,11 @@
     <el-card>
       <template #header>
         <div class="card-header">
-          <span>用户管理</span>
+          <span>{{ pageTitle }}</span>
         </div>
       </template>
 
-      <div class="user-info-section">
+      <div v-if="isProfilePage" class="user-info-section">
         <el-descriptions title="当前用户信息" :column="2" border>
           <el-descriptions-item label="用户ID">{{ currentUser.id }}</el-descriptions-item>
           <el-descriptions-item label="用户名">{{ currentUser.username }}</el-descriptions-item>
@@ -23,6 +23,55 @@
           <el-button type="primary" @click="showEditDialog">修改信息</el-button>
           <el-button type="success" @click="refreshUserInfo">刷新信息</el-button>
         </div>
+      </div>
+
+      <div v-else class="user-manage-section">
+        <div class="toolbar">
+          <el-input
+            v-model="keyword"
+            placeholder="搜索用户名"
+            clearable
+            style="max-width: 320px"
+            @keyup.enter="handleSearch"
+            @clear="handleSearch"
+          />
+          <div class="toolbar-actions">
+            <el-button @click="handleReset">重置</el-button>
+            <el-button type="primary" @click="handleSearch">搜索</el-button>
+          </div>
+        </div>
+
+        <el-table :data="userList" v-loading="listLoading" style="width: 100%">
+          <el-table-column prop="id" label="ID" width="80" />
+          <el-table-column prop="username" label="用户名" min-width="180" />
+          <el-table-column label="角色" min-width="220">
+            <template #default="{ row }">
+              <div class="role-tags">
+                <el-tag v-for="role in row.roles || []" :key="role.id" size="small">
+                  {{ role.name }}
+                </el-tag>
+                <span v-if="!row.roles?.length" class="empty-text">未分配</span>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="创建时间" width="180">
+            <template #default="{ row }">
+              {{ formatDate(row.createdAt) }}
+            </template>
+          </el-table-column>
+          <el-table-column label="更新时间" width="180">
+            <template #default="{ row }">
+              {{ formatDate(row.updatedAt) }}
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="140" fixed="right">
+            <template #default="{ row }">
+              <el-button size="small" type="primary" @click="openAssignDialog(row)">
+                分配角色
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
       </div>
     </el-card>
 
@@ -62,13 +111,49 @@
         </el-button>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="assignDialogVisible" title="分配角色" width="520px">
+      <el-form label-width="100px">
+        <el-form-item label="用户">
+          <el-input :model-value="selectedUser.username" disabled />
+        </el-form-item>
+        <el-form-item label="角色">
+          <el-select
+            v-model="assignForm.roleIds"
+            multiple
+            filterable
+            placeholder="请选择角色"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="role in roleOptions"
+              :key="role.id"
+              :label="role.name"
+              :value="role.id"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="assignDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="assignLoading" @click="submitAssign">
+          保存
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { computed, ref, reactive, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import { getUserDetail, updateUser } from '@/api/user'
+import { assignUserRoles, getUserDetail, getUserList, updateUser } from '@/api/user'
+import { getRoleList } from '@/api/role'
+
+const route = useRoute()
+const isProfilePage = computed(() => route.path === '/profile')
+const pageTitle = computed(() => isProfilePage.value ? '个人中心' : '用户管理')
 
 // 当前用户信息
 const currentUser = ref<any>({
@@ -76,6 +161,20 @@ const currentUser = ref<any>({
   username: '',
   createdAt: '',
   updatedAt: ''
+})
+
+const keyword = ref('')
+const userList = ref<any[]>([])
+const listLoading = ref(false)
+const roleOptions = ref<any[]>([])
+const assignDialogVisible = ref(false)
+const assignLoading = ref(false)
+const selectedUser = ref<any>({
+  id: 0,
+  username: ''
+})
+const assignForm = reactive({
+  roleIds: [] as number[]
 })
 
 // 编辑对话框
@@ -136,6 +235,38 @@ const fetchUserInfo = async () => {
   }
 }
 
+const fetchUserList = async () => {
+  listLoading.value = true
+  try {
+    const res: any = await getUserList({
+      keyword: keyword.value.trim() || undefined
+    })
+    userList.value = res || []
+  } catch (error) {
+    ElMessage.error('获取用户列表失败')
+  } finally {
+    listLoading.value = false
+  }
+}
+
+const fetchRoleOptions = async () => {
+  try {
+    const res: any = await getRoleList()
+    roleOptions.value = res || []
+  } catch (error) {
+    ElMessage.error('获取角色列表失败')
+  }
+}
+
+const handleSearch = () => {
+  fetchUserList()
+}
+
+const handleReset = () => {
+  keyword.value = ''
+  fetchUserList()
+}
+
 /**
  * 刷新用户信息
  */
@@ -152,6 +283,28 @@ const showEditDialog = () => {
   editForm.password = ''
   editForm.confirmPassword = ''
   editDialogVisible.value = true
+}
+
+const openAssignDialog = async (user: any) => {
+  if (!roleOptions.value.length) {
+    await fetchRoleOptions()
+  }
+  selectedUser.value = user
+  assignForm.roleIds = (user.roles || []).map((role: any) => role.id)
+  assignDialogVisible.value = true
+}
+
+const submitAssign = async () => {
+  assignLoading.value = true
+  try {
+    await assignUserRoles(selectedUser.value.id, assignForm.roleIds)
+    ElMessage.success('角色分配成功')
+    assignDialogVisible.value = false
+    fetchUserList()
+  } catch (error) {
+  } finally {
+    assignLoading.value = false
+  }
 }
 
 /**
@@ -206,7 +359,21 @@ const submitEdit = async () => {
 
 // 页面加载时获取用户信息
 onMounted(() => {
-  fetchUserInfo()
+  if (isProfilePage.value) {
+    fetchUserInfo()
+  } else {
+    fetchUserList()
+    fetchRoleOptions()
+  }
+})
+
+watch(() => route.path, () => {
+  if (isProfilePage.value) {
+    fetchUserInfo()
+  } else {
+    fetchUserList()
+    fetchRoleOptions()
+  }
 })
 </script>
 
@@ -236,6 +403,34 @@ onMounted(() => {
 
 .user-info-section {
   padding: 20px 0;
+}
+
+.user-manage-section {
+  padding: 4px 0 8px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.role-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.empty-text {
+  color: #909399;
 }
 
 .user-info-section :deep(.el-descriptions) {

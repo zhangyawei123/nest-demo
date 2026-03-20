@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard">
+  <div class="dashboard" v-loading="loading">
     <!-- 欢迎区域 -->
     <div class="welcome-banner">
       <div class="welcome-content">
@@ -20,8 +20,8 @@
             <el-icon class="stat-icon"><User /></el-icon>
           </div>
           <div class="stat-content">
-            <div class="stat-value">{{ userInfo.username }}</div>
-            <div class="stat-label">当前用户</div>
+            <div class="stat-value">{{ overview.stats.userCount }}</div>
+            <div class="stat-label">系统用户</div>
           </div>
         </div>
       </el-col>
@@ -32,8 +32,8 @@
             <el-icon class="stat-icon"><Document /></el-icon>
           </div>
           <div class="stat-content">
-            <div class="stat-value">2</div>
-            <div class="stat-label">功能模块</div>
+            <div class="stat-value">{{ overview.stats.articleCount }}</div>
+            <div class="stat-label">文章总数</div>
           </div>
         </div>
       </el-col>
@@ -44,8 +44,8 @@
             <el-icon class="stat-icon"><TrendCharts /></el-icon>
           </div>
           <div class="stat-content">
-            <div class="stat-value">100%</div>
-            <div class="stat-label">系统健康</div>
+            <div class="stat-value">{{ overview.stats.myArticleCount }}</div>
+            <div class="stat-label">我的文章</div>
           </div>
         </div>
       </el-col>
@@ -56,7 +56,7 @@
             <el-icon class="stat-icon"><CircleCheck /></el-icon>
           </div>
           <div class="stat-content">
-            <div class="stat-value">在线</div>
+            <div class="stat-value">{{ statusText }}</div>
             <div class="stat-label">运行状态</div>
           </div>
         </div>
@@ -110,25 +110,24 @@
         <el-card class="tech-card" shadow="hover">
           <template #header>
             <div class="card-header">
-              <el-icon><Monitor /></el-icon>
-              <span>技术栈</span>
+              <el-icon><Document /></el-icon>
+              <span>最近文章</span>
             </div>
           </template>
-          <div class="tech-stack">
-            <div class="tech-group">
-              <h4>前端技术</h4>
-              <el-tag type="primary" effect="plain">Vue 3</el-tag>
-              <el-tag type="success" effect="plain">Element Plus</el-tag>
-              <el-tag type="info" effect="plain">TypeScript</el-tag>
-              <el-tag type="warning" effect="plain">Vite</el-tag>
+          <div class="recent-list">
+            <div v-if="overview.recentArticles.length === 0" class="recent-empty">
+              暂无文章数据
             </div>
-            <el-divider />
-            <div class="tech-group">
-              <h4>后端技术</h4>
-              <el-tag type="danger" effect="plain">NestJS</el-tag>
-              <el-tag type="primary" effect="plain">TypeORM</el-tag>
-              <el-tag type="success" effect="plain">MySQL</el-tag>
-              <el-tag type="warning" effect="plain">JWT</el-tag>
+            <div
+              v-for="article in overview.recentArticles"
+              :key="article.id"
+              class="recent-item"
+            >
+              <div class="recent-title">{{ article.title }}</div>
+              <div class="recent-meta">
+                <span>{{ article.author?.username || '未知作者' }}</span>
+                <span>{{ formatDate(article.createdAt) }}</span>
+              </div>
             </div>
           </div>
         </el-card>
@@ -138,22 +137,43 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { ElMessage } from 'element-plus'
 import { 
   User, 
   Clock, 
   Document, 
   TrendCharts, 
   CircleCheck, 
-  InfoFilled, 
-  Monitor 
+  InfoFilled 
 } from '@element-plus/icons-vue'
+import { getDashboardOverview } from '@/api/dashboard'
 
 const userInfo = ref({
   username: ''
 })
 
+const loading = ref(false)
+const overview = ref<any>({
+  stats: {
+    userCount: 0,
+    articleCount: 0,
+    myArticleCount: 0,
+    roleCount: 0,
+    menuCount: 0
+  },
+  recentArticles: [],
+  systemStatus: ''
+})
+
 const currentTime = ref('')
+
+const statusText = computed(() => {
+  if (overview.value.systemStatus === 'online') {
+    return '在线'
+  }
+  return overview.value.systemStatus || '-'
+})
 
 // 更新时间
 const updateTime = () => {
@@ -170,6 +190,39 @@ const updateTime = () => {
 
 let timer: any = null
 
+const formatDate = (value: string) => {
+  if (!value) return '-'
+  return new Date(value).toLocaleString('zh-CN')
+}
+
+const fetchOverview = async () => {
+  loading.value = true
+  try {
+    const res: any = await getDashboardOverview()
+    overview.value = {
+      stats: {
+        userCount: 0,
+        articleCount: 0,
+        myArticleCount: 0,
+        roleCount: 0,
+        menuCount: 0,
+        ...(res?.stats || {})
+      },
+      recentArticles: res?.recentArticles || [],
+      systemStatus: res?.systemStatus || ''
+    }
+    if (res?.user?.username) {
+      userInfo.value = {
+        username: res.user.username
+      }
+    }
+  } catch (error) {
+    ElMessage.error('获取仪表盘数据失败')
+  } finally {
+    loading.value = false
+  }
+}
+
 onMounted(() => {
   const userInfoStr = localStorage.getItem('userInfo')
   if (userInfoStr) {
@@ -178,6 +231,7 @@ onMounted(() => {
   
   updateTime()
   timer = setInterval(updateTime, 1000)
+  fetchOverview()
 })
 
 onUnmounted(() => {
@@ -371,24 +425,38 @@ onUnmounted(() => {
   line-height: 1.6;
 }
 
-/* 技术栈 */
-.tech-stack {
+ .recent-list {
   padding: 10px 0;
 }
 
-.tech-group {
-  margin-bottom: 10px;
+.recent-item {
+  padding: 14px 0;
+  border-bottom: 1px solid #ebeef5;
 }
 
-.tech-group h4 {
-  margin: 0 0 12px 0;
+.recent-item:last-child {
+  border-bottom: none;
+}
+
+.recent-title {
+  margin: 0 0 8px 0;
   font-size: 14px;
   font-weight: 600;
   color: #303133;
 }
 
-.tech-group .el-tag {
-  margin: 0 8px 8px 0;
+.recent-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  color: #909399;
+}
+
+.recent-empty {
+  padding: 40px 0;
+  text-align: center;
+  color: #909399;
 }
 
 /* 响应式 */

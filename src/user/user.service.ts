@@ -1,9 +1,10 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { User } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Role } from '../role/role.entity';
 
 /**
  * 用户服务 - 处理用户相关的业务逻辑
@@ -13,6 +14,8 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(Role)
+    private roleRepository: Repository<Role>,
   ) {}
 
   /**
@@ -60,6 +63,22 @@ export class UserService {
     return user;
   }
 
+  async findAll(keyword?: string) {
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.roles', 'role')
+      .orderBy('user.createdAt', 'DESC');
+
+    if (keyword?.trim()) {
+      queryBuilder.where('user.username LIKE :keyword', {
+        keyword: `%${keyword.trim()}%`,
+      });
+    }
+
+    const users = await queryBuilder.getMany();
+    return users.map((user) => this.sanitizeUser(user));
+  }
+
   async getMenusByUserId(id: number) {
     const user = await this.findById(id);
     const menuMap = new Map<number, any>();
@@ -68,15 +87,33 @@ export class UserService {
         menuMap.set(menu.id, menu);
       }
     }
-    const menus = Array.from(menuMap.values());
-    menus.sort((a, b) => a.sort - b.sort);
-    return menus;
+    const allMenus = Array.from(menuMap.values());
+    allMenus.sort((a, b) => a.sort - b.sort);
+    
+    // 构建树形结构
+    return this.buildMenuTree(allMenus);
+  }
+
+  private buildMenuTree(menus: any[], parentId: number | null = null): any[] {
+    return menus
+      .filter(menu => menu.parentId === parentId)
+      .map(menu => ({
+        ...menu,
+        children: this.buildMenuTree(menus, menu.id)
+      }));
   }
 
   async assignRoles(id: number, roles: any[]): Promise<User> {
     const user = await this.findById(id);
     user.roles = roles;
     return this.userRepository.save(user);
+  }
+
+  async assignRoleIds(id: number, roleIds: number[]) {
+    const user = await this.findById(id);
+    user.roles = roleIds.length ? await this.roleRepository.findBy({ id: In(roleIds) }) : [];
+    const savedUser = await this.userRepository.save(user);
+    return this.sanitizeUser(savedUser);
   }
 
   /**
@@ -104,5 +141,10 @@ export class UserService {
    */
   async validatePassword(md5Password: string, storedPassword: string): Promise<boolean> {
     return md5Password === storedPassword;
+  }
+
+  private sanitizeUser(user: User) {
+    const { password, ...result } = user as any;
+    return result;
   }
 }

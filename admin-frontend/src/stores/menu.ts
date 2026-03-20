@@ -2,17 +2,17 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { getMyMenus } from '@/api/user'
 import router from '@/router'
+import RouterLayout from '@/components/RouterLayout.vue'
 
 // 使用 Vite 的 glob import 预加载所有视图组件
-const modules = import.meta.glob('@/views/**/*.vue')
+// @/views glob 的 key 格式为 /src/views/xxx.vue
+const modules = import.meta.glob('/src/views/**/*.vue')
 
-// 根据组件路径获取对应的加载器
 function loadComponent(componentPath: string) {
-  const path = `/src/views/${componentPath}.vue`
-  const loader = modules[path]
+  const key = `/src/views/${componentPath}.vue`
+  const loader = modules[key]
   if (!loader) {
-    console.error(`组件未找到: ${path}`)
-    console.log('可用组件:', Object.keys(modules))
+    console.warn(`组件未找到: ${key}`)
     return null
   }
   return loader
@@ -43,7 +43,6 @@ export const useMenuStore = defineStore('menu', () => {
   function registerMenuRoute(menu: any) {
     if (!menu.component) return
 
-    // 动态加载组件
     const loader = loadComponent(menu.component)
     if (!loader) {
       console.warn(`组件加载失败: ${menu.component}`)
@@ -62,16 +61,14 @@ export const useMenuStore = defineStore('menu', () => {
     const existing = router.getRoutes().find(r => r.name === menu.name)
     if (existing) return
 
-    // 构建路由配置
-    const routeConfig: any = {
-      path: routePath,
-      name: menu.name,
-      component: loader,
-    }
+    const hasChildren = menu.children && menu.children.length > 0
 
-    // 如果有子菜单，注册为嵌套路由
-    if (menu.children && menu.children.length > 0) {
-      routeConfig.children = []
+    if (hasChildren) {
+      // 父菜单使用 RouterLayout 容器，自身组件作为空路径默认子路由
+      const children: any[] = [
+        { path: '', name: menu.name, component: loader },
+      ]
+
       menu.children.forEach((child: any) => {
         if (!child.component) return
         const childLoader = loadComponent(child.component)
@@ -79,26 +76,33 @@ export const useMenuStore = defineStore('menu', () => {
           console.warn(`子组件加载失败: ${child.component}`)
           return
         }
-        
         // 子路由路径是相对父路由的
         let childPath = child.path || ''
-        if (childPath.startsWith('/')) {
-          // 如果是绝对路径，提取相对部分
-          const parentPath = menu.path
-          if (childPath.startsWith(parentPath + '/')) {
-            childPath = childPath.substring(parentPath.length + 1)
-          }
+        if (childPath.startsWith(menu.path + '/')) {
+          childPath = childPath.substring(menu.path.length + 1)
+        } else if (childPath.startsWith('/')) {
+          childPath = childPath.substring(1)
         }
-        
-        routeConfig.children.push({
+        children.push({
           path: childPath,
           name: child.name,
           component: childLoader,
         })
       })
-    }
 
-    router.addRoute('home', routeConfig)
+      router.addRoute('home', {
+        path: routePath,
+        name: menu.name + '_layout',
+        component: RouterLayout,
+        children,
+      })
+    } else {
+      router.addRoute('home', {
+        path: routePath,
+        name: menu.name,
+        component: loader,
+      })
+    }
   }
 
   function reset() {
