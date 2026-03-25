@@ -8,11 +8,25 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy via SSH
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Sync files to server
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: -avz --delete --exclude='node_modules' --exclude='dist' --exclude='.env' --exclude='admin-frontend/node_modules' --exclude='admin-frontend/dist' --exclude='uploads'
+          path: ./
+          remote_path: /var/www/nest-demo/
+          remote_host: 120.48.191.112
+          remote_user: root
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Build and deploy
         uses: appleboy/ssh-action@v1
         with:
           host: 120.48.191.112
           username: root
-          password: ${{ secrets.SERVER_PASSWORD }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            export PATH=/usr/local/bin:$PATH
             bash /var/www/nest-demo/deploy/deploy.sh

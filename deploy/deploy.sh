@@ -7,18 +7,9 @@ echo "=========================================="
 
 PROJECT_DIR="/var/www/nest-demo"
 FRONTEND_DIR="/var/www/nest-demo-frontend"
-REPO_URL="https://github.com/zhangyawei123/nest-demo.git"
 
-# ---- 拉取代码 ----
-echo "[1/5] 拉取最新代码..."
-if [ -d "$PROJECT_DIR/.git" ]; then
-  cd $PROJECT_DIR
-  git pull origin main
-else
-  rm -rf $PROJECT_DIR
-  git clone $REPO_URL $PROJECT_DIR
-  cd $PROJECT_DIR
-fi
+# ---- 代码已通过 rsync 同步，无需 git pull ----
+cd $PROJECT_DIR
 
 # ---- 配置环境变量 ----
 if [ ! -f "$PROJECT_DIR/.env" ]; then
