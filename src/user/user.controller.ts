@@ -21,6 +21,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Role } from '../role/role.entity';
 import { Menu } from '../menu/menu.entity';
+import { LotteryPrize } from '../lottery/lottery-prize.entity';
 
 @ApiTags('用户管理')
 @Controller('user')
@@ -31,6 +32,8 @@ export class UserController {
     private readonly roleRepository: Repository<Role>,
     @InjectRepository(Menu)
     private readonly menuRepository: Repository<Menu>,
+    @InjectRepository(LotteryPrize)
+    private readonly prizeRepository: Repository<LotteryPrize>,
   ) {}
 
   @ApiOperation({ summary: '获取用户列表' })
@@ -107,6 +110,8 @@ export class UserController {
       { name: '幸运转盘', path: '/lottery', component: 'lottery/LotteryView', icon: 'Opportunity', sort: 5 },
       { name: '通知公告', path: '/notice', component: 'notice/NoticeView', icon: 'Bell', sort: 6 },
       { name: '操作日志', path: '/operation-log', component: 'operation-log/OperationLogView', icon: 'Memo', sort: 7 },
+      { name: '抖音热点', path: '/douyin-hot', component: 'douyin-hot/DouyinHotListView', icon: 'VideoPlay', sort: 8 },
+      { name: 'AI 对话', path: '/ai-chat', component: 'ai-chat/AiChatView', icon: 'ChatDotRound', sort: 9 },
     ];
 
     const savedMenus: Menu[] = [];
@@ -138,6 +143,42 @@ export class UserController {
           menu = await this.menuRepository.save(menu);
         }
         savedMenus.push(menu);
+      }
+    }
+
+    // 抖音热点的子菜单
+    const douyinHotMenu = savedMenus.find(m => m.path === '/douyin-hot');
+    if (douyinHotMenu) {
+      const douyinSubMenus = [
+        { name: '评论抓取', path: 'comments', component: 'douyin-hot/DouyinCommentView', icon: '', sort: 0, visible: false, parentId: douyinHotMenu.id },
+      ];
+      for (const m of douyinSubMenus) {
+        let menu = await this.menuRepository.findOne({ where: { name: m.name } });
+        if (!menu) {
+          menu = this.menuRepository.create(m);
+          menu = await this.menuRepository.save(menu);
+        } else {
+          Object.assign(menu, m);
+          menu = await this.menuRepository.save(menu);
+        }
+        savedMenus.push(menu);
+      }
+    }
+
+    // 初始化默认奖项
+    const existingPrizes = await this.prizeRepository.count();
+    if (existingPrizes === 0) {
+      const defaultPrizes = [
+        { name: '一等奖', description: 'iPhone 16 Pro', icon: '🏆', probability: 5, color: '#FF6B6B', sort: 0 },
+        { name: '二等奖', description: 'AirPods Pro', icon: '🎧', probability: 10, color: '#FF9F43', sort: 1 },
+        { name: '三等奖', description: '小米充电宝', icon: '🔋', probability: 15, color: '#FECA57', sort: 2 },
+        { name: '四等奖', description: '定制T恤', icon: '👕', probability: 20, color: '#48DBFB', sort: 3 },
+        { name: '五等奖', description: '贴纸套装', icon: '🎨', probability: 25, color: '#1DD1A1', sort: 4 },
+        { name: '谢谢参与', description: '下次再来', icon: '🍀', probability: 25, color: '#54A0FF', sort: 5 },
+      ];
+      for (const p of defaultPrizes) {
+        const prize = this.prizeRepository.create({ ...p, enabled: true });
+        await this.prizeRepository.save(prize);
       }
     }
 

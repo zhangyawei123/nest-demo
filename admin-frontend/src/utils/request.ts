@@ -7,7 +7,7 @@ import router from '@/router'
  * baseURL 会在开发环境通过 vite.config.ts 的 proxy 代理到后端
  */
 const request = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json'

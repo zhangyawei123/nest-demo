@@ -30,7 +30,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { Platform, HomeFilled, Document, User, UserFilled, Grid, Setting, Opportunity } from '@element-plus/icons-vue'
+import { Platform, HomeFilled, Document, User, UserFilled, Grid, Setting, Opportunity, VideoPlay, Bell, Memo, ChatDotRound } from '@element-plus/icons-vue'
 import { useMenuStore } from '@/stores/menu'
 
 const route = useRoute()
@@ -45,7 +45,11 @@ const iconMap: Record<string, any> = {
   UserFilled,
   Grid,
   Setting,
-  Opportunity
+  Opportunity,
+  VideoPlay,
+  Bell,
+  Memo,
+  ChatDotRound,
 }
 
 const activeMenu = computed(() => route.path)

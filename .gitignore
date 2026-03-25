@@ -1,1 +1,9 @@
 node_modules
+dist
+.env
+uploads
+*.log
+
+# frontend
+admin-frontend/node_modules
+admin-frontend/dist

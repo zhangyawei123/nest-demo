@@ -12,6 +12,9 @@ import { RoleModule } from './role/role.module';
 import { LotteryModule } from './lottery/lottery.module';
 import { OperationLogModule } from './operation-log/operation-log.module';
 import { NoticeModule } from './notice/notice.module';
+import { DouyinHotModule } from './douyin-hot/douyin-hot.module';
+import { DouyinCommentModule } from './douyin-comment/douyin-comment.module';
+import { AiChatModule } from './ai-chat/ai-chat.module';
 
 /**
  * 根模块 - 应用程序的入口模块
@@ -64,6 +67,9 @@ import { NoticeModule } from './notice/notice.module';
     LotteryModule,
     OperationLogModule,
     NoticeModule,
+    DouyinHotModule,
+    DouyinCommentModule,
+    AiChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
