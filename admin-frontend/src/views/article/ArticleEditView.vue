@@ -95,7 +95,7 @@ const editorConfig = {
       customInsert(res: any, insertFn: any) {
         // 后端统一响应格式：{ code: 200, data: { url: '...' } }
         const fileUrl = res?.data?.url || res?.url
-        const url = `http://localhost:3000${fileUrl}`
+        const url = `/api${fileUrl}`
         insertFn(url, '', url)
       }
     }

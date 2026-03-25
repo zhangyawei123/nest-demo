@@ -70,7 +70,7 @@ const handleSuccess = (response: any) => {
     ElMessage.error('上传失败：无法获取文件地址')
     return
   }
-  const url = `http://localhost:3000${fileUrl}`
+  const url = `/api${fileUrl}`
   imageUrl.value = url
   emit('update:modelValue', url)
   ElMessage.success('上传成功')
