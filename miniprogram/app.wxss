@@ -1,0 +1,84 @@
+/* 全局样式 */
+page {
+  background-color: #f5f7fa;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 28rpx;
+  color: #303133;
+  box-sizing: border-box;
+}
+
+.container {
+  padding: 24rpx;
+}
+
+/* 卡片 */
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+/* 按钮 */
+.btn-primary {
+  background: linear-gradient(135deg, #409eff, #66b1ff);
+  color: #fff;
+  border: none;
+  border-radius: 12rpx;
+  padding: 20rpx 0;
+  font-size: 30rpx;
+  text-align: center;
+}
+
+.btn-primary::after {
+  border: none;
+}
+
+/* 空状态 */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 0;
+  color: #909399;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+}
+
+/* 标签 */
+.tag {
+  display: inline-block;
+  padding: 4rpx 16rpx;
+  border-radius: 8rpx;
+  font-size: 22rpx;
+  margin-right: 12rpx;
+}
+
+.tag-blue {
+  background: #ecf5ff;
+  color: #409eff;
+}
+
+.tag-green {
+  background: #f0f9eb;
+  color: #67c23a;
+}
+
+.tag-orange {
+  background: #fdf6ec;
+  color: #e6a23c;
+}
+
+.tag-red {
+  background: #fef0f0;
+  color: #f56c6c;
+}

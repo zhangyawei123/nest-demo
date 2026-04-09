@@ -1,0 +1,53 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/articles/articles",
+    "pages/article-detail/article-detail",
+    "pages/hot/hot",
+    "pages/lottery/lottery",
+    "pages/ai-chat/ai-chat",
+    "pages/notice/notice",
+    "pages/mine/mine",
+    "pages/login/login"
+  ],
+  "tabBar": {
+    "color": "#999",
+    "selectedColor": "#409eff",
+    "backgroundColor": "#fff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/tab-home.png",
+        "selectedIconPath": "images/tab-home-active.png"
+      },
+      {
+        "pagePath": "pages/articles/articles",
+        "text": "文章",
+        "iconPath": "images/tab-article.png",
+        "selectedIconPath": "images/tab-article-active.png"
+      },
+      {
+        "pagePath": "pages/hot/hot",
+        "text": "热榜",
+        "iconPath": "images/tab-hot.png",
+        "selectedIconPath": "images/tab-hot-active.png"
+      },
+      {
+        "pagePath": "pages/mine/mine",
+        "text": "我的",
+        "iconPath": "images/tab-mine.png",
+        "selectedIconPath": "images/tab-mine-active.png"
+      }
+    ]
+  },
+  "window": {
+    "navigationBarBackgroundColor": "#409eff",
+    "navigationBarTitleText": "NestDemo",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f5f7fa"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

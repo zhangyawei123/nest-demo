@@ -1,0 +1,30 @@
+<view class="articles-page">
+  <view class="search-bar">
+    <input class="search-input" placeholder="搜索文章..." value="{{keyword}}" bindinput="onSearch" bindconfirm="doSearch" />
+  </view>
+
+  <view class="article-list">
+    <view class="article-card card" wx:for="{{articles}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
+      <view class="article-cover" wx:if="{{item.coverImage}}">
+        <image src="{{item.coverImage}}" mode="aspectFill" class="cover-img" />
+      </view>
+      <view class="article-info">
+        <text class="article-title">{{item.title}}</text>
+        <text class="article-summary">{{item.summary || ''}}</text>
+        <view class="article-meta">
+          <text class="meta-author">{{item.author.username || '匿名'}}</text>
+          <text class="meta-time">{{item.createdAt}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{!loading && !articles.length}}">
+    <text class="empty-icon">📄</text>
+    <text class="empty-text">暂无文章</text>
+  </view>
+
+  <view class="loading-tip" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+</view>

@@ -1,0 +1,22 @@
+<view class="detail-page" wx:if="{{article}}">
+  <view class="detail-header">
+    <text class="detail-title">{{article.title}}</text>
+    <view class="detail-meta">
+      <text class="meta-author">{{article.author.username || '匿名'}}</text>
+      <text class="meta-time">{{article.createdAt}}</text>
+    </view>
+  </view>
+
+  <view class="detail-cover" wx:if="{{article.coverImage}}">
+    <image src="{{article.coverImage}}" mode="widthFix" class="cover-img" />
+  </view>
+
+  <view class="detail-content">
+    <rich-text nodes="{{article.content}}"></rich-text>
+  </view>
+</view>
+
+<view class="empty" wx:if="{{!article && !loading}}">
+  <text class="empty-icon">📄</text>
+  <text class="empty-text">文章不存在</text>
+</view>

@@ -1,0 +1,71 @@
+.articles-page {
+  padding: 24rpx;
+}
+
+.search-bar {
+  margin-bottom: 24rpx;
+}
+
+.search-input {
+  background: #fff;
+  border-radius: 40rpx;
+  padding: 16rpx 32rpx;
+  font-size: 28rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.06);
+}
+
+.article-card {
+  display: flex;
+  gap: 20rpx;
+  padding: 24rpx;
+}
+
+.article-cover {
+  flex-shrink: 0;
+}
+
+.cover-img {
+  width: 180rpx;
+  height: 120rpx;
+  border-radius: 12rpx;
+}
+
+.article-info {
+  flex: 1;
+  overflow: hidden;
+}
+
+.article-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #303133;
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin-bottom: 8rpx;
+}
+
+.article-summary {
+  font-size: 24rpx;
+  color: #909399;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 12rpx;
+}
+
+.article-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 22rpx;
+  color: #c0c4cc;
+}
+
+.loading-tip {
+  text-align: center;
+  padding: 40rpx;
+  color: #909399;
+  font-size: 26rpx;
+}

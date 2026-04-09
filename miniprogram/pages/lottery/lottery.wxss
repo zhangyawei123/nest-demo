@@ -1,0 +1,147 @@
+.lottery-page {
+  padding: 24rpx;
+  padding-bottom: 60rpx;
+}
+
+.wheel-area {
+  display: flex;
+  justify-content: center;
+  padding: 40rpx 0;
+}
+
+.wheel-container {
+  position: relative;
+  width: 300px;
+  height: 300px;
+}
+
+.wheel-canvas {
+  width: 300px;
+  height: 300px;
+}
+
+.wheel-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f56c6c, #e6413e);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 16rpx rgba(245,108,108,0.5);
+  z-index: 10;
+}
+
+.wheel-btn-text {
+  color: #fff;
+  font-size: 28rpx;
+  font-weight: bold;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #303133;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.prize-list {
+  margin-top: 12rpx;
+}
+
+.prize-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.prize-item:last-child {
+  border-bottom: none;
+}
+
+.prize-icon {
+  font-size: 40rpx;
+  margin-right: 20rpx;
+}
+
+.prize-info {
+  flex: 1;
+}
+
+.prize-name {
+  font-size: 28rpx;
+  color: #303133;
+  display: block;
+}
+
+.prize-desc {
+  font-size: 22rpx;
+  color: #909399;
+  margin-top: 4rpx;
+  display: block;
+}
+
+.prize-prob {
+  font-size: 24rpx;
+  color: #e6a23c;
+  font-weight: bold;
+}
+
+/* 弹窗 */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 60rpx 48rpx;
+  width: 560rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.modal-icon {
+  font-size: 96rpx;
+  margin-bottom: 20rpx;
+}
+
+.modal-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #f56c6c;
+  margin-bottom: 16rpx;
+}
+
+.modal-prize {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #303133;
+}
+
+.modal-desc {
+  font-size: 26rpx;
+  color: #909399;
+  margin-top: 8rpx;
+  margin-bottom: 32rpx;
+}
+
+.modal-btn {
+  width: 320rpx;
+}

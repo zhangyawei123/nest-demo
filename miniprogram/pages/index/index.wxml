@@ -1,0 +1,84 @@
+<view class="index-page">
+  <!-- 头部欢迎 -->
+  <view class="header">
+    <view class="header-info">
+      <text class="greeting">{{greeting}}</text>
+      <text class="username">{{userInfo.username || '未登录'}}</text>
+    </view>
+    <view class="header-avatar" bindtap="goLogin">
+      <text class="avatar-text">{{userInfo.username ? userInfo.username[0] : '?'}}</text>
+    </view>
+  </view>
+
+  <!-- 公告横幅 -->
+  <view class="notice-bar" wx:if="{{notices.length}}" bindtap="goNotice">
+    <text class="notice-icon">📢</text>
+    <swiper class="notice-swiper" autoplay circular vertical>
+      <swiper-item wx:for="{{notices}}" wx:key="id">
+        <text class="notice-text">{{item.title}}</text>
+      </swiper-item>
+    </swiper>
+  </view>
+
+  <!-- 功能入口 -->
+  <view class="grid-nav">
+    <view class="grid-item" bindtap="goPage" data-url="/pages/articles/articles">
+      <view class="grid-icon" style="background:#ecf5ff;color:#409eff">📄</view>
+      <text class="grid-label">文章</text>
+    </view>
+    <view class="grid-item" bindtap="goPage" data-url="/pages/hot/hot">
+      <view class="grid-icon" style="background:#fef0f0;color:#f56c6c">🔥</view>
+      <text class="grid-label">热榜</text>
+    </view>
+    <view class="grid-item" bindtap="goPage" data-url="/pages/lottery/lottery">
+      <view class="grid-icon" style="background:#fdf6ec;color:#e6a23c">🎯</view>
+      <text class="grid-label">抽奖</text>
+    </view>
+    <view class="grid-item" bindtap="goPage" data-url="/pages/ai-chat/ai-chat">
+      <view class="grid-icon" style="background:#f0f9eb;color:#67c23a">🤖</view>
+      <text class="grid-label">AI 对话</text>
+    </view>
+    <view class="grid-item" bindtap="goPage" data-url="/pages/notice/notice">
+      <view class="grid-icon" style="background:#ecf5ff;color:#409eff">📢</view>
+      <text class="grid-label">公告</text>
+    </view>
+    <view class="grid-item" bindtap="goPage" data-url="/pages/mine/mine">
+      <view class="grid-icon" style="background:#f5f0ff;color:#9b59b6">👤</view>
+      <text class="grid-label">我的</text>
+    </view>
+  </view>
+
+  <!-- 最新文章 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">最新文章</text>
+      <text class="section-more" bindtap="goPage" data-url="/pages/articles/articles">更多 ></text>
+    </view>
+    <view class="article-card" wx:for="{{articles}}" wx:key="id" bindtap="goArticle" data-id="{{item.id}}">
+      <text class="article-title">{{item.title}}</text>
+      <view class="article-meta">
+        <text class="article-author">{{item.author.username}}</text>
+        <text class="article-time">{{item.createdAt}}</text>
+      </view>
+    </view>
+    <view class="empty" wx:if="{{!articles.length}}">
+      <text class="empty-text">暂无文章</text>
+    </view>
+  </view>
+
+  <!-- 热榜 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">🔥 抖音热榜</text>
+      <text class="section-more" bindtap="goPage" data-url="/pages/hot/hot">更多 ></text>
+    </view>
+    <view class="hot-item" wx:for="{{hotList}}" wx:key="id" wx:if="{{index < 5}}">
+      <view class="hot-rank {{index < 3 ? 'hot-top' : ''}}">{{index + 1}}</view>
+      <text class="hot-title">{{item.title}}</text>
+      <text class="hot-value">{{item.hotValue}}</text>
+    </view>
+    <view class="empty" wx:if="{{!hotList.length}}">
+      <text class="empty-text">暂无热榜数据</text>
+    </view>
+  </view>
+</view>

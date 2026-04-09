@@ -1,0 +1,19 @@
+<view class="notice-page">
+  <view class="notice-list">
+    <view class="notice-card card" wx:for="{{notices}}" wx:key="id">
+      <view class="notice-header">
+        <text class="notice-type tag {{item.type === 'important' ? 'tag-red' : item.type === 'warning' ? 'tag-orange' : 'tag-blue'}}">
+          {{item.type === 'important' ? '重要' : item.type === 'warning' ? '警告' : '通知'}}
+        </text>
+        <text class="notice-time">{{item.createdAt}}</text>
+      </view>
+      <text class="notice-title">{{item.title}}</text>
+      <text class="notice-content">{{item.content}}</text>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{!loading && !notices.length}}">
+    <text class="empty-icon">📢</text>
+    <text class="empty-text">暂无公告</text>
+  </view>
+</view>

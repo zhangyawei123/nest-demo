@@ -1,0 +1,40 @@
+.detail-page {
+  padding: 32rpx;
+  background: #fff;
+  min-height: 100vh;
+}
+
+.detail-header {
+  margin-bottom: 32rpx;
+}
+
+.detail-title {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #303133;
+  line-height: 1.5;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.detail-meta {
+  display: flex;
+  gap: 24rpx;
+  font-size: 24rpx;
+  color: #909399;
+}
+
+.detail-cover {
+  margin-bottom: 32rpx;
+}
+
+.cover-img {
+  width: 100%;
+  border-radius: 12rpx;
+}
+
+.detail-content {
+  font-size: 30rpx;
+  color: #303133;
+  line-height: 1.8;
+}
