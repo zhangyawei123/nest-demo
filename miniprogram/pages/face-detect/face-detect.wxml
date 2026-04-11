@@ -1,0 +1,44 @@
+<view class="detect-page">
+  <view class="bg-orb orb-1"></view>
+  <view class="bg-orb orb-2"></view>
+
+  <view class="detect-hero card">
+    <text class="hero-kicker">FACE DETECTION</text>
+    <text class="hero-title">人脸识别</text>
+    <text class="hero-desc">上传一张正面照片，AI 将自动检测并标注人脸位置。</text>
+  </view>
+
+  <view class="upload-area card" bindtap="chooseImage">
+    <block wx:if="{{!imagePath}}">
+      <text class="upload-icon">📷</text>
+      <text class="upload-text">点击选择或拍摄照片</text>
+      <text class="upload-hint">支持 jpg / png / webp，最大 5MB</text>
+    </block>
+    <block wx:else>
+      <image class="preview-img" src="{{imagePath}}" mode="aspectFit" />
+    </block>
+  </view>
+
+  <view class="action-bar">
+    <view class="btn-primary {{imagePath && !loading ? 'active' : ''}}" bindtap="startDetect">
+      <text>{{loading ? '识别中…' : '开始识别'}}</text>
+    </view>
+    <view class="btn-secondary" bindtap="reset" wx:if="{{imagePath}}">
+      <text>重新选择</text>
+    </view>
+  </view>
+
+  <view class="result-card card" wx:if="{{result}}">
+    <view class="result-header">
+      <text class="result-icon">{{result.hasFace ? '✅' : '😕'}}</text>
+      <text class="result-title">{{result.summary}}</text>
+    </view>
+
+    <view class="face-list" wx:if="{{result.faces.length}}">
+      <view class="face-item" wx:for="{{result.faces}}" wx:key="index">
+        <text class="face-label">人脸 {{index + 1}}</text>
+        <text class="face-detail">位置 ({{item.x}}, {{item.y}})  尺寸 {{item.width}}×{{item.height}}</text>
+      </view>
+    </view>
+  </view>
+</view>

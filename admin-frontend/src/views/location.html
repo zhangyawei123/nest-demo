@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地点转经纬度</title>
+    <style>
+        * { box-sizing: border-box; margin:0; padding:0; }
+        html,body { width:100%; min-height:100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background:#f5f7fb; }
+        .page { max-width: 720px; margin: 48px auto; padding: 24px; background:#fff; border-radius:16px; box-shadow: 0 8px 32px rgba(0,0,0,.08); }
+        .title { font-size: 24px; font-weight: 600; color:#222; margin-bottom: 12px; }
+        .desc { font-size: 14px; color:#666; margin-bottom: 20px; line-height: 1.7; }
+        .row { display:flex; gap:12px; align-items:center; margin-bottom: 16px; }
+        .input { flex:1; height: 40px; border:1px solid #dcdfe6; border-radius:8px; padding: 0 12px; font-size:14px; }
+        .btn { height:40px; padding: 0 18px; border:none; border-radius:8px; background:#409eff; color:#fff; cursor:pointer; font-size:14px; }
+        .btn:disabled { opacity:.6; cursor:not-allowed; }
+        .btn-light { background:#ecf5ff; color:#409eff; border:1px solid #b3d8ff; }
+        .result { margin-top: 18px; padding: 16px; background:#f8fafc; border-radius:12px; border:1px solid #ebeef5; }
+        .item { margin-bottom: 12px; }
+        .label { font-size: 13px; color:#909399; margin-bottom: 6px; }
+        .value { font-size: 14px; color:#303133; word-break: break-all; }
+        .actions { display:flex; gap:12px; margin-top: 16px; }
+        .sub-btn { height:36px; padding: 0 14px; border:1px solid #dcdfe6; border-radius:8px; background:#fff; color:#303133; cursor:pointer; }
+        .tips { margin-top: 12px; font-size: 12px; color:#909399; line-height: 1.6; }
+        .error { margin-top: 12px; color:#f56c6c; font-size: 13px; }
+        .picker-mask { position: fixed; inset: 0; background: rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; padding: 24px; }
+        .picker-panel { width: min(1000px, 100%); height: min(720px, 100%); background:#fff; border-radius:16px; overflow:hidden; box-shadow: 0 12px 48px rgba(0,0,0,.18); display:flex; flex-direction:column; }
+        .picker-header { height: 56px; display:flex; align-items:center; justify-content:space-between; padding: 0 16px; border-bottom:1px solid #ebeef5; }
+        .picker-title { font-size: 16px; color:#303133; font-weight:600; }
+        .picker-close { border:none; background:transparent; font-size:24px; line-height:1; cursor:pointer; color:#909399; }
+        .picker-iframe { width:100%; flex:1; border:none; }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="title">地点转经纬度</div>
+    <div class="desc">输入地点后点击“获取经纬度”，直接返回腾讯地图解析结果。支持门店名、商圈、道路地址等关键词。</div>
+    <div class="row">
+        <input id="addressInput" class="input" placeholder="请输入地点，例如：遵义市红花岗区中山路街道内环路走马坝市建老徐脆哨" />
+        <button id="searchBtn" class="btn">获取经纬度</button>
+        <button id="pickerBtn" class="btn btn-light">地图选点</button>
+    </div>
+    <div id="errorBox" class="error" style="display:none;"></div>
+    <div id="resultBox" class="result" style="display:none;">
+        <div class="item">
+            <div class="label">输入地点</div>
+            <div id="queryText" class="value"></div>
+        </div>
+        <div class="item">
+            <div class="label">标准地址</div>
+            <div id="addressText" class="value"></div>
+        </div>
+        <div class="item">
+            <div class="label">经纬度</div>
+            <div id="locationText" class="value"></div>
+        </div>
+        <div class="actions">
+            <button id="copyLocationBtn" class="sub-btn">复制经纬度</button>
+            <button id="copyAddressBtn" class="sub-btn">复制标准地址</button>
+        </div>
+        <div class="tips">返回格式为 `纬度,经度`，和你当前业务页 `location` 字段保持一致。</div>
+    </div>
+</div>
+<div id="pickerMask" class="picker-mask">
+    <div class="picker-panel">
+        <div class="picker-header">
+            <div class="picker-title">地图选点</div>
+            <button id="pickerCloseBtn" class="picker-close">×</button>
+        </div>
+        <iframe id="pickerFrame" class="picker-iframe" allow="geolocation"></iframe>
+    </div>
+</div>
+
+<script>
+    var KEY = 'CPEBZ-VERW3-62Q3C-O4O4N-JXBCF-CFBF7';
+    var addressInput = document.getElementById('addressInput');
+    var searchBtn = document.getElementById('searchBtn');
+    var pickerBtn = document.getElementById('pickerBtn');
+    var errorBox = document.getElementById('errorBox');
+    var resultBox = document.getElementById('resultBox');
+    var queryText = document.getElementById('queryText');
+    var addressText = document.getElementById('addressText');
+    var locationText = document.getElementById('locationText');
+    var copyLocationBtn = document.getElementById('copyLocationBtn');
+    var copyAddressBtn = document.getElementById('copyAddressBtn');
+    var pickerMask = document.getElementById('pickerMask');
+    var pickerCloseBtn = document.getElementById('pickerCloseBtn');
+    var pickerFrame = document.getElementById('pickerFrame');
+    var currentResult = null;
+
+    function setError(message) {
+        errorBox.style.display = message ? 'block' : 'none';
+        errorBox.textContent = message || '';
+    }
+
+    function setLoading(loading) {
+        searchBtn.disabled = loading;
+        searchBtn.textContent = loading ? '获取中...' : '获取经纬度';
+    }
+
+    function copyText(text, successText) {
+        if (!text) return;
+        navigator.clipboard.writeText(text).then(function() {
+            alert(successText);
+        }).catch(function() {
+            alert('复制失败，请手动复制');
+        });
+    }
+
+    function renderResult(query, result) {
+        currentResult = result;
+        queryText.textContent = query;
+        addressText.textContent = result.address || query;
+        locationText.textContent = result.location.lat + ',' + result.location.lng;
+        resultBox.style.display = 'block';
+    }
+
+    function buildPickerUrl() {
+        var url = 'https://apis.map.qq.com/tools/locpicker?search=1&type=1&key=' + KEY + '&referer=latlng';
+        var address = addressInput.value.trim();
+        if (address) {
+            url += '&addr=' + encodeURIComponent(address);
+        }
+        if (currentResult && currentResult.location) {
+            url += '&coord=' + currentResult.location.lat + ',' + currentResult.location.lng;
+        }
+        return url;
+    }
+
+    function openPicker() {
+        pickerFrame.src = buildPickerUrl();
+        pickerMask.style.display = 'flex';
+    }
+
+    function closePicker() {
+        pickerMask.style.display = 'none';
+        pickerFrame.src = '';
+    }
+
+    function searchLocation() {
+        var address = addressInput.value.trim();
+        if (!address) {
+            setError('请输入地点');
+            resultBox.style.display = 'none';
+            return;
+        }
+        setError('');
+        setLoading(true);
+        resultBox.style.display = 'none';
+
+        var callbackName = 'qqMapGeocoder_' + Date.now();
+        var script = document.createElement('script');
+
+        window[callbackName] = function(res) {
+            try {
+                if (res && res.status === 0 && res.result && res.result.location) {
+                    renderResult(address, res.result);
+                } else {
+                    setError((res && res.message) || '未获取到经纬度');
+                }
+            } finally {
+                setLoading(false);
+                delete window[callbackName];
+                if (script.parentNode) script.parentNode.removeChild(script);
+            }
+        };
+
+        script.onerror = function() {
+            setLoading(false);
+            setError('请求失败，请检查 Key 或网络');
+            delete window[callbackName];
+            if (script.parentNode) script.parentNode.removeChild(script);
+        };
+
+        script.src = 'https://apis.map.qq.com/ws/geocoder/v1/?address=' + encodeURIComponent(address) + '&output=jsonp&key=' + KEY + '&callback=' + callbackName;
+        document.body.appendChild(script);
+    }
+
+    searchBtn.addEventListener('click', searchLocation);
+    pickerBtn.addEventListener('click', openPicker);
+    pickerCloseBtn.addEventListener('click', closePicker);
+    pickerMask.addEventListener('click', function(event) {
+        if (event.target === pickerMask) {
+            closePicker();
+        }
+    });
+    addressInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            searchLocation();
+        }
+    });
+    copyLocationBtn.addEventListener('click', function() {
+        if (currentResult) copyText(currentResult.location.lat + ',' + currentResult.location.lng, '经纬度已复制');
+    });
+    copyAddressBtn.addEventListener('click', function() {
+        if (currentResult) copyText(currentResult.address || '', '标准地址已复制');
+    });
+    window.addEventListener('message', function(event) {
+        var loc = event.data;
+        if (!loc || loc.module !== 'locationPicker' || !loc.latlng) {
+            return;
+        }
+        console.log('locationPicker raw:', loc);
+        console.log('locationPicker latlng:', loc.latlng.lat + ',' + loc.latlng.lng);
+        console.log('locationPicker address:', loc.poiaddress || '');
+        console.log('locationPicker name:', loc.poiname || '');
+        var address = loc.poiaddress || loc.poiname || addressInput.value.trim();
+        addressInput.value = address;
+        setError('');
+        renderResult(address, {
+            address: address,
+            location: {
+                lat: loc.latlng.lat,
+                lng: loc.latlng.lng
+            }
+        });
+        closePicker();
+    }, false);
+</script>
+</body>
+</html>

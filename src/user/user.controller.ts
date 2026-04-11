@@ -112,6 +112,7 @@ export class UserController {
       { name: '操作日志', path: '/operation-log', component: 'operation-log/OperationLogView', icon: 'Memo', sort: 7 },
       { name: '抖音热点', path: '/douyin-hot', component: 'douyin-hot/DouyinHotListView', icon: 'VideoPlay', sort: 8 },
       { name: 'AI 对话', path: '/ai-chat', component: 'ai-chat/AiChatView', icon: 'ChatDotRound', sort: 9 },
+      { name: '小功能', path: '/tools', component: 'tools/ToolsView', icon: 'Setting', sort: 10 },
     ];
 
     const savedMenus: Menu[] = [];

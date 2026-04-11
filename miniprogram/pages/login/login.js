@@ -29,9 +29,14 @@ Page({
 
   refreshCaptcha() {
     app.request({ url: '/auth/captcha' }).then(res => {
+      // 后端返回 { captchaId, svg }，svg 是 SVG 字符串
+      // 小程序 image 不能直接渲染 SVG 字符串，转 base64 data URI
+      const base64 = 'data:image/svg+xml;base64,' + wx.arrayBufferToBase64(
+        new Uint8Array(Array.from(encodeURIComponent(res.svg).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode('0x' + p1))).map(c => c.charCodeAt(0))).buffer
+      )
       this.setData({
-        captchaId: res.id,
-        captchaImg: res.img
+        captchaId: res.captchaId,
+        captchaImg: base64
       })
     })
   },
@@ -54,7 +59,7 @@ Page({
       data: {
         username,
         password: md5(password),
-        captcha,
+        captchaCode: captcha,
         captchaId
       }
     }).then(res => {

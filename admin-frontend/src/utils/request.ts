@@ -2,6 +2,8 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import router from '@/router'
 
+let isRedirectingToLogin = false
+
 /**
  * Axios 实例配置
  * baseURL 会在开发环境通过 vite.config.ts 的 proxy 代理到后端
@@ -50,9 +52,15 @@ request.interceptors.response.use(
       
       switch (status) {
         case 401:
-          ElMessage.error('登录已过期，请重新登录')
-          localStorage.removeItem('token')
-          router.push('/login')
+          if (!isRedirectingToLogin) {
+            isRedirectingToLogin = true
+            ElMessage.error('登录已过期，请重新登录')
+            localStorage.removeItem('token')
+            localStorage.removeItem('userInfo')
+            router.push('/login').finally(() => {
+              isRedirectingToLogin = false
+            })
+          }
           break
         case 403:
           ElMessage.error('无权访问')

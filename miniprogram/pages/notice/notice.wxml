@@ -1,4 +1,13 @@
 <view class="notice-page">
+  <view class="bg-orb orb-1"></view>
+  <view class="bg-orb orb-2"></view>
+
+  <view class="hero-card">
+    <text class="hero-kicker">ANNOUNCEMENT</text>
+    <text class="hero-title">通知公告</text>
+    <text class="hero-desc">查看系统通知、重要提醒和平台最新动态，及时掌握每一条消息。</text>
+  </view>
+
   <view class="notice-list">
     <view class="notice-card card" wx:for="{{notices}}" wx:key="id">
       <view class="notice-header">

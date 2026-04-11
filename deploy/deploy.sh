@@ -5,7 +5,7 @@ echo "=========================================="
 echo "  NestDemo 部署脚本"
 echo "=========================================="
 
-PROJECT_DIR="/var/www/nest-demo"
+PROJECT_DIR="/opt/nest-demo"
 FRONTEND_DIR="/var/www/nest-demo-frontend"
 
 # ---- 代码已通过 rsync 同步，无需 git pull ----
@@ -21,14 +21,14 @@ fi
 # ---- 后端部署 ----
 echo "[2/5] 安装后端依赖并构建..."
 cd $PROJECT_DIR
-pnpm install
-pnpm run build
+npm install
+npm run build
 
 # ---- 前端部署 ----
 echo "[3/5] 安装前端依赖并构建..."
 cd $PROJECT_DIR/admin-frontend
-pnpm install
-pnpm run build-only
+npm install
+npm run build-only
 rm -rf $FRONTEND_DIR/*
 cp -r dist/* $FRONTEND_DIR/
 
@@ -48,8 +48,8 @@ pm2 save
 
 echo ""
 echo "=========================================="
-echo "  ✅ 部署完成！"
-echo "  前端: http://120.48.191.112"
-echo "  后端: http://120.48.191.112/api"
-echo "  Swagger: http://120.48.191.112/api-docs"
+echo "  部署完成！"
+echo "  前端: http://111.229.210.78"
+echo "  后端: http://111.229.210.78/api"
+echo "  Swagger: http://111.229.210.78/api-docs"
 echo "=========================================="

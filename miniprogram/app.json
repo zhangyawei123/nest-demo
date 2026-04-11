@@ -6,15 +6,17 @@
     "pages/hot/hot",
     "pages/lottery/lottery",
     "pages/ai-chat/ai-chat",
+    "pages/face-detect/face-detect",
+    "pages/recipe-combo/recipe-combo",
     "pages/notice/notice",
     "pages/mine/mine",
     "pages/login/login"
   ],
   "tabBar": {
-    "color": "#999",
-    "selectedColor": "#409eff",
-    "backgroundColor": "#fff",
-    "borderStyle": "black",
+    "color": "#94a3b8",
+    "selectedColor": "#4c8dff",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/index/index",
@@ -43,10 +45,10 @@
     ]
   },
   "window": {
-    "navigationBarBackgroundColor": "#409eff",
+    "navigationBarBackgroundColor": "#4c8dff",
     "navigationBarTitleText": "NestDemo",
     "navigationBarTextStyle": "white",
-    "backgroundColor": "#f5f7fa"
+    "backgroundColor": "#f2f6ff"
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json"

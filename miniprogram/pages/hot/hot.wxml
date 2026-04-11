@@ -1,15 +1,27 @@
 <view class="hot-page">
-  <view class="hot-header">
-    <text class="hot-header-title">🔥 抖音热搜榜</text>
+  <view class="bg-orb orb-1"></view>
+  <view class="bg-orb orb-2"></view>
+
+  <view class="hero-card">
+    <text class="hero-kicker">TREND NOW</text>
+    <text class="hero-title">抖音热搜榜</text>
+    <text class="hero-desc">追踪当下最热话题，快速掌握热门趋势与讨论焦点。</text>
+  </view>
+
+  <view class="hot-header card">
+    <view>
+      <text class="hot-header-title">今日热榜</text>
+      <text class="hot-header-desc">实时热度更新，点击刷新获取最新内容</text>
+    </view>
     <text class="hot-header-refresh" bindtap="refreshList">刷新</text>
   </view>
 
-  <view class="hot-list">
+  <view class="hot-list card">
     <view class="hot-item" wx:for="{{hotList}}" wx:key="id">
       <view class="hot-rank {{index < 3 ? 'rank-top' : ''}}">{{index + 1}}</view>
       <view class="hot-info">
         <text class="hot-title">{{item.title}}</text>
-        <text class="hot-value">热度 {{item.hotValue > 10000 ? (item.hotValue / 10000).toFixed(1) + '万' : item.hotValue}}</text>
+        <text class="hot-value">热度 {{item.hotValueText}}</text>
       </view>
     </view>
   </view>

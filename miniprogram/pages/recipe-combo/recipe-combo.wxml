@@ -1,0 +1,72 @@
+<view class="recipe-page">
+  <view class="bg-orb orb-1"></view>
+  <view class="bg-orb orb-2"></view>
+
+  <view class="recipe-hero card">
+    <text class="hero-kicker">RECIPE COMBO</text>
+    <text class="hero-title">菜谱套餐</text>
+    <text class="hero-desc">拍一张菜单或菜品照片，AI 帮你识别菜品并推荐营养均衡的套餐搭配。</text>
+  </view>
+
+  <view class="upload-area card" bindtap="chooseImage">
+    <block wx:if="{{!imagePath}}">
+      <text class="upload-icon">🍱</text>
+      <text class="upload-text">点击选择或拍摄菜品照片</text>
+      <text class="upload-hint">菜单、餐盘、食材均可识别</text>
+    </block>
+    <block wx:else>
+      <image class="preview-img" src="{{imagePath}}" mode="aspectFit" />
+    </block>
+  </view>
+
+  <view class="action-bar">
+    <view class="btn-primary {{imagePath && !loading ? 'active' : ''}}" bindtap="startAnalyze">
+      <text>{{loading ? '分析中…' : '开始分析'}}</text>
+    </view>
+    <view class="btn-secondary" bindtap="reset" wx:if="{{imagePath}}">
+      <text>重新选择</text>
+    </view>
+  </view>
+
+  <view class="result-section" wx:if="{{result}}">
+    <view class="result-card card">
+      <text class="result-section-title">📋 图片摘要</text>
+      <text class="result-summary">{{result.summary}}</text>
+    </view>
+
+    <view class="result-card card" wx:if="{{result.dishes.length}}">
+      <text class="result-section-title">🍽️ 识别菜品</text>
+      <view class="tag-list">
+        <text class="tag" wx:for="{{result.dishes}}" wx:key="index">{{item}}</text>
+      </view>
+    </view>
+
+    <view class="result-card card" wx:if="{{result.ingredients.length}}">
+      <text class="result-section-title">🥬 主要食材</text>
+      <view class="tag-list">
+        <text class="tag tag-green" wx:for="{{result.ingredients}}" wx:key="index">{{item}}</text>
+      </view>
+    </view>
+
+    <view class="combo-card card" wx:if="{{result.recommendedCombo}}">
+      <text class="combo-name">🎯 {{result.recommendedCombo.name}}</text>
+      <view class="combo-items">
+        <view class="combo-item" wx:for="{{result.recommendedCombo.items}}" wx:key="index">
+          <text class="combo-dot"></text>
+          <text class="combo-text">{{item}}</text>
+        </view>
+      </view>
+      <text class="combo-reason">{{result.recommendedCombo.reason}}</text>
+    </view>
+
+    <view class="result-card card" wx:if="{{result.nutritionTips.length}}">
+      <text class="result-section-title">💡 营养建议</text>
+      <view class="tip-list">
+        <view class="tip-item" wx:for="{{result.nutritionTips}}" wx:key="index">
+          <text class="tip-dot">•</text>
+          <text class="tip-text">{{item}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

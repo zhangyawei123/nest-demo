@@ -1,20 +1,54 @@
 <view class="lottery-page">
-  <!-- 转盘区域 -->
-  <view class="wheel-area">
-    <view class="wheel-container">
-      <canvas type="2d" id="wheelCanvas" class="wheel-canvas" style="width:300px;height:300px;"></canvas>
-      <view class="wheel-btn" bindtap="handleDraw">
-        <text class="wheel-btn-text">抽奖</text>
+  <view class="bg-orb orb-1"></view>
+  <view class="bg-orb orb-2"></view>
+  <view class="hero-card">
+    <text class="hero-kicker">LUCKY DRAW</text>
+    <text class="hero-title">幸运大转盘</text>
+    <text class="hero-desc">轻触转盘中心，看看今天的好运会落在哪个奖品上</text>
+    <view class="hero-stats">
+      <view class="hero-stat">
+        <text class="hero-stat-label">奖项数</text>
+        <text class="hero-stat-value">{{prizes.length}}</text>
+      </view>
+      <view class="hero-stat hero-stat-accent">
+        <text class="hero-stat-label">状态</text>
+        <text class="hero-stat-value">{{spinning ? '抽奖中' : '待开始'}}</text>
       </view>
     </view>
   </view>
 
+  <!-- 转盘区域 -->
+  <view class="wheel-panel card">
+    <view class="panel-head">
+      <view class="panel-head-main">
+        <text class="panel-title">试试手气</text>
+        <text class="panel-subtitle">点击转盘中心开始抽奖，看看大奖会不会落到你头上</text>
+      </view>
+      <text class="panel-badge {{spinning ? 'panel-badge-active' : ''}}">{{spinning ? '转动中' : '可抽奖'}}</text>
+    </view>
+    <view class="wheel-section">
+      <view class="pointer"></view>
+      <view class="wheel-container">
+        <canvas type="2d" id="wheelCanvas" class="wheel-canvas" bindtap="handleDraw"></canvas>
+      </view>
+    </view>
+    <text class="wheel-tip">{{spinning ? '好运正在路上，请稍候片刻…' : '点击转盘中心按钮，立即开始抽奖'}}</text>
+  </view>
+
   <!-- 奖项列表 -->
-  <view class="section card">
-    <text class="section-title">🎁 奖项列表</text>
+  <view class="section card prize-card">
+    <view class="panel-head panel-head-list">
+      <view class="panel-head-main">
+        <text class="section-title">🎁 奖项列表</text>
+        <text class="section-subtitle">当前可参与抽取的奖品与概率分布</text>
+      </view>
+      <text class="list-count">{{prizes.length}} 项</text>
+    </view>
     <view class="prize-list">
       <view class="prize-item" wx:for="{{prizes}}" wx:key="id">
-        <text class="prize-icon">{{item.icon}}</text>
+        <view class="prize-icon-wrap">
+          <text class="prize-icon">{{item.icon}}</text>
+        </view>
         <view class="prize-info">
           <text class="prize-name">{{item.name}}</text>
           <text class="prize-desc">{{item.description}}</text>
@@ -26,15 +60,17 @@
       <text class="empty-text">暂无奖项</text>
     </view>
   </view>
-
-  <!-- 中奖弹窗 -->
-  <view class="modal-mask" wx:if="{{showResult}}" bindtap="closeResult">
-    <view class="modal-content" catchtap="">
+</view>
+<!-- 中奖弹窗 -->
+<view class="modal-mask" wx:if="{{showResult}}" bindtap="closeResult">
+  <view class="modal-content" catchtap="">
+    <view class="modal-icon-wrap">
       <text class="modal-icon">{{resultPrize.icon}}</text>
-      <text class="modal-title">🎉 恭喜中奖！</text>
-      <text class="modal-prize">{{resultPrize.name}}</text>
-      <text class="modal-desc">{{resultPrize.description}}</text>
-      <button class="btn-primary modal-btn" bindtap="closeResult">知道了</button>
     </view>
+    <text class="modal-kicker">LUCKY MOMENT</text>
+    <text class="modal-title">🎉 恭喜中奖！</text>
+    <text class="modal-prize">{{resultPrize.name}}</text>
+    <text class="modal-desc">{{resultPrize.description}}</text>
+    <button class="btn-primary modal-btn" bindtap="closeResult">知道了</button>
   </view>
 </view>

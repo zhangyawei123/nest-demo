@@ -1,6 +1,16 @@
 <view class="articles-page">
-  <view class="search-bar">
-    <input class="search-input" placeholder="搜索文章..." value="{{keyword}}" bindinput="onSearch" bindconfirm="doSearch" />
+  <view class="bg-orb orb-1"></view>
+  <view class="bg-orb orb-2"></view>
+
+  <view class="hero-card">
+    <text class="hero-kicker">CONTENT HUB</text>
+    <text class="hero-title">文章中心</text>
+    <text class="hero-desc">浏览最新内容、快速搜索感兴趣的话题，沉浸式阅读每一篇文章。</text>
+  </view>
+
+  <view class="search-bar card">
+    <text class="search-label">搜索文章</text>
+    <input class="search-input" placeholder="输入标题、摘要关键词..." value="{{keyword}}" bindinput="onSearch" bindconfirm="doSearch" />
   </view>
 
   <view class="article-list">
@@ -9,6 +19,7 @@
         <image src="{{item.coverImage}}" mode="aspectFill" class="cover-img" />
       </view>
       <view class="article-info">
+        <text class="article-badge">精选内容</text>
         <text class="article-title">{{item.title}}</text>
         <text class="article-summary">{{item.summary || ''}}</text>
         <view class="article-meta">

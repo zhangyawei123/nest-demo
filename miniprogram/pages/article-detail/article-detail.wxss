@@ -1,40 +1,81 @@
 .detail-page {
-  padding: 32rpx;
-  background: #fff;
   min-height: 100vh;
+  padding: 24rpx;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
 }
 
-.detail-header {
-  margin-bottom: 32rpx;
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(18rpx);
+  opacity: 0.5;
+}
+
+.orb-1 {
+  width: 240rpx;
+  height: 240rpx;
+  top: 20rpx;
+  right: -40rpx;
+  background: radial-gradient(circle, rgba(103, 175, 255, 0.28) 0%, rgba(103, 175, 255, 0) 72%);
+}
+
+.orb-2 {
+  width: 300rpx;
+  height: 300rpx;
+  left: -110rpx;
+  top: 320rpx;
+  background: radial-gradient(circle, rgba(245, 108, 108, 0.16) 0%, rgba(245, 108, 108, 0) 76%);
+}
+
+.detail-hero,
+.detail-cover,
+.detail-content {
+  position: relative;
+  z-index: 1;
+}
+
+.detail-kicker {
+  display: block;
+  font-size: 20rpx;
+  letter-spacing: 4rpx;
+  color: #8b95a7;
 }
 
 .detail-title {
-  font-size: 40rpx;
-  font-weight: bold;
-  color: #303133;
-  line-height: 1.5;
   display: block;
-  margin-bottom: 16rpx;
+  margin-top: 14rpx;
+  font-size: 42rpx;
+  font-weight: 700;
+  color: #1f2d3d;
+  line-height: 1.45;
 }
 
 .detail-meta {
   display: flex;
-  gap: 24rpx;
-  font-size: 24rpx;
-  color: #909399;
+  gap: 18rpx;
+  flex-wrap: wrap;
+  margin-top: 18rpx;
 }
 
-.detail-cover {
-  margin-bottom: 32rpx;
+.meta-author,
+.meta-time {
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  color: #6f7d92;
+  background: #f4f7fb;
 }
 
 .cover-img {
   width: 100%;
-  border-radius: 12rpx;
+  border-radius: 20rpx;
+  display: block;
 }
 
 .detail-content {
   font-size: 30rpx;
-  color: #303133;
-  line-height: 1.8;
+  color: #334155;
+  line-height: 1.9;
 }

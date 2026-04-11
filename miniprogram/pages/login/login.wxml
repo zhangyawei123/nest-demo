@@ -1,31 +1,55 @@
 <view class="login-page">
-  <view class="logo-area">
-    <view class="logo-icon">🚀</view>
-    <text class="logo-title">NestDemo</text>
-    <text class="logo-desc">全栈演示平台</text>
+  <!-- 顶部背景装饰 -->
+  <view class="bg-top">
+    <view class="bg-circle c1"></view>
+    <view class="bg-circle c2"></view>
+    <view class="bg-circle c3"></view>
   </view>
 
-  <view class="form-area">
-    <view class="form-item">
-      <text class="form-label">用户名</text>
-      <input class="form-input" placeholder="请输入用户名" value="{{username}}" bindinput="onUsernameInput" />
+  <!-- Logo 区域 -->
+  <view class="logo-area">
+    <view class="logo-box">
+      <text class="logo-emoji">🚀</text>
     </view>
-    <view class="form-item">
-      <text class="form-label">密码</text>
-      <input class="form-input" placeholder="请输入密码" password="true" value="{{password}}" bindinput="onPasswordInput" />
-    </view>
-    <view class="form-item" wx:if="{{captchaImg}}">
-      <text class="form-label">验证码</text>
-      <view class="captcha-row">
-        <input class="form-input captcha-input" placeholder="验证码" value="{{captcha}}" bindinput="onCaptchaInput" />
-        <image class="captcha-img" src="{{captchaImg}}" mode="aspectFit" bindtap="refreshCaptcha" />
+    <text class="logo-title">NestDemo</text>
+    <text class="logo-subtitle">全栈演示平台 · 小程序端</text>
+  </view>
+
+  <!-- 表单卡片 -->
+  <view class="form-card">
+    <view class="input-group">
+      <view class="input-wrap">
+        <text class="input-icon">👤</text>
+        <input class="input-field" placeholder="请输入用户名" placeholder-class="placeholder" value="{{username}}" bindinput="onUsernameInput" />
+      </view>
+      <view class="input-wrap">
+        <text class="input-icon">🔒</text>
+        <input class="input-field" placeholder="请输入密码" placeholder-class="placeholder" password="true" value="{{password}}" bindinput="onPasswordInput" />
+      </view>
+      <view class="input-wrap captcha-wrap">
+        <text class="input-icon">🛡️</text>
+        <input class="input-field captcha-field" placeholder="验证码" placeholder-class="placeholder" value="{{captcha}}" bindinput="onCaptchaInput" />
+        <view class="captcha-box" bindtap="refreshCaptcha">
+          <image wx:if="{{captchaImg}}" class="captcha-img" src="{{captchaImg}}" mode="aspectFit" />
+          <text wx:else class="captcha-placeholder">点击获取</text>
+        </view>
       </view>
     </view>
 
-    <button class="btn-primary login-btn" bindtap="handleLogin" loading="{{loading}}">登 录</button>
+    <button class="login-btn" bindtap="handleLogin" loading="{{loading}}">
+      <text class="login-btn-text">登 录</text>
+    </button>
 
-    <view class="register-link" bindtap="handleRegister">
-      <text>还没有账号？立即注册</text>
+    <view class="bottom-row">
+      <view class="register-link" bindtap="handleRegister">
+        <text>还没有账号？</text>
+        <text class="link-highlight">立即注册</text>
+      </view>
     </view>
+  </view>
+
+  <!-- 底部装饰 -->
+  <view class="footer-text">
+    <text>Powered by NestJS + Vue + 微信小程序</text>
   </view>
 </view>

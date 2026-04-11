@@ -47,7 +47,14 @@ router.beforeEach(async (to, from, next) => {
   const { useMenuStore } = await import('@/stores/menu')
   const menuStore = useMenuStore()
   if (!menuStore.loaded) {
-    await menuStore.loadMenus()
+    const success = await menuStore.loadMenus()
+    if (!success) {
+      localStorage.removeItem('token')
+      localStorage.removeItem('userInfo')
+      menuStore.reset()
+      ElMessage.error('加载菜单失败，请重新登录')
+      return next('/login')
+    }
     // 注册完成后重新导航，让新路由生效
     return next({ ...to, replace: true })
   }

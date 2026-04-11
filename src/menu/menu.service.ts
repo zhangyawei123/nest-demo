@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Menu } from './menu.entity';
+import { Role } from '../role/role.entity';
 import { CreateMenuDto } from './dto/create-menu.dto';
 
 @Injectable()
@@ -9,6 +10,8 @@ export class MenuService {
   constructor(
     @InjectRepository(Menu)
     private readonly menuRepository: Repository<Menu>,
+    @InjectRepository(Role)
+    private readonly roleRepository: Repository<Role>,
   ) {}
 
   async findAll(): Promise<Menu[]> {
@@ -37,7 +40,9 @@ export class MenuService {
 
   async create(dto: CreateMenuDto): Promise<Menu> {
     const menu = this.menuRepository.create(dto);
-    return this.menuRepository.save(menu);
+    const saved = await this.menuRepository.save(menu);
+    await this.syncAdminMenus();
+    return saved;
   }
 
   async update(id: number, dto: Partial<CreateMenuDto>): Promise<Menu> {
@@ -49,5 +54,13 @@ export class MenuService {
   async remove(id: number): Promise<void> {
     await this.findOne(id);
     await this.menuRepository.delete(id);
+    await this.syncAdminMenus();
+  }
+
+  private async syncAdminMenus(): Promise<void> {
+    const adminRole = await this.roleRepository.findOne({ where: { name: 'admin' }, relations: ['menus'] });
+    if (!adminRole) return;
+    adminRole.menus = await this.menuRepository.find();
+    await this.roleRepository.save(adminRole);
   }
 }

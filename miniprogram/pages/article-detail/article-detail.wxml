@@ -1,5 +1,9 @@
 <view class="detail-page" wx:if="{{article}}">
-  <view class="detail-header">
+  <view class="bg-orb orb-1"></view>
+  <view class="bg-orb orb-2"></view>
+
+  <view class="detail-hero card">
+    <text class="detail-kicker">ARTICLE DETAIL</text>
     <text class="detail-title">{{article.title}}</text>
     <view class="detail-meta">
       <text class="meta-author">{{article.author.username || '匿名'}}</text>
@@ -7,11 +11,11 @@
     </view>
   </view>
 
-  <view class="detail-cover" wx:if="{{article.coverImage}}">
+  <view class="detail-cover card" wx:if="{{article.coverImage}}">
     <image src="{{article.coverImage}}" mode="widthFix" class="cover-img" />
   </view>
 
-  <view class="detail-content">
+  <view class="detail-content card">
     <rich-text nodes="{{article.content}}"></rich-text>
   </view>
 </view>

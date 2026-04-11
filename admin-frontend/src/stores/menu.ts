@@ -29,8 +29,11 @@ export const useMenuStore = defineStore('menu', () => {
       menus.value = data || []
       registerRoutes(menus.value)
       loaded.value = true
+      return true
     } catch (e) {
       menus.value = []
+      loaded.value = false
+      return false
     }
   }
 
