@@ -22,14 +22,10 @@ export class DouyinHotService {
 
       await this.douyinHotRepository.clear();
 
-      const savedItems: DouyinHot[] = [];
-      for (const item of hotList) {
-        const hotItem = this.douyinHotRepository.create(item);
-        const savedItem = await this.douyinHotRepository.save(hotItem as any);
-        savedItems.push(savedItem as DouyinHot);
-      }
-
-      return savedItems;
+      const entities = hotList.map((item) =>
+        this.douyinHotRepository.create(item as Partial<DouyinHot>),
+      );
+      return this.douyinHotRepository.save(entities);
     } catch (error) {
       console.error('获取抖音热点榜失败:', error);
       throw error;

@@ -24,17 +24,18 @@ export class DouyinCommentService {
 
     await this.commentRepository.delete({ videoUrl });
 
-    const saved: DouyinComment[] = [];
-    for (const c of comments) {
-      const entity = this.commentRepository.create({ ...c, videoUrl });
-      saved.push(await this.commentRepository.save(entity));
-    }
-    return saved;
+    const entities = comments.map((c) => this.commentRepository.create({ ...c, videoUrl }));
+    return this.commentRepository.save(entities) as Promise<DouyinComment[]>;
   }
 
   private async crawlComments(videoUrl: string): Promise<Partial<DouyinComment>[]> {
+    // 可执行路径优先读取环境变量 PUPPETEER_EXECUTABLE_PATH
+    // 方便本地（macOS Chrome）和服务器（Linux Chromium）在不同环境下部署
+    const executablePath =
+      process.env.PUPPETEER_EXECUTABLE_PATH ||
+      '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
     const browser = await puppeteer.launch({
-      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      executablePath,
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
     });

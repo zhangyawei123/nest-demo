@@ -15,19 +15,27 @@ cd $PROJECT_DIR
 if [ ! -f "$PROJECT_DIR/.env" ]; then
   echo "[*] 创建 .env 文件..."
   cp $PROJECT_DIR/deploy/env.production $PROJECT_DIR/.env
-  echo "⚠️  请编辑 /var/www/nest-demo/.env 填入正确的 DB_PASSWORD"
+  echo "⚠️  请编辑 $PROJECT_DIR/.env 填入正确的配置"
 fi
 
 # ---- 后端部署 ----
 echo "[2/5] 安装后端依赖并构建..."
 cd $PROJECT_DIR
-npm install
+if [ -f package-lock.json ]; then
+  npm ci
+else
+  npm install
+fi
 npm run build
 
 # ---- 前端部署 ----
 echo "[3/5] 安装前端依赖并构建..."
 cd $PROJECT_DIR/admin-frontend
-npm install
+if [ -f package-lock.json ]; then
+  npm ci
+else
+  npm install
+fi
 npm run build-only
 rm -rf $FRONTEND_DIR/*
 cp -r dist/* $FRONTEND_DIR/
@@ -43,8 +51,12 @@ nginx -t && systemctl reload nginx
 echo "[5/5] 启动后端服务..."
 cd $PROJECT_DIR
 pm2 delete nest-demo 2>/dev/null || true
-pm2 start dist/main.js --name nest-demo --env production
+NODE_ENV=production pm2 start dist/main.js --name nest-demo --update-env
 pm2 save
+
+echo "[*] 健康检查..."
+sleep 2
+curl -fsS http://127.0.0.1:3000/ >/dev/null
 
 echo ""
 echo "=========================================="

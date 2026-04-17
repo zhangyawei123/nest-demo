@@ -75,7 +75,9 @@ export class UserController {
     if (req.user.userId !== userId) {
       throw new ForbiddenException('只能修改自己的信息');
     }
-    return this.userService.update(userId, updateUserDto);
+    const user = await this.userService.update(userId, updateUserDto);
+    const { password, ...result } = user as any;
+    return result;
   }
 
   @ApiOperation({ summary: '分配角色给用户' })
@@ -94,7 +96,7 @@ export class UserController {
       return { message: 'admin 用户不存在' };
     }
     await this.userService.update(admin.id, { password: '21232f297a57a5a743894a0e4a801fc3' });
-    return { message: 'admin 密码已重置为 admin (MD5)' };
+    return { message: 'admin 密码已重置为 admin' };
   }
 
   @ApiOperation({ summary: '初始化菜单数据并给 admin 分配最高权限（仅首次使用）' })

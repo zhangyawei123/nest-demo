@@ -36,7 +36,44 @@
 
 <script setup lang="ts">
 import { ref, onBeforeUnmount } from 'vue'
-import * as echarts from 'echarts'
+import * as echarts from 'echarts/core'
+import { BarChart, LineChart, PieChart } from 'echarts/charts'
+import {
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent,
+  GridComponent,
+} from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
+import type { ComposeOption } from 'echarts/core'
+import type { BarSeriesOption, LineSeriesOption, PieSeriesOption } from 'echarts/charts'
+import type {
+  TitleComponentOption,
+  TooltipComponentOption,
+  LegendComponentOption,
+  GridComponentOption,
+} from 'echarts/components'
+
+echarts.use([
+  BarChart,
+  LineChart,
+  PieChart,
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent,
+  GridComponent,
+  CanvasRenderer,
+])
+
+type EChartsOption = ComposeOption<
+  | BarSeriesOption
+  | LineSeriesOption
+  | PieSeriesOption
+  | TitleComponentOption
+  | TooltipComponentOption
+  | LegendComponentOption
+  | GridComponentOption
+>
 
 const rawData = ref('')
 const chartType = ref('bar')
@@ -82,7 +119,7 @@ const renderChart = () => {
   const values = data.map(d => d.value)
   const type = chartType.value
 
-  let option: echarts.EChartsOption
+  let option: EChartsOption
 
   if (type === 'pie') {
     option = {
@@ -107,10 +144,17 @@ const renderChart = () => {
           type: type as 'bar' | 'line',
           data: values,
           itemStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: '#667eea' },
-              { offset: 1, color: '#764ba2' },
-            ]),
+            color: {
+              type: 'linear',
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [
+                { offset: 0, color: '#667eea' },
+                { offset: 1, color: '#764ba2' },
+              ],
+            },
           },
         },
       ],

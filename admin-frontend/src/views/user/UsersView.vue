@@ -150,6 +150,7 @@ import { useRoute } from 'vue-router'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { assignUserRoles, getUserDetail, getUserList, updateUser } from '@/api/user'
 import { getRoleList } from '@/api/role'
+import { md5 } from 'js-md5'
 
 const route = useRoute()
 const isProfilePage = computed(() => route.path === '/profile')
@@ -329,7 +330,7 @@ const submitEdit = async () => {
         updateData.username = editForm.username
       }
       if (editForm.password) {
-        updateData.password = editForm.password
+        updateData.password = md5(editForm.password)
       }
 
       const res: any = await updateUser(currentUser.value.id, updateData)

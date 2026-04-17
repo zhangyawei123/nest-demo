@@ -66,6 +66,11 @@ export class AuthService {
       throw new UnauthorizedException('用户名或密码错误');
     }
 
+    await this.userService.migratePasswordHashIfNeeded(
+      user,
+      loginUserDto.password,
+    );
+
     // 第四步：生成 JWT Token（payload 中存放用户 id 和 username）
     const payload = { sub: user.id, username: user.username };
     const access_token = await this.jwtService.signAsync(payload);

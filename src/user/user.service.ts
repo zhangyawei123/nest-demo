@@ -1,6 +1,7 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { User } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -35,7 +36,10 @@ export class UserService {
     }
 
     // 直接存储前端传来的 MD5 密码
-    const user = this.userRepository.create(createUserDto);
+    const user = this.userRepository.create({
+      ...createUserDto,
+      password: await this.hashPassword(createUserDto.password),
+    });
 
     return this.userRepository.save(user);
   }
@@ -112,8 +116,8 @@ export class UserService {
   async assignRoleIds(id: number, roleIds: number[]) {
     const user = await this.findById(id);
     user.roles = roleIds.length ? await this.roleRepository.findBy({ id: In(roleIds) }) : [];
-    const savedUser = await this.userRepository.save(user);
-    return this.sanitizeUser(savedUser);
+    await this.userRepository.save(user);
+    return this.sanitizeUser(await this.findById(id));
   }
 
   /**
@@ -128,7 +132,12 @@ export class UserService {
     const user = await this.findById(id);
 
     // 直接保存前端传来的 MD5 密码
-    Object.assign(user, updateUserDto);
+    const nextUser = { ...updateUserDto };
+    if (nextUser.password) {
+      nextUser.password = await this.hashPassword(nextUser.password);
+    }
+
+    Object.assign(user, nextUser);
     return this.userRepository.save(user);
   }
 
@@ -140,11 +149,33 @@ export class UserService {
    * @returns 匹配返回 true，不匹配返回 false
    */
   async validatePassword(md5Password: string, storedPassword: string): Promise<boolean> {
+    if (this.isBcryptHash(storedPassword)) {
+      return bcrypt.compare(md5Password, storedPassword);
+    }
+
     return md5Password === storedPassword;
+  }
+
+  async migratePasswordHashIfNeeded(user: User, md5Password: string): Promise<void> {
+    if (!user.password || this.isBcryptHash(user.password) || user.password !== md5Password) {
+      return;
+    }
+
+    const hashedPassword = await this.hashPassword(md5Password);
+    await this.userRepository.update(user.id, { password: hashedPassword });
+    user.password = hashedPassword;
   }
 
   private sanitizeUser(user: User) {
     const { password, ...result } = user as any;
     return result;
+  }
+
+  private isBcryptHash(password: string) {
+    return /^\$2[aby]\$\d{2}\$/.test(password);
+  }
+
+  private hashPassword(password: string) {
+    return bcrypt.hash(password, 10);
   }
 }

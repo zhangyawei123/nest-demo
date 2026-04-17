@@ -101,6 +101,9 @@ const handleCommand = (command: string) => {
   }
 }
 
+const escapeHtml = (str: string) =>
+  str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+
 const showNotices = async () => {
   try {
     const list: any = await getActiveNotices()
@@ -111,7 +114,7 @@ const showNotices = async () => {
     if (last === today) return
     localStorage.setItem(noticeKey, today)
     const html = list
-      .map((n: any) => `<div style="margin-bottom:10px"><strong>${n.title}</strong><p style="margin:4px 0 0;color:#606266;font-size:13px">${n.content}</p></div>`)
+      .map((n: any) => `<div style="margin-bottom:10px"><strong>${escapeHtml(n.title)}</strong><p style="margin:4px 0 0;color:#606266;font-size:13px">${escapeHtml(n.content)}</p></div>`)
       .join('')
     ElMessageBox.alert(html, '系统公告', { dangerouslyUseHTMLString: true, confirmButtonText: '知道了' })
   } catch {}

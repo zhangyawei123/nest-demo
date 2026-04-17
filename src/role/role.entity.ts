@@ -12,7 +12,7 @@ export class Role {
   @Column({ length: 200, nullable: true })
   description: string;
 
-  @ManyToMany(() => Menu, { eager: true })
+  @ManyToMany(() => Menu)
   @JoinTable({ name: 'role_menus' })
   menus: Menu[];
 

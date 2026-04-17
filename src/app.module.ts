@@ -43,18 +43,25 @@ import { VisionModule } from './vision/vision.module';
     // 数据库模块 - 异步读取环境变量后再连接 MySQL
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
-        host: configService.get('DB_HOST'),
-        port: configService.get<number>('DB_PORT'),
-        username: configService.get('DB_USERNAME'),
-        password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_DATABASE'),
-        // 自动扫描所有 *.entity.ts / *.entity.js 文件
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        // 开发环境：自动同步实体到数据库表结构（生产环境务必设为 false）
-        synchronize: true,
-      }),
+      useFactory: (configService: ConfigService) => {
+        const nodeEnv = configService.get<string>('NODE_ENV', 'development');
+        const enableDbSync = configService.get<string>('DB_SYNCHRONIZE');
+
+        return {
+          type: 'mysql',
+          host: configService.get('DB_HOST'),
+          port: configService.get<number>('DB_PORT'),
+          username: configService.get('DB_USERNAME'),
+          password: configService.get('DB_PASSWORD'),
+          database: configService.get('DB_DATABASE'),
+          // 自动扫描所有 *.entity.ts / *.entity.js 文件
+          entities: [__dirname + '/**/*.entity{.ts,.js}'],
+          // 开发环境默认开启，生产环境默认关闭，可通过 DB_SYNCHRONIZE 显式覆盖
+          synchronize: enableDbSync !== undefined
+            ? enableDbSync === 'true'
+            : nodeEnv !== 'production',
+        };
+      },
       inject: [ConfigService],
     }),
     // 用户模块

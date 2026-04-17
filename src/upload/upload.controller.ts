@@ -7,8 +7,9 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiConsumes } from '@nestjs/swagger';
-import { writeFileSync, mkdirSync, existsSync } from 'fs';
+import { mkdir, writeFile } from 'fs/promises';
 import { extname, join } from 'path';
+import { randomUUID } from 'crypto';
 
 /**
  * 文件上传控制器
@@ -23,7 +24,7 @@ export class UploadController {
   @ApiConsumes('multipart/form-data')
   @Post('image')
   @UseInterceptors(FileInterceptor('file'))
-  uploadImage(@UploadedFile() file: any) {
+  async uploadImage(@UploadedFile() file: any) {
     if (!file) {
       throw new BadRequestException('请选择文件');
     }
@@ -38,22 +39,16 @@ export class UploadController {
       throw new BadRequestException('文件大小不能超过 5MB');
     }
 
-    // 生成随机文件名
-    const randomName = Array(32)
-      .fill(null)
-      .map(() => Math.round(Math.random() * 16).toString(16))
-      .join('');
-    const filename = `${randomName}${extname(file.originalname)}`;
+    // 生成安全随机文件名
+    const filename = `${randomUUID()}${extname(file.originalname)}`;
 
     // 确保 uploads 目录存在
     const uploadDir = join(process.cwd(), 'uploads');
-    if (!existsSync(uploadDir)) {
-      mkdirSync(uploadDir, { recursive: true });
-    }
+    await mkdir(uploadDir, { recursive: true });
 
     // 保存文件
     const filepath = join(uploadDir, filename);
-    writeFileSync(filepath, file.buffer);
+    await writeFile(filepath, file.buffer);
 
     return {
       filename,

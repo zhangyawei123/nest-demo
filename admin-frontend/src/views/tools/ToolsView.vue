@@ -15,7 +15,7 @@
             <p>输入地点名称或详细地址，快速获取标准地址和经纬度。</p>
           </div>
         </template>
-        <LocationTool />
+        <component :is="toolComponents.location" v-if="activeNames.includes('location')" />
       </el-collapse-item>
 
       <el-collapse-item name="coordinate">
@@ -25,7 +25,7 @@
             <p>支持 WGS84、GCJ02、BD09 互转，并生成常用地图打开链接。</p>
           </div>
         </template>
-        <CoordinateTransformTool />
+        <component :is="toolComponents.coordinate" v-if="activeNames.includes('coordinate')" />
       </el-collapse-item>
 
       <el-collapse-item name="qrcode">
@@ -35,7 +35,7 @@
             <p>支持文本或链接生成二维码，也可以上传二维码图片直接解析内容。</p>
           </div>
         </template>
-        <QrCodeTool />
+        <component :is="toolComponents.qrcode" v-if="activeNames.includes('qrcode')" />
       </el-collapse-item>
 
       <el-collapse-item name="lottery">
@@ -45,20 +45,22 @@
             <p>把原来的抽奖页收进工具页，方便直接配置、抽奖和看记录。</p>
           </div>
         </template>
-        <LotteryTool />
+        <component :is="toolComponents.lottery" v-if="activeNames.includes('lottery')" />
       </el-collapse-item>
     </el-collapse>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import LocationTool from './LocationTool.vue'
-import CoordinateTransformTool from './CoordinateTransformTool.vue'
-import QrCodeTool from './QrCodeTool.vue'
-import LotteryTool from './LotteryTool.vue'
+import { defineAsyncComponent, ref } from 'vue'
 
 const activeNames = ref<string[]>([])
+const toolComponents = {
+  location: defineAsyncComponent(() => import('./LocationTool.vue')),
+  coordinate: defineAsyncComponent(() => import('./CoordinateTransformTool.vue')),
+  qrcode: defineAsyncComponent(() => import('./QrCodeTool.vue')),
+  lottery: defineAsyncComponent(() => import('./LotteryTool.vue')),
+}
 </script>
 
 <style scoped>
