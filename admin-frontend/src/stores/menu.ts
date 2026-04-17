@@ -7,6 +7,7 @@ import RouterLayout from '@/components/RouterLayout.vue'
 // 使用 Vite 的 glob import 预加载所有视图组件
 // @/views glob 的 key 格式为 /src/views/xxx.vue
 const modules = import.meta.glob('/src/views/**/*.vue')
+const hiddenComponents = new Set(['lottery/LotteryView'])
 
 function loadComponent(componentPath: string) {
   const key = `/src/views/${componentPath}.vue`
@@ -22,11 +23,27 @@ export const useMenuStore = defineStore('menu', () => {
   const menus = ref<any[]>([])
   const loaded = ref(false)
 
+  function sanitizeMenus(menuList: any[]): any[] {
+    return menuList.reduce((list: any[], menu) => {
+      if (hiddenComponents.has(menu.component)) {
+        return list
+      }
+
+      const nextMenu = { ...menu }
+      if (Array.isArray(menu.children) && menu.children.length) {
+        nextMenu.children = sanitizeMenus(menu.children)
+      }
+
+      list.push(nextMenu)
+      return list
+    }, [])
+  }
+
   async function loadMenus() {
     if (loaded.value) return
     try {
       const data: any = await getMyMenus()
-      menus.value = data || []
+      menus.value = sanitizeMenus(data || [])
       registerRoutes(menus.value)
       loaded.value = true
       return true

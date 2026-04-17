@@ -3,164 +3,62 @@
     <div class="page-header">
       <div>
         <h2>小功能</h2>
-        <p>这里放一些零散但实用的小工具，后面可以继续往这里加。</p>
+        <p>这里放一些零散但实用的小工具，统一作为组件收口，不再单独拆新路由。</p>
       </div>
     </div>
 
-    <div class="tool-card">
-      <div class="tool-card-header">
-        <div>
-          <h3>地点转经纬度</h3>
-          <p>输入地点名称或详细地址，快速获取标准地址和经纬度。</p>
-        </div>
-      </div>
+    <el-collapse v-model="activeNames" class="tools-collapse">
+      <el-collapse-item name="location">
+        <template #title>
+          <div class="tool-collapse-title">
+            <h3>地点转经纬度</h3>
+            <p>输入地点名称或详细地址，快速获取标准地址和经纬度。</p>
+          </div>
+        </template>
+        <LocationTool />
+      </el-collapse-item>
 
-      <div class="search-row">
-        <el-input
-          v-model="address"
-          placeholder="请输入地点，例如：遵义市红花岗区中山路街道内环路走马坝市建老徐脆哨"
-          clearable
-          @keyup.enter="searchLocation"
-        />
-        <el-button type="primary" :loading="loading" @click="searchLocation">获取经纬度</el-button>
-        <el-button @click="openPicker">地图选点</el-button>
-      </div>
+      <el-collapse-item name="coordinate">
+        <template #title>
+          <div class="tool-collapse-title">
+            <h3>坐标系转换</h3>
+            <p>支持 WGS84、GCJ02、BD09 互转，并生成常用地图打开链接。</p>
+          </div>
+        </template>
+        <CoordinateTransformTool />
+      </el-collapse-item>
 
-      <el-alert v-if="errorMessage" :title="errorMessage" type="error" :closable="false" show-icon />
+      <el-collapse-item name="qrcode">
+        <template #title>
+          <div class="tool-collapse-title">
+            <h3>二维码工具</h3>
+            <p>支持文本或链接生成二维码，也可以上传二维码图片直接解析内容。</p>
+          </div>
+        </template>
+        <QrCodeTool />
+      </el-collapse-item>
 
-      <div v-if="result" class="result-panel">
-        <div class="result-item">
-          <span class="label">输入地点</span>
-          <span class="value">{{ result.query }}</span>
-        </div>
-        <div class="result-item">
-          <span class="label">标准地址</span>
-          <span class="value">{{ result.address }}</span>
-        </div>
-        <div class="result-item">
-          <span class="label">经纬度</span>
-          <span class="value">{{ result.location }}</span>
-        </div>
-        <div class="action-row">
-          <el-button @click="copyText(result.location, '经纬度已复制')">复制经纬度</el-button>
-          <el-button @click="copyText(result.address, '标准地址已复制')">复制标准地址</el-button>
-        </div>
-      </div>
-    </div>
-
-    <el-dialog v-model="pickerVisible" title="地图选点" width="80%" top="5vh" destroy-on-close>
-      <iframe :src="pickerUrl" class="picker-frame" allow="geolocation"></iframe>
-    </el-dialog>
+      <el-collapse-item name="lottery">
+        <template #title>
+          <div class="tool-collapse-title">
+            <h3>幸运转盘</h3>
+            <p>把原来的抽奖页收进工具页，方便直接配置、抽奖和看记录。</p>
+          </div>
+        </template>
+        <LotteryTool />
+      </el-collapse-item>
+    </el-collapse>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref } from 'vue'
+import LocationTool from './LocationTool.vue'
+import CoordinateTransformTool from './CoordinateTransformTool.vue'
+import QrCodeTool from './QrCodeTool.vue'
+import LotteryTool from './LotteryTool.vue'
 
-const mapKey = 'CPEBZ-VERW3-62Q3C-O4O4N-JXBCF-CFBF7'
-const address = ref('')
-const loading = ref(false)
-const errorMessage = ref('')
-const pickerVisible = ref(false)
-const currentLocation = ref('')
-
-const result = ref<{ query: string; address: string; location: string } | null>(null)
-
-const pickerUrl = computed(() => {
-  let url = `https://apis.map.qq.com/tools/locpicker?search=1&type=1&key=${mapKey}&referer=latlng`
-  if (address.value.trim()) {
-    url += `&addr=${encodeURIComponent(address.value.trim())}`
-  }
-  if (currentLocation.value) {
-    url += `&coord=${currentLocation.value}`
-  }
-  return url
-})
-
-const copyText = async (text: string, message: string) => {
-  if (!text) return
-  try {
-    await navigator.clipboard.writeText(text)
-    ElMessage.success(message)
-  } catch {
-    ElMessage.error('复制失败，请手动复制')
-  }
-}
-
-const renderResult = (query: string, targetAddress: string, lat: number, lng: number) => {
-  const location = `${lat},${lng}`
-  currentLocation.value = location
-  result.value = {
-    query,
-    address: targetAddress || query,
-    location,
-  }
-}
-
-const searchLocation = () => {
-  const query = address.value.trim()
-  if (!query) {
-    errorMessage.value = '请输入地点'
-    result.value = null
-    return
-  }
-
-  errorMessage.value = ''
-  result.value = null
-  loading.value = true
-
-  const callbackName = `qqMapGeocoder_${Date.now()}`
-  const script = document.createElement('script')
-
-  ;(window as any)[callbackName] = (res: any) => {
-    try {
-      if (res?.status === 0 && res?.result?.location) {
-        renderResult(query, res.result.address || query, res.result.location.lat, res.result.location.lng)
-      } else {
-        errorMessage.value = res?.message || '未获取到经纬度'
-      }
-    } finally {
-      loading.value = false
-      delete (window as any)[callbackName]
-      script.remove()
-    }
-  }
-
-  script.onerror = () => {
-    loading.value = false
-    errorMessage.value = '请求失败，请检查 Key 或网络'
-    delete (window as any)[callbackName]
-    script.remove()
-  }
-
-  script.src = `https://apis.map.qq.com/ws/geocoder/v1/?address=${encodeURIComponent(query)}&output=jsonp&key=${mapKey}&callback=${callbackName}`
-  document.body.appendChild(script)
-}
-
-const openPicker = () => {
-  pickerVisible.value = true
-}
-
-const handleMessage = (event: MessageEvent) => {
-  const loc = event.data as any
-  if (!loc || loc.module !== 'locationPicker' || !loc.latlng) {
-    return
-  }
-  const targetAddress = loc.poiaddress || loc.poiname || address.value.trim()
-  address.value = targetAddress
-  errorMessage.value = ''
-  renderResult(targetAddress, targetAddress, loc.latlng.lat, loc.latlng.lng)
-  pickerVisible.value = false
-}
-
-onMounted(() => {
-  window.addEventListener('message', handleMessage, false)
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener('message', handleMessage, false)
-})
+const activeNames = ref<string[]>([])
 </script>
 
 <style scoped>
@@ -188,38 +86,66 @@ onBeforeUnmount(() => {
   font-size: 14px;
 }
 
-.tool-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+.tools-collapse {
+  --el-collapse-border-color: transparent;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
 }
 
-.tool-card-header h3 {
+.tools-page :deep(.el-collapse-item) {
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  background: #fff;
+}
+
+.tools-page :deep(.el-collapse-item__header) {
+  min-height: 88px;
+  padding: 18px 24px;
+  border: none;
+  align-items: center;
+  line-height: normal;
+  background: #fff;
+}
+
+.tool-collapse-title h3 {
   margin: 0 0 8px;
   font-size: 20px;
   color: #303133;
 }
 
-.tool-card-header p {
+.tool-collapse-title p {
   margin: 0;
   color: #606266;
   font-size: 14px;
 }
 
-.search-row {
+.tools-page :deep(.el-collapse-item__wrap) {
+  border: none;
+}
+
+.tools-page :deep(.el-collapse-item__content) {
+  padding: 0 24px 24px;
+}
+
+.tools-page :deep(.tool-panel-content) {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.tools-page :deep(.search-row) {
   display: flex;
   gap: 12px;
 }
 
-.search-row :deep(.el-input) {
+.tools-page :deep(.search-row .el-input) {
   flex: 1;
 }
 
-.result-panel {
+.tools-page :deep(.result-panel) {
   background: #f8fafc;
   border: 1px solid #ebeef5;
   border-radius: 12px;
@@ -229,41 +155,42 @@ onBeforeUnmount(() => {
   gap: 14px;
 }
 
-.result-item {
+.tools-page :deep(.result-item) {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.label {
+.tools-page :deep(.label) {
   font-size: 13px;
   color: #909399;
 }
 
-.value {
+.tools-page :deep(.value) {
   font-size: 14px;
   color: #303133;
   word-break: break-all;
 }
 
-.action-row {
+.tools-page :deep(.action-row) {
   display: flex;
   gap: 12px;
 }
 
-.picker-frame {
-  width: 100%;
-  height: 70vh;
-  border: none;
-  border-radius: 10px;
-}
-
 @media (max-width: 768px) {
-  .search-row {
+  .tools-page :deep(.el-collapse-item__header) {
+    padding: 16px 18px;
+  }
+
+  .tools-page :deep(.el-collapse-item__content) {
+    padding: 0 18px 18px;
+  }
+
+  .tools-page :deep(.search-row) {
     flex-direction: column;
   }
 
-  .action-row {
+  .tools-page :deep(.action-row) {
     flex-direction: column;
   }
 }
