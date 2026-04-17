@@ -4,6 +4,11 @@ import router from '@/router'
 
 let isRedirectingToLogin = false
 
+const shouldBypassAuthRedirect = (url?: string) => {
+  if (!url) return false
+  return ['/auth/login'].some(path => url.includes(path))
+}
+
 /**
  * Axios 实例配置
  * baseURL 会在开发环境通过 vite.config.ts 的 proxy 代理到后端
@@ -49,9 +54,14 @@ request.interceptors.response.use(
   (error) => {
     if (error.response) {
       const { status, data } = error.response
+      const requestUrl = error.config?.url as string | undefined
       
       switch (status) {
         case 401:
+          if (shouldBypassAuthRedirect(requestUrl)) {
+            ElMessage.error(data.message || '请求失败')
+            break
+          }
           if (!isRedirectingToLogin) {
             isRedirectingToLogin = true
             ElMessage.error('登录已过期，请重新登录')
