@@ -1,12 +1,11 @@
 <template>
   <div class="ai-chat">
     <div class="chat-container">
-      <!-- 消息列表 -->
       <div class="chat-messages" ref="messagesRef">
         <div v-if="messages.length === 0" class="empty-state">
           <el-icon :size="48" color="#409eff"><ChatDotRound /></el-icon>
           <h3>AI 助手</h3>
-          <p>输入消息开始对话，支持代码问答、技术咨询等</p>
+          <p>输入文字或上传图片开始对话，支持图文问答与技术咨询</p>
         </div>
 
         <div
@@ -25,7 +24,19 @@
           </div>
           <div class="message-content">
             <div class="message-role">{{ msg.role === 'user' ? '我' : 'AI 助手' }}</div>
-            <div class="message-text" v-html="renderMarkdown(msg.content)"></div>
+            <div class="message-body" :class="{ 'image-only': !getMessageText(msg.content) }">
+              <img
+                v-if="getMessageImage(msg.content)"
+                :src="getMessageImage(msg.content)"
+                alt="用户上传图片"
+                class="message-image"
+              />
+              <div
+                v-if="getMessageText(msg.content)"
+                class="message-text"
+                v-html="renderMarkdown(getMessageText(msg.content))"
+              ></div>
+            </div>
           </div>
         </div>
 
@@ -47,22 +58,32 @@
         </div>
       </div>
 
-      <!-- 输入区 -->
       <div class="chat-input">
+        <div v-if="selectedImageUrl" class="selected-image-panel">
+          <img :src="selectedImageUrl" alt="待发送图片" class="selected-image-preview" />
+          <div class="selected-image-meta">
+            <span class="selected-image-name">{{ selectedImageName }}</span>
+            <el-button text @click="removeSelectedImage">
+              <el-icon><Close /></el-icon>
+              移除图片
+            </el-button>
+          </div>
+        </div>
+
         <div class="input-wrapper">
           <el-input
             v-model="inputText"
             type="textarea"
             :rows="2"
             :autosize="{ minRows: 1, maxRows: 5 }"
-            placeholder="输入消息... (Enter 发送, Shift+Enter 换行)"
+            placeholder="输入消息... (支持图片，Enter 发送，Shift+Enter 换行)"
             resize="none"
             @keydown.enter.exact.prevent="handleSend"
           />
           <el-button
             type="primary"
             :loading="loading"
-            :disabled="!inputText.trim()"
+            :disabled="!canSend"
             class="send-btn"
             @click="handleSend"
           >
@@ -70,11 +91,26 @@
           </el-button>
         </div>
         <div class="input-actions">
-          <el-button size="small" text @click="clearMessages">
-            <el-icon><Delete /></el-icon>
-            清空对话
-          </el-button>
-          <span class="model-tag">Doubao-Seed-2.0-Code</span>
+          <div class="input-actions-left">
+            <el-upload
+              :auto-upload="false"
+              :show-file-list="false"
+              accept="image/*"
+              @change="handleImageChange"
+            >
+              <template #trigger>
+                <el-button size="small" text>
+                  <el-icon><Picture /></el-icon>
+                  上传图片
+                </el-button>
+              </template>
+            </el-upload>
+            <el-button size="small" text @click="clearMessages">
+              <el-icon><Delete /></el-icon>
+              清空对话
+            </el-button>
+          </div>
+          <span class="model-tag">模型由服务端配置</span>
         </div>
       </div>
     </div>
@@ -82,16 +118,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { User, Monitor, Promotion, Delete, ChatDotRound } from '@element-plus/icons-vue'
-import { sendChatStream, type ChatMessage } from '@/api/ai-chat'
+import type { UploadFile } from 'element-plus'
+import { User, Monitor, Promotion, Delete, ChatDotRound, Picture, Close } from '@element-plus/icons-vue'
+import { sendChatStream, type ChatContentPart, type ChatMessage } from '@/api/ai-chat'
 
 const messages = ref<ChatMessage[]>([])
 const inputText = ref('')
 const loading = ref(false)
 const streamContent = ref('')
 const messagesRef = ref<HTMLDivElement>()
+const selectedImageUrl = ref('')
+const selectedImageName = ref('')
+
+const canSend = computed(() => {
+  return Boolean(inputText.value.trim() || selectedImageUrl.value) && !loading.value
+})
 
 const scrollToBottom = async () => {
   await nextTick()
@@ -100,24 +143,86 @@ const scrollToBottom = async () => {
   }
 }
 
+const fileToDataUrl = (file: File) =>
+  new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result || ''))
+    reader.onerror = () => reject(new Error('图片读取失败'))
+    reader.readAsDataURL(file)
+  })
+
+const buildUserMessage = (text: string, imageUrl: string): ChatMessage => {
+  if (!imageUrl) {
+    return { role: 'user', content: text }
+  }
+
+  const parts: ChatContentPart[] = []
+  if (text) {
+    parts.push({ type: 'text', text })
+  }
+  parts.push({
+    type: 'image_url',
+    image_url: { url: imageUrl },
+  })
+  return { role: 'user', content: parts }
+}
+
+const getMessageText = (content: ChatMessage['content']) => {
+  if (typeof content === 'string') return content
+  return content
+    .filter((part): part is Extract<ChatContentPart, { type: 'text' }> => part.type === 'text')
+    .map(part => part.text)
+    .join('\n')
+}
+
+const getMessageImage = (content: ChatMessage['content']) => {
+  if (typeof content === 'string') return ''
+  return content.find(part => part.type === 'image_url')?.image_url.url || ''
+}
+
+const handleImageChange = async (file: UploadFile) => {
+  const raw = file.raw
+  if (!raw) return
+
+  if (!raw.type.startsWith('image/')) {
+    ElMessage.error('只能上传图片文件')
+    return
+  }
+
+  if (raw.size > 3 * 1024 * 1024) {
+    ElMessage.error('图片大小不能超过 3MB')
+    return
+  }
+
+  try {
+    selectedImageUrl.value = await fileToDataUrl(raw)
+    selectedImageName.value = raw.name
+  } catch (e: any) {
+    ElMessage.error(e?.message || '图片读取失败')
+  }
+}
+
+const removeSelectedImage = () => {
+  selectedImageUrl.value = ''
+  selectedImageName.value = ''
+}
+
 const handleSend = async () => {
   const text = inputText.value.trim()
-  if (!text || loading.value) return
+  const imageUrl = selectedImageUrl.value
+  if ((!text && !imageUrl) || loading.value) return
 
-  messages.value.push({ role: 'user', content: text })
+  const userMessage = buildUserMessage(text, imageUrl)
+  messages.value.push(userMessage)
   inputText.value = ''
+  removeSelectedImage()
   loading.value = true
   streamContent.value = ''
   await scrollToBottom()
 
   try {
-    const chatMessages: ChatMessage[] = messages.value.map(m => ({
-      role: m.role,
-      content: m.content,
-    }))
-
     let fullContent = ''
-    for await (const chunk of sendChatStream(chatMessages)) {
+    for await (const chunk of sendChatStream(messages.value)) {
       fullContent += chunk
       streamContent.value = fullContent
       await scrollToBottom()
@@ -235,12 +340,35 @@ const renderMarkdown = (text: string) => {
   margin-bottom: 4px;
 }
 
+.message-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.message-item.user .message-body {
+  align-items: flex-end;
+}
+
+.message-body.image-only {
+  max-width: 320px;
+}
+
 .message-text {
   padding: 12px 16px;
   border-radius: 12px;
   font-size: 14px;
   line-height: 1.6;
   word-break: break-word;
+}
+
+.message-image {
+  max-width: 320px;
+  max-height: 240px;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
 
 .message-item.user .message-text {
@@ -283,6 +411,43 @@ const renderMarkdown = (text: string) => {
   border-top: 1px solid #e4e7ed;
 }
 
+.selected-image-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  background: #f5f7fa;
+  border: 1px solid #e4e7ed;
+  border-radius: 10px;
+}
+
+.selected-image-preview {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.selected-image-meta {
+  min-width: 0;
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.selected-image-name {
+  min-width: 0;
+  color: #606266;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .input-wrapper {
   display: flex;
   gap: 12px;
@@ -309,6 +474,12 @@ const renderMarkdown = (text: string) => {
   margin-top: 8px;
 }
 
+.input-actions-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .model-tag {
   font-size: 12px;
   color: #c0c4cc;
@@ -332,5 +503,26 @@ const renderMarkdown = (text: string) => {
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .message-content {
+    max-width: calc(100% - 48px);
+  }
+
+  .message-image,
+  .message-body.image-only {
+    max-width: 100%;
+  }
+
+  .selected-image-panel {
+    align-items: flex-start;
+  }
+
+  .selected-image-meta,
+  .input-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 </style>
