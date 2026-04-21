@@ -10,7 +10,26 @@
     "pages/recipe-combo/recipe-combo",
     "pages/notice/notice",
     "pages/mine/mine",
-    "pages/login/login"
+    "pages/login/login",
+    "pages/tools/tools"
+  ],
+  "subpackages": [
+    {
+      "root": "subpackages/tools",
+      "pages": [
+        "clean-speaker/clean-speaker",
+        "flashlight/flashlight",
+        "level/level",
+        "ruler/ruler",
+        "compass/compass",
+        "decibel/decibel",
+        "qr/qr",
+        "mirror/mirror",
+        "calc/calc",
+        "woodfish/woodfish",
+        "singing-bowl/singing-bowl"
+      ]
+    }
   ],
   "tabBar": {
     "color": "#94a3b8",

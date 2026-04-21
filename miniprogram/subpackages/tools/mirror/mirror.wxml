@@ -1,0 +1,14 @@
+<view class="mirror-page">
+  <camera class="mirror-camera" device-position="front" flash="off" resolution="high"></camera>
+  <view class="mirror-controls">
+    <view class="mirror-btn {{brightness === 1 ? 'active' : ''}}" bindtap="setBrightness" data-val="1">
+      <text>☀️ 最亮</text>
+    </view>
+    <view class="mirror-btn {{brightness === 0.7 ? 'active' : ''}}" bindtap="setBrightness" data-val="0.7">
+      <text>🌤️ 柔和</text>
+    </view>
+    <view class="mirror-btn {{brightness === 0.4 ? 'active' : ''}}" bindtap="setBrightness" data-val="0.4">
+      <text>🌙 暗光</text>
+    </view>
+  </view>
+</view>

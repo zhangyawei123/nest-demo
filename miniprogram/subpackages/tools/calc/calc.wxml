@@ -1,0 +1,37 @@
+<view class="calc-page">
+  <view class="calc-display">
+    <text class="calc-expr">{{expr || ' '}}</text>
+    <text class="calc-result">{{display}}</text>
+  </view>
+  <view class="calc-keys">
+    <view class="calc-row">
+      <view class="calc-key key-func" bindtap="onKey" data-val="C"><text>C</text></view>
+      <view class="calc-key key-func" bindtap="onKey" data-val="±"><text>±</text></view>
+      <view class="calc-key key-func" bindtap="onKey" data-val="%"><text>%</text></view>
+      <view class="calc-key key-op" bindtap="onKey" data-val="÷"><text>÷</text></view>
+    </view>
+    <view class="calc-row">
+      <view class="calc-key" bindtap="onKey" data-val="7"><text>7</text></view>
+      <view class="calc-key" bindtap="onKey" data-val="8"><text>8</text></view>
+      <view class="calc-key" bindtap="onKey" data-val="9"><text>9</text></view>
+      <view class="calc-key key-op" bindtap="onKey" data-val="×"><text>×</text></view>
+    </view>
+    <view class="calc-row">
+      <view class="calc-key" bindtap="onKey" data-val="4"><text>4</text></view>
+      <view class="calc-key" bindtap="onKey" data-val="5"><text>5</text></view>
+      <view class="calc-key" bindtap="onKey" data-val="6"><text>6</text></view>
+      <view class="calc-key key-op" bindtap="onKey" data-val="-"><text>-</text></view>
+    </view>
+    <view class="calc-row">
+      <view class="calc-key" bindtap="onKey" data-val="1"><text>1</text></view>
+      <view class="calc-key" bindtap="onKey" data-val="2"><text>2</text></view>
+      <view class="calc-key" bindtap="onKey" data-val="3"><text>3</text></view>
+      <view class="calc-key key-op" bindtap="onKey" data-val="+"><text>+</text></view>
+    </view>
+    <view class="calc-row">
+      <view class="calc-key key-zero" bindtap="onKey" data-val="0"><text>0</text></view>
+      <view class="calc-key" bindtap="onKey" data-val="."><text>.</text></view>
+      <view class="calc-key key-op" bindtap="onKey" data-val="="><text>=</text></view>
+    </view>
+  </view>
+</view>

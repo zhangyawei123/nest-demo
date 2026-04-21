@@ -1,0 +1,21 @@
+<view class="decibel-page">
+  <view class="db-display">
+    <text class="db-value">{{db}}</text>
+    <text class="db-unit">dB</text>
+  </view>
+  <view class="db-bar-wrap">
+    <view class="db-bar" style="width: {{barWidth}}%;"></view>
+  </view>
+  <view class="db-level">
+    <text class="db-level-text {{levelClass}}">{{levelText}}</text>
+  </view>
+  <view class="db-legend">
+    <view class="db-legend-item"><view class="legend-dot legend-green"></view><text>0-40 安静</text></view>
+    <view class="db-legend-item"><view class="legend-dot legend-yellow"></view><text>40-70 正常</text></view>
+    <view class="db-legend-item"><view class="legend-dot legend-orange"></view><text>70-90 较吵</text></view>
+    <view class="db-legend-item"><view class="legend-dot legend-red"></view><text>90+ 危险</text></view>
+  </view>
+  <view class="db-btn" bindtap="toggle">
+    <text>{{isListening ? '停止' : '开始检测'}}</text>
+  </view>
+</view>

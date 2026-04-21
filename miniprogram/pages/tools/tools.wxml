@@ -1,0 +1,25 @@
+<view class="tools-page">
+  <view class="bg-orb orb-a"></view>
+  <view class="bg-orb orb-b"></view>
+
+  <view class="tools-header">
+    <text class="tools-title">实用小工具</text>
+    <text class="tools-desc">日常生活中用得上的小功能</text>
+  </view>
+
+  <view class="tools-section" wx:for="{{groups}}" wx:key="id">
+    <view class="section-header">
+      <text class="section-title">{{item.title}}</text>
+      <text class="section-desc">{{item.desc}}</text>
+    </view>
+    <view class="tools-grid">
+      <view class="tool-item" wx:for="{{item.tools}}" wx:key="id" bindtap="goTool" data-url="{{item.url}}" data-enabled="{{item.enabled}}">
+        <view class="tool-icon-wrap {{item.enabled ? '' : 'disabled'}}">
+          <text class="tool-emoji">{{item.icon}}</text>
+        </view>
+        <text class="tool-name">{{item.name}}</text>
+        <text class="tool-tag" wx:if="{{!item.enabled}}">即将上线</text>
+      </view>
+    </view>
+  </view>
+</view>

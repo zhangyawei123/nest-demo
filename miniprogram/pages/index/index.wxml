@@ -83,6 +83,10 @@
       <view class="grid-icon grid-cyan">📢</view>
       <text class="grid-label">公告</text>
     </view>
+    <view class="grid-item" bindtap="goPage" data-url="/pages/tools/tools">
+      <view class="grid-icon grid-purple">🧰</view>
+      <text class="grid-label">小工具</text>
+    </view>
     <view class="grid-item" bindtap="goPage" data-url="/pages/mine/mine">
       <view class="grid-icon grid-purple">👤</view>
       <text class="grid-label">我的</text>

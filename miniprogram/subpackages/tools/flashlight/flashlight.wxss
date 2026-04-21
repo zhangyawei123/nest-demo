@@ -1,0 +1,10 @@
+page { background: #1a1a2e; }
+.flash-page { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: background 0.4s; }
+.flash-page.on { background: #fffde7; }
+.flash-circle { width: 300rpx; height: 300rpx; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 60rpx rgba(255,255,255,0.1); transition: all 0.4s; }
+.flash-page.on .flash-circle { background: #fff9c4; box-shadow: 0 0 120rpx rgba(255,235,59,0.6); }
+.flash-icon { font-size: 100rpx; }
+.flash-status { margin-top: 40rpx; font-size: 32rpx; color: rgba(255,255,255,0.8); font-weight: 600; }
+.flash-page.on .flash-status { color: #f57f17; }
+.flash-tip { margin-top: 16rpx; font-size: 24rpx; color: rgba(255,255,255,0.4); }
+.flash-page.on .flash-tip { color: #f9a825; }

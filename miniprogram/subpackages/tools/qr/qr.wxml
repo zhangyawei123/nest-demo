@@ -1,0 +1,15 @@
+<view class="qr-page">
+  <view class="qr-input-wrap">
+    <textarea class="qr-input" placeholder="输入文字或网址生成二维码" value="{{text}}" bindinput="onInput" maxlength="300" />
+  </view>
+  <view class="qr-canvas-wrap" wx:if="{{text}}">
+    <canvas canvas-id="qrCanvas" class="qr-canvas"></canvas>
+  </view>
+  <view class="qr-empty" wx:else>
+    <text class="qr-empty-icon">🔳</text>
+    <text class="qr-empty-text">输入内容后自动生成</text>
+  </view>
+  <view class="qr-btn" wx:if="{{text}}" bindtap="saveToAlbum">
+    <text>保存到相册</text>
+  </view>
+</view>

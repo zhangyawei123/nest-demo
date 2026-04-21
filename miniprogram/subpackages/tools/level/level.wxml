@@ -1,0 +1,11 @@
+<view class="level-page">
+  <view class="level-ring">
+    <view class="level-bubble" style="transform: translate({{bubbleX}}rpx, {{bubbleY}}rpx);"></view>
+    <view class="level-crosshair-h"></view>
+    <view class="level-crosshair-v"></view>
+  </view>
+  <view class="level-info">
+    <text class="level-value">X: {{angleX}}°  Y: {{angleY}}°</text>
+    <text class="level-status {{isLevel ? 'level-ok' : ''}}">{{isLevel ? '✅ 水平' : '⚠️ 未水平'}}</text>
+  </view>
+</view>

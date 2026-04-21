@@ -1,0 +1,142 @@
+page {
+  background: linear-gradient(180deg, #6a4bd9 0%, #4c2ea8 100%);
+}
+
+.tools-page {
+  min-height: 100vh;
+  padding: 40rpx 30rpx 60rpx;
+  position: relative;
+  overflow: hidden;
+}
+
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80rpx);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.orb-a {
+  width: 400rpx;
+  height: 400rpx;
+  background: #a07cff;
+  top: -120rpx;
+  right: -80rpx;
+}
+
+.orb-b {
+  width: 360rpx;
+  height: 360rpx;
+  background: #5e3ec0;
+  bottom: 100rpx;
+  left: -120rpx;
+}
+
+.tools-header {
+  position: relative;
+  z-index: 1;
+  padding: 20rpx 10rpx 40rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.tools-title {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 2rpx;
+}
+
+.tools-desc {
+  margin-top: 10rpx;
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.tools-section {
+  position: relative;
+  z-index: 1;
+  margin-top: 24rpx;
+}
+
+.section-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20rpx;
+  padding: 0 6rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  color: #fff;
+  font-weight: 700;
+}
+
+.section-desc {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.tools-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24rpx;
+  margin-top: 20rpx;
+}
+
+.tool-item {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1rpx solid rgba(255, 255, 255, 0.2);
+  border-radius: 24rpx;
+  padding: 36rpx 10rpx 28rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  transition: transform 0.2s;
+}
+
+.tool-item:active {
+  transform: scale(0.95);
+}
+
+.tool-icon-wrap {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18rpx;
+  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.15);
+}
+
+.tool-icon-wrap.disabled {
+  opacity: 0.55;
+}
+
+.tool-emoji {
+  font-size: 52rpx;
+}
+
+.tool-name {
+  font-size: 26rpx;
+  color: #fff;
+  font-weight: 500;
+}
+
+.tool-tag {
+  position: absolute;
+  top: 12rpx;
+  right: 12rpx;
+  font-size: 18rpx;
+  padding: 2rpx 10rpx;
+  border-radius: 16rpx;
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}

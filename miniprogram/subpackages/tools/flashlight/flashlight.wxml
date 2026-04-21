@@ -1,0 +1,7 @@
+<view class="flash-page {{isOn ? 'on' : ''}}">
+  <view class="flash-circle" bindtap="toggle">
+    <text class="flash-icon">{{isOn ? '🔦' : '🌑'}}</text>
+  </view>
+  <text class="flash-status">{{isOn ? '已开启' : '点击开启'}}</text>
+  <text class="flash-tip">使用手机闪光灯照明</text>
+</view>

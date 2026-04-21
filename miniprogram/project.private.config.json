@@ -1,7 +1,19 @@
 {
   "libVersion": "3.15.1",
   "projectname": "nest-demo-miniprogram",
-  "condition": {},
+  "condition": {
+    "miniprogram": {
+      "list": [
+        {
+          "name": "pages/tools/tools",
+          "pathName": "pages/tools/tools",
+          "query": "",
+          "scene": null,
+          "launchMode": "default"
+        }
+      ]
+    }
+  },
   "setting": {
     "urlCheck": false,
     "coverView": true,

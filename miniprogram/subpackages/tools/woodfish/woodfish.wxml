@@ -1,0 +1,22 @@
+<view class="woodfish-page">
+  <view class="merit-card">
+    <text class="merit-title">今日功德</text>
+    <text class="merit-count">{{count}}</text>
+  </view>
+
+  <view class="woodfish-wrap">
+    <view class="woodfish-body {{hitting ? 'hitting' : ''}}" bindtap="hitWoodfish">
+      <text class="woodfish-emoji">🪵</text>
+    </view>
+    <view class="mallet {{hitting ? 'mallet-hit' : ''}}">🥢</view>
+  </view>
+
+  <text class="chant-text">轻敲木鱼，静心积福</text>
+  <text class="floating-merit" wx:if="{{showFloat}}">功德 +1</text>
+
+  <view class="actions">
+    <view class="action-btn" bindtap="resetCount">
+      <text>清零</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,23 @@
+<view class="bowl-page">
+  <view class="bowl-header">
+    <text class="bowl-title">静心颂钵</text>
+    <text class="bowl-desc">点击颂钵聆听钵音，也可开启循环冥想音</text>
+  </view>
+
+  <view class="bowl-zone" bindtap="strikeBowl">
+    <view class="sound-ring ring-1 {{playing ? 'ring-active' : ''}}"></view>
+    <view class="sound-ring ring-2 {{playing ? 'ring-active' : ''}}"></view>
+    <view class="sound-ring ring-3 {{playing ? 'ring-active' : ''}}"></view>
+    <view class="bowl-body {{playing ? 'bowl-active' : ''}}">
+      <text class="bowl-emoji">🔔</text>
+    </view>
+  </view>
+
+  <text class="bowl-tip">{{playing ? '钵音回荡中...' : (loopPlaying ? '循环冥想音播放中...' : '轻触开始静心')}}</text>
+
+  <view class="bowl-actions">
+    <view class="bowl-btn {{loopPlaying ? 'bowl-btn-active' : ''}}" bindtap="toggleLoop">
+      <text>{{loopPlaying ? '关闭循环冥想音' : '开启循环冥想音'}}</text>
+    </view>
+  </view>
+</view>

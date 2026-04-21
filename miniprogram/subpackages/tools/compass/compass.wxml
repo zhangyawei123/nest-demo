@@ -1,0 +1,14 @@
+<view class="compass-page">
+  <view class="compass-degree">
+    <text class="degree-text">{{degree}}°</text>
+    <text class="direction-text">{{direction}}</text>
+  </view>
+  <view class="compass-ring" style="transform: rotate({{-degree}}deg);">
+    <text class="compass-n">N</text>
+    <text class="compass-e">E</text>
+    <text class="compass-s">S</text>
+    <text class="compass-w">W</text>
+    <view class="compass-needle"></view>
+  </view>
+  <text class="compass-tip">请远离磁性物体以获取准确读数</text>
+</view>

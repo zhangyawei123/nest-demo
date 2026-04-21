@@ -4,6 +4,9 @@ dist
 uploads
 *.log
 
+# deploy secrets
+deploy/.server-password
+
 # frontend
 admin-frontend/node_modules
 admin-frontend/dist

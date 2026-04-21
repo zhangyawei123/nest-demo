@@ -1,0 +1,17 @@
+page { background: linear-gradient(180deg, #6d4c41 0%, #4e342e 100%); }
+.woodfish-page { min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 50rpx 30rpx; position: relative; }
+.merit-card { width: 100%; background: rgba(255,255,255,0.12); border: 1rpx solid rgba(255,255,255,0.18); border-radius: 24rpx; padding: 28rpx; display: flex; flex-direction: column; align-items: center; }
+.merit-title { font-size: 28rpx; color: rgba(255,255,255,0.7); }
+.merit-count { margin-top: 12rpx; font-size: 76rpx; color: #fff3e0; font-weight: 700; }
+.woodfish-wrap { position: relative; margin-top: 120rpx; width: 360rpx; height: 360rpx; display: flex; align-items: center; justify-content: center; }
+.woodfish-body { width: 280rpx; height: 220rpx; border-radius: 50% 50% 42% 42%; background: radial-gradient(circle at 50% 35%, #a1887f, #6d4c41 70%); box-shadow: inset 0 -16rpx 30rpx rgba(0,0,0,0.22), 0 18rpx 40rpx rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; transition: transform 0.16s; }
+.woodfish-body.hitting { transform: scale(0.94); }
+.woodfish-emoji { font-size: 92rpx; }
+.mallet { position: absolute; right: 10rpx; top: 30rpx; font-size: 64rpx; transform: rotate(-25deg); transition: transform 0.16s; }
+.mallet-hit { transform: rotate(18deg) translate(-28rpx, 24rpx); }
+.chant-text { margin-top: 60rpx; font-size: 28rpx; color: rgba(255,255,255,0.82); }
+.floating-merit { position: absolute; top: 480rpx; font-size: 34rpx; color: #ffe082; font-weight: 700; animation: floatUp 0.9s ease-out forwards; }
+@keyframes floatUp { 0% { opacity: 0; transform: translateY(30rpx); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-70rpx); } }
+.actions { margin-top: 80rpx; }
+.action-btn { padding: 18rpx 60rpx; background: rgba(255,255,255,0.14); border-radius: 36rpx; }
+.action-btn text { color: #fff; font-size: 28rpx; }

@@ -1,0 +1,108 @@
+<view class="clean-page">
+  <view class="bg-orb orb-a"></view>
+  <view class="bg-orb orb-b"></view>
+
+  <!-- 操作区 -->
+  <view class="section operate-section">
+    <text class="speaker-emoji">🔊</text>
+    <text class="main-title">清理手机喇叭灰尘</text>
+    <text class="main-desc">原理：利用声波振动，使灰尘振动脱离扬声器</text>
+    <view class="safe-badge">
+      <text class="safe-icon">✅</text>
+      <text class="safe-text">安全、苹果通用、需打开声音</text>
+    </view>
+
+    <!-- 选择频率 -->
+    <view class="freq-card">
+      <view class="freq-header">
+        <text class="freq-header-icon">🔲</text>
+        <text class="freq-header-text">选择频率</text>
+      </view>
+      <view class="freq-list">
+        <view class="freq-item {{currentFreq === 'low' ? 'freq-active' : ''}}" bindtap="selectFreq" data-freq="low">
+          <text class="freq-gem freq-gem-low">◆</text>
+          <text class="freq-label">低频</text>
+        </view>
+        <view class="freq-item {{currentFreq === 'mid' ? 'freq-active' : ''}}" bindtap="selectFreq" data-freq="mid">
+          <text class="freq-gem freq-gem-mid">◆</text>
+          <text class="freq-label">中频</text>
+        </view>
+        <view class="freq-item {{currentFreq === 'high' ? 'freq-active' : ''}}" bindtap="selectFreq" data-freq="high">
+          <text class="freq-gem freq-gem-high">◆</text>
+          <text class="freq-label">高频</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 播放按钮 -->
+    <view class="play-btn-wrap" bindtap="togglePlay">
+      <view class="play-btn {{isPlaying ? 'playing' : ''}}">
+        <text class="play-icon">{{isPlaying ? '⏹' : '🎵'}}</text>
+      </view>
+      <text class="play-text">{{isPlaying ? '停止清理' : '马上清理'}}</text>
+    </view>
+
+    <!-- 进度 -->
+    <view class="progress-wrap" wx:if="{{isPlaying}}">
+      <progress percent="{{progress}}" stroke-width="6" activeColor="#a07cff" backgroundColor="rgba(255,255,255,0.2)" />
+      <text class="progress-text">{{progressText}}</text>
+    </view>
+
+    <!-- 底部标签 -->
+    <view class="tag-bar">
+      <view class="tag-item">
+        <text class="tag-emoji">🔊</text>
+        <text class="tag-text">声波清理</text>
+      </view>
+      <view class="tag-item">
+        <text class="tag-emoji">🛡️</text>
+        <text class="tag-text">安全无害</text>
+      </view>
+      <view class="tag-item">
+        <text class="tag-emoji">⚡</text>
+        <text class="tag-text">即时生效</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 说明区 -->
+  <view class="section guide-section">
+    <text class="section-title">📋 使用说明</text>
+    <view class="guide-list">
+      <view class="guide-item">
+        <view class="guide-num">1</view>
+        <text class="guide-text">将手机音量调至最大 🔊</text>
+      </view>
+      <view class="guide-item">
+        <view class="guide-num">2</view>
+        <text class="guide-text">选择合适的清理频率 🔲</text>
+      </view>
+      <view class="guide-item">
+        <view class="guide-num">3</view>
+        <text class="guide-text">点击"马上清理"按钮开始 👆</text>
+      </view>
+      <view class="guide-item">
+        <view class="guide-num">4</view>
+        <text class="guide-text">持续30秒即可完成清理 😊</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 清理效果 -->
+  <view class="section effect-section">
+    <text class="section-title">✨ 清理效果</text>
+    <view class="effect-row">
+      <view class="effect-card effect-before">
+        <text class="effect-emoji">😷</text>
+        <text class="effect-label">清理前</text>
+        <text class="effect-desc">声音闷闷的</text>
+      </view>
+      <view class="effect-arrow">➡️</view>
+      <view class="effect-card effect-after">
+        <text class="effect-emoji">😁</text>
+        <text class="effect-label">清理后</text>
+        <text class="effect-desc">音质清晰响亮</text>
+      </view>
+    </view>
+  </view>
+</view>

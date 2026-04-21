@@ -1,0 +1,8 @@
+<view class="ruler-page">
+  <canvas canvas-id="rulerCanvas" class="ruler-canvas"></canvas>
+  <view class="ruler-reading">
+    <text class="ruler-value">{{reading}} cm</text>
+    <text class="ruler-tip">沿屏幕左侧放置物体测量</text>
+  </view>
+  <slider class="ruler-slider" min="0" max="{{maxCm}}" value="{{reading}}" bindchange="onSlider" activeColor="#66bb6a" />
+</view>
