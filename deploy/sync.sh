@@ -16,6 +16,10 @@ SERVER_IP="111.229.210.78"
 REMOTE_PROJECT="/opt/nest-demo"
 REMOTE_FRONTEND="/var/www/nest-demo-frontend"
 
+# 需要从本地 .env 同步到服务器 .env 的变量白名单
+# 其他变量（如 DB_PASSWORD 等）保持服务器原值不变
+SYNC_ENV_KEYS=("AI_API_KEY")
+
 # ---------- 读取密码 ----------
 if [ ! -f "$PASSWORD_FILE" ]; then
   echo "❌ 密码文件不存在: $PASSWORD_FILE"
@@ -60,6 +64,34 @@ remote "cd ${REMOTE_PROJECT}/admin-frontend && npm install --silent --no-audit -
 
 echo "🚀 部署前端静态文件..."
 remote "rm -rf ${REMOTE_FRONTEND}/* && cp -r ${REMOTE_PROJECT}/admin-frontend/dist/* ${REMOTE_FRONTEND}/"
+
+# ---------- 同步 .env 白名单变量 ----------
+if [ -f "$PROJECT_DIR/.env" ] && [ ${#SYNC_ENV_KEYS[@]} -gt 0 ]; then
+  echo "🔑 同步 .env 白名单变量到服务器..."
+  TMP_REMOTE_ENV="$(mktemp)"
+  trap 'rm -f "$TMP_REMOTE_ENV" "$TMP_REMOTE_ENV.new"' EXIT
+
+  # 下载远程 .env（若不存在则视为空）
+  sshpass -e scp $SSH_OPTS "${SERVER_USER}@${SERVER_IP}:${REMOTE_PROJECT}/.env" "$TMP_REMOTE_ENV" >/dev/null 2>&1 || : > "$TMP_REMOTE_ENV"
+
+  CHANGED=0
+  for key in "${SYNC_ENV_KEYS[@]}"; do
+    LOCAL_LINE=$(grep -E "^${key}=" "$PROJECT_DIR/.env" | head -n1 || true)
+    if [ -z "$LOCAL_LINE" ]; then
+      echo "   ⚠️  本地 .env 未找到 ${key}，跳过"
+      continue
+    fi
+    grep -v -E "^${key}=" "$TMP_REMOTE_ENV" > "$TMP_REMOTE_ENV.new" || true
+    echo "$LOCAL_LINE" >> "$TMP_REMOTE_ENV.new"
+    mv "$TMP_REMOTE_ENV.new" "$TMP_REMOTE_ENV"
+    echo "   ✓ ${key}"
+    CHANGED=1
+  done
+
+  if [ "$CHANGED" = "1" ]; then
+    sshpass -e scp $SSH_OPTS "$TMP_REMOTE_ENV" "${SERVER_USER}@${SERVER_IP}:${REMOTE_PROJECT}/.env" >/dev/null
+  fi
+fi
 
 echo "🔄 重启后端服务..."
 remote "pm2 restart nest-demo --update-env"

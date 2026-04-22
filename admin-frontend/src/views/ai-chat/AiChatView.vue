@@ -31,11 +31,9 @@
                 alt="用户上传图片"
                 class="message-image"
               />
-              <div
-                v-if="getMessageText(msg.content)"
-                class="message-text"
-                v-html="renderMarkdown(getMessageText(msg.content))"
-              ></div>
+              <div v-if="getMessageText(msg.content)" class="message-text">
+                <MarkdownRenderer :content="getMessageText(msg.content)" />
+              </div>
             </div>
           </div>
         </div>
@@ -48,9 +46,11 @@
           </div>
           <div class="message-content">
             <div class="message-role">AI 助手</div>
-            <div class="message-text typing">
-              <span v-if="streamContent">{{ streamContent }}</span>
-              <span v-else class="typing-dots">
+            <div v-if="streamContent" class="message-text typing">
+              <MarkdownRenderer :content="streamContent" />
+            </div>
+            <div v-else class="message-text typing">
+              <span class="typing-dots">
                 <span></span><span></span><span></span>
               </span>
             </div>
@@ -122,6 +122,7 @@ import { computed, nextTick, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { UploadFile } from 'element-plus'
 import { User, Monitor, Promotion, Delete, ChatDotRound, Picture, Close } from '@element-plus/icons-vue'
+import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
 import { sendChatStream, type ChatContentPart, type ChatMessage } from '@/api/ai-chat'
 
 const messages = ref<ChatMessage[]>([])
@@ -241,27 +242,6 @@ const handleSend = async () => {
 
 const clearMessages = () => {
   messages.value = []
-}
-
-const renderMarkdown = (text: string) => {
-  // 简易 markdown：代码块、行内代码、加粗、换行
-  let html = text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-
-  // 代码块
-  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_m, lang, code) => {
-    return `<pre class="code-block"><code class="language-${lang}">${code.trim()}</code></pre>`
-  })
-  // 行内代码
-  html = html.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>')
-  // 加粗
-  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-  // 换行
-  html = html.replace(/\n/g, '<br>')
-
-  return html
 }
 </script>
 
@@ -485,24 +465,15 @@ const renderMarkdown = (text: string) => {
   color: #c0c4cc;
 }
 
-/* 代码样式 */
-:deep(.code-block) {
-  background: #1e1e1e;
-  color: #d4d4d4;
-  padding: 12px 16px;
-  border-radius: 8px;
-  overflow-x: auto;
-  margin: 8px 0;
-  font-size: 13px;
-  line-height: 1.5;
+/* 用户气泡里反色 */
+.message-item.user :deep(p code),
+.message-item.user :deep(li code) {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
 }
-
-:deep(.inline-code) {
-  background: #f0f2f5;
-  color: #c7254e;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 13px;
+.message-item.user :deep(a) {
+  color: #fff;
+  text-decoration: underline;
 }
 
 @media (max-width: 768px) {
