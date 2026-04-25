@@ -61,7 +61,11 @@ export const useMenuStore = defineStore('menu', () => {
   }
 
   function registerMenuRoute(menu: any) {
-    if (!menu.component) return
+    // 纯分组父菜单（无 component），把 children 当独立顶层路由注册
+    if (!menu.component) {
+      if (menu.children && menu.children.length) registerRoutes(menu.children)
+      return
+    }
 
     const loader = loadComponent(menu.component)
     if (!loader) {

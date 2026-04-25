@@ -1,5 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
+import { ChatSession } from './chat-session.entity';
+import { ChatMessageEntity } from './chat-message.entity';
 
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
@@ -26,11 +30,94 @@ export class AiChatService {
   private apiKey: string;
   private model: string;
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    @InjectRepository(ChatSession)
+    private sessionRepo: Repository<ChatSession>,
+    @InjectRepository(ChatMessageEntity)
+    private messageRepo: Repository<ChatMessageEntity>,
+  ) {
     this.baseUrl = this.configService.get<string>('AI_BASE_URL', '');
     this.apiKey = this.configService.get<string>('AI_API_KEY', '');
     this.model = this.configService.get<string>('AI_MODEL', '');
   }
+
+  // ─── 会话 CRUD ───
+
+  async createSession(userId: number, title?: string): Promise<ChatSession> {
+    const session = this.sessionRepo.create({
+      userId,
+      title: title || '新会话',
+    });
+    return this.sessionRepo.save(session);
+  }
+
+  async getSessions(userId: number): Promise<ChatSession[]> {
+    return this.sessionRepo.find({
+      where: { userId },
+      order: { updatedAt: 'DESC' },
+    });
+  }
+
+  async getSession(sessionId: number, userId: number): Promise<ChatSession> {
+    if (!sessionId || isNaN(sessionId)) {
+      throw new NotFoundException('无效的会话ID');
+    }
+    const session = await this.sessionRepo.findOne({
+      where: { id: sessionId, userId },
+    });
+    if (!session) throw new NotFoundException('会话不存在');
+    return session;
+  }
+
+  async updateSessionTitle(
+    sessionId: number,
+    userId: number,
+    title: string,
+  ): Promise<ChatSession> {
+    const session = await this.getSession(sessionId, userId);
+    session.title = title;
+    return this.sessionRepo.save(session);
+  }
+
+  async deleteSession(sessionId: number, userId: number): Promise<void> {
+    const session = await this.getSession(sessionId, userId);
+    await this.messageRepo.delete({ sessionId: session.id });
+    await this.sessionRepo.remove(session);
+  }
+
+  // ─── 消息 ───
+
+  async getMessages(sessionId: number, userId: number) {
+    await this.getSession(sessionId, userId);
+    return this.messageRepo.find({
+      where: { sessionId },
+      order: { createdAt: 'ASC' },
+    });
+  }
+
+  async saveMessage(
+    sessionId: number,
+    role: string,
+    content: string,
+  ): Promise<ChatMessageEntity> {
+    const msg = this.messageRepo.create({ sessionId, role, content });
+    const saved = await this.messageRepo.save(msg);
+    await this.sessionRepo.update(sessionId, { updatedAt: new Date() });
+    return saved;
+  }
+
+  // ─── 自动生成会话标题 ───
+
+  async autoTitle(sessionId: number, firstUserMsg: string): Promise<void> {
+    const title =
+      firstUserMsg.length > 30
+        ? firstUserMsg.slice(0, 30) + '…'
+        : firstUserMsg;
+    await this.sessionRepo.update(sessionId, { title });
+  }
+
+  // ─── AI 调用（保持原有逻辑）───
 
   async chat(messages: ChatMessage[]): Promise<string> {
     const url = `${this.baseUrl}/chat/completions`;

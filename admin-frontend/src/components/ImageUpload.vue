@@ -83,16 +83,18 @@ const handleError = () => {
 
 <style scoped>
 .image-upload {
-  display: inline-block;
+  display: inline-flex;
+  flex-direction: column;
 }
 
 .image-preview {
   position: relative;
-  width: 200px;
-  height: 150px;
-  border-radius: 8px;
+  width: 240px;
+  height: 164px;
+  border-radius: 22px;
   overflow: hidden;
   cursor: pointer;
+  box-shadow: 0 16px 32px rgba(95, 124, 170, 0.14);
 }
 
 .image-preview :deep(.el-image) {
@@ -106,12 +108,12 @@ const handleError = () => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: linear-gradient(180deg, rgba(16, 31, 59, 0.06), rgba(16, 31, 59, 0.46));
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: opacity 0.24s ease;
 }
 
 .image-preview:hover .image-mask {
@@ -124,37 +126,45 @@ const handleError = () => {
 }
 
 .upload-placeholder {
-  width: 200px;
-  height: 150px;
-  border: 2px dashed #dcdfe6;
-  border-radius: 8px;
+  width: 240px;
+  height: 164px;
+  border: 1px dashed rgba(122, 160, 211, 0.28);
+  border-radius: 22px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(241, 247, 255, 0.92));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 14px 28px rgba(95, 124, 170, 0.08);
+  transition: all 0.24s ease;
 }
 
 .upload-placeholder:hover {
-  border-color: #667eea;
-  background: #f5f7fa;
+  border-color: rgba(47, 145, 255, 0.34);
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.98),
+    0 18px 34px rgba(95, 124, 170, 0.12);
 }
 
 .upload-icon {
-  font-size: 48px;
-  color: #8c939d;
-  margin-bottom: 8px;
+  font-size: 42px;
+  color: #4d8ff5;
+  margin-bottom: 12px;
 }
 
 .upload-text {
   font-size: 14px;
-  color: #8c939d;
+  color: #51647f;
+  font-weight: 700;
 }
 
 .upload-tip {
   margin-top: 8px;
   font-size: 12px;
-  color: #909399;
+  color: #8ca0bc;
 }
 </style>
