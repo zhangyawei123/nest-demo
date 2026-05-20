@@ -1,0 +1,28 @@
+<view class="feedback-page">
+  <view class="feedback-hero">
+    <text class="hero-title">意见反馈</text>
+    <text class="hero-desc">你的建议会帮助我们把产品做得更好。</text>
+  </view>
+
+  <view class="card form-card">
+    <view class="form-item">
+      <text class="form-label">反馈类型</text>
+      <picker range="{{types}}" bindchange="onTypeChange">
+        <view class="picker-value">{{type}}<text class="picker-arrow">›</text></view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">反馈内容</text>
+      <textarea class="content-input" value="{{content}}" maxlength="300" placeholder="请描述你遇到的问题或建议" bindinput="onContentInput"></textarea>
+      <text class="input-count">{{content.length}}/300</text>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">联系方式（选填）</text>
+      <input class="contact-input" value="{{contact}}" placeholder="微信号、手机号或邮箱" bindinput="onContactInput" />
+    </view>
+  </view>
+
+  <button class="submit-btn {{submitting ? 'submitting' : ''}}" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submitFeedback">{{submitting ? '提交中...' : '提交反馈'}}</button>
+</view>

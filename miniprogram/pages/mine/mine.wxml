@@ -52,6 +52,21 @@
       <text class="menu-label">通知公告</text>
       <text class="menu-arrow">›</text>
     </view>
+    <view class="menu-item" bindtap="goPage" data-url="/pages/article-collection/article-collection">
+      <view class="menu-icon-wrap"><text class="menu-icon">⭐</text></view>
+      <text class="menu-label">我的收藏</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="goPage" data-url="/pages/article-history/article-history">
+      <view class="menu-icon-wrap"><text class="menu-icon">🕘</text></view>
+      <text class="menu-label">阅读历史</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="goPage" data-url="/pages/tools/tools">
+      <view class="menu-icon-wrap"><text class="menu-icon">🧰</text></view>
+      <text class="menu-label">实用小工具</text>
+      <text class="menu-arrow">›</text>
+    </view>
   </view>
 
   <view class="menu-group card">
@@ -64,8 +79,18 @@
       <text class="menu-label">清除缓存</text>
       <text class="menu-arrow">›</text>
     </view>
-    <view class="menu-item">
+    <view class="menu-item" bindtap="goPage" data-url="/pages/feedback/feedback">
+      <view class="menu-icon-wrap"><text class="menu-icon">💬</text></view>
+      <text class="menu-label">意见反馈</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="goPage" data-url="/pages/about/about">
       <view class="menu-icon-wrap"><text class="menu-icon">ℹ️</text></view>
+      <text class="menu-label">关于我们</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item">
+      <view class="menu-icon-wrap"><text class="menu-icon">🏷️</text></view>
       <text class="menu-label">版本</text>
       <text class="menu-value">v1.0.0</text>
     </view>

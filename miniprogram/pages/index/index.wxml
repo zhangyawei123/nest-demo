@@ -14,7 +14,11 @@
       </view>
     </view>
     <text class="hero-title">欢迎来到 NestDemo</text>
-    <text class="hero-desc">在这里快速浏览内容、体验 AI 对话、查看热门榜单和参与幸运抽奖。</text>
+    <text class="hero-desc">聚合 AI 助手、热门内容和实用工具，让日常信息获取与轻量任务处理更高效。</text>
+    <view class="login-guide" wx:if="{{!userInfo}}" bindtap="goLogin">
+      <text class="login-guide-text">登录后解锁公告、AI 对话和更多个性化能力</text>
+      <text class="login-guide-action">去登录</text>
+    </view>
     <view class="hero-stats">
       <view class="hero-stat">
         <text class="hero-stat-label">公告</text>
@@ -27,6 +31,16 @@
       <view class="hero-stat">
         <text class="hero-stat-label">热榜</text>
         <text class="hero-stat-value">{{hotList.length}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="highlight-card card">
+    <view class="highlight-item" wx:for="{{productHighlights}}" wx:key="title">
+      <text class="highlight-icon">{{item.icon}}</text>
+      <view class="highlight-main">
+        <text class="highlight-title">{{item.title}}</text>
+        <text class="highlight-desc">{{item.desc}}</text>
       </view>
     </view>
   </view>
@@ -102,18 +116,22 @@
       </view>
       <text class="section-more" bindtap="goPage" data-url="/pages/articles/articles">更多</text>
     </view>
-    <view class="article-card" wx:for="{{articles}}" wx:key="id" bindtap="goArticle" data-id="{{item.id}}">
-      <view class="article-dot"></view>
-      <view class="article-content">
-        <text class="article-title">{{item.title}}</text>
-      <view class="article-meta">
-        <text class="article-author">{{item.author.username}}</text>
-        <text class="article-time">{{item.createdAt}}</text>
+    <view class="loading-line" wx:if="{{loadingArticles}}">文章加载中...</view>
+    <block wx:if="{{!loadingArticles}}">
+      <view class="article-card" wx:for="{{articles}}" wx:key="id" bindtap="goArticle" data-id="{{item.id}}">
+        <view class="article-dot"></view>
+        <view class="article-content">
+          <text class="article-title">{{item.title}}</text>
+          <view class="article-meta">
+            <text class="article-author">{{item.author.username}}</text>
+            <text class="article-time">{{item.createdAtText}}</text>
+          </view>
+        </view>
       </view>
-      </view>
-    </view>
-    <view class="empty" wx:if="{{!articles.length}}">
-      <text class="empty-text">暂无文章</text>
+    </block>
+    <view class="empty" wx:if="{{!loadingArticles && !articles.length}}">
+      <text class="empty-icon">📄</text>
+      <text class="empty-text">暂无文章，稍后再来看看</text>
     </view>
   </view>
 
@@ -126,15 +144,19 @@
       </view>
       <text class="section-more" bindtap="goPage" data-url="/pages/hot/hot">更多</text>
     </view>
-    <view class="hot-item" wx:for="{{hotList}}" wx:key="id" wx:if="{{index < 5}}">
-      <view class="hot-rank {{index < 3 ? 'hot-top' : ''}}">{{index + 1}}</view>
-      <view class="hot-content">
-        <text class="hot-title">{{item.title}}</text>
-        <text class="hot-value">热度 {{item.hotValue}}</text>
+    <view class="loading-line" wx:if="{{loadingHot}}">热榜加载中...</view>
+    <block wx:if="{{!loadingHot}}">
+      <view class="hot-item" wx:for="{{hotPreview}}" wx:key="id">
+        <view class="hot-rank {{index < 3 ? 'hot-top' : ''}}">{{index + 1}}</view>
+        <view class="hot-content">
+          <text class="hot-title">{{item.title}}</text>
+          <text class="hot-value">热度 {{item.hotValue}}</text>
+        </view>
       </view>
-    </view>
-    <view class="empty" wx:if="{{!hotList.length}}">
-      <text class="empty-text">暂无热榜数据</text>
+    </block>
+    <view class="empty" wx:if="{{!loadingHot && !hotList.length}}">
+      <text class="empty-icon">🔥</text>
+      <text class="empty-text">暂无热榜数据，请稍后刷新</text>
     </view>
   </view>
 </view>

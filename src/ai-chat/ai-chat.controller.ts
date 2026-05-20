@@ -2,6 +2,7 @@ import {
   Controller,
   Post,
   Body,
+  BadRequestException,
   Res,
   Request,
   UseGuards,
@@ -33,7 +34,7 @@ export class AiChatController {
 
   @Post('sessions/delete')
   async deleteSession(@Body('sessionId') sessionId: number, @Request() req) {
-    await this.aiChatService.deleteSession(sessionId, req.user.userId);
+    await this.aiChatService.deleteSession(Number(sessionId), req.user.userId);
     return null;
   }
 
@@ -44,7 +45,7 @@ export class AiChatController {
     @Request() req,
   ) {
     const session = await this.aiChatService.updateSessionTitle(
-      sessionId,
+      Number(sessionId),
       req.user.userId,
       title,
     );
@@ -55,7 +56,7 @@ export class AiChatController {
 
   @Post('sessions/messages')
   async getMessages(@Body('sessionId') sessionId: number, @Request() req) {
-    return this.aiChatService.getMessages(sessionId, req.user.userId);
+    return this.aiChatService.getMessages(Number(sessionId), req.user.userId);
   }
 
   /**
@@ -69,8 +70,12 @@ export class AiChatController {
     @Request() req,
     @Res() res: Response,
   ) {
-    const sessionId = sessionIdParam;
+    const sessionId = Number(sessionIdParam);
     const userId = req.user.userId;
+    const content = String(userContent || '').trim();
+    if (!content) {
+      throw new BadRequestException('消息内容不能为空');
+    }
 
     // 验证会话归属
     await this.aiChatService.getSession(sessionId, userId);
@@ -79,7 +84,7 @@ export class AiChatController {
     const savedUserMsg = await this.aiChatService.saveMessage(
       sessionId,
       'user',
-      userContent,
+      content,
     );
 
     // 如果是第一条消息，自动设置标题
@@ -88,7 +93,7 @@ export class AiChatController {
       userId,
     );
     if (allMessages.length === 1) {
-      await this.aiChatService.autoTitle(sessionId, userContent);
+      await this.aiChatService.autoTitle(sessionId, content);
     }
 
     // 构建完整消息历史发给 AI
@@ -132,6 +137,53 @@ export class AiChatController {
     } finally {
       res.end();
     }
+  }
+
+  @Post('sessions/chat-once')
+  async sessionChatOnce(
+    @Body('sessionId') sessionIdParam: number,
+    @Body('message') userContent: string,
+    @Request() req,
+  ) {
+    const sessionId = Number(sessionIdParam);
+    const userId = req.user.userId;
+    const content = String(userContent || '').trim();
+    if (!content) {
+      throw new BadRequestException('消息内容不能为空');
+    }
+
+    await this.aiChatService.getSession(sessionId, userId);
+
+    const savedUserMsg = await this.aiChatService.saveMessage(
+      sessionId,
+      'user',
+      content,
+    );
+
+    const allMessages = await this.aiChatService.getMessages(
+      sessionId,
+      userId,
+    );
+    if (allMessages.length === 1) {
+      await this.aiChatService.autoTitle(sessionId, content);
+    }
+
+    const chatMessages: ChatMessage[] = allMessages.map((m) => ({
+      role: m.role as ChatMessage['role'],
+      content: m.content,
+    }));
+    const reply = await this.aiChatService.chat(chatMessages);
+    const savedAssistantMsg = await this.aiChatService.saveMessage(
+      sessionId,
+      'assistant',
+      reply,
+    );
+
+    return {
+      reply,
+      userMessage: savedUserMsg,
+      assistantMessage: savedAssistantMsg,
+    };
   }
 
   // ─── 旧接口（兼容）───

@@ -24,7 +24,7 @@
         <text class="article-summary">{{item.summary || ''}}</text>
         <view class="article-meta">
           <text class="meta-author">{{item.author.username || '匿名'}}</text>
-          <text class="meta-time">{{item.createdAt}}</text>
+          <text class="meta-time">{{item.createdAtText}}</text>
         </view>
       </view>
     </view>

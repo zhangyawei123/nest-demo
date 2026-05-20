@@ -6,7 +6,15 @@ Page({
     userInfo: null,
     notices: [],
     articles: [],
-    hotList: []
+    hotList: [],
+    hotPreview: [],
+    loadingArticles: false,
+    loadingHot: false,
+    productHighlights: [
+      { title: '智能助手', desc: 'AI 对话和图片识别', icon: '🤖' },
+      { title: '热点内容', desc: '文章与抖音热榜', icon: '🔥' },
+      { title: '效率工具', desc: '生活工具一站使用', icon: '🧰' }
+    ]
   },
 
   onLoad() {
@@ -29,22 +37,37 @@ Page({
   },
 
   loadData() {
-    // 加载文章
-    app.request({ url: '/article/list' }).then(res => {
-      const articles = (res || []).slice(0, 5)
+    this.setData({ loadingArticles: true, loadingHot: true })
+    app.request({ url: '/article/list', showLoading: false }).then(res => {
+      const articles = (res || []).slice(0, 5).map(this.formatArticle)
       this.setData({ articles })
-    }).catch(() => {})
+    }).catch(() => {}).finally(() => {
+      this.setData({ loadingArticles: false })
+    })
 
-    // 加载热榜
-    app.request({ url: '/douyin-hot' }).then(res => {
-      this.setData({ hotList: res || [] })
-    }).catch(() => {})
+    app.request({ url: '/douyin-hot', showLoading: false }).then(res => {
+      const hotList = res || []
+      this.setData({
+        hotList,
+        hotPreview: hotList.slice(0, 5)
+      })
+    }).catch(() => {}).finally(() => {
+      this.setData({ loadingHot: false })
+    })
 
-    // 加载公告
     if (app.globalData.token) {
-      app.request({ url: '/notice/active' }).then(res => {
+      app.request({ url: '/notice/active', showLoading: false, silent: true }).then(res => {
         this.setData({ notices: res || [] })
       }).catch(() => {})
+    } else {
+      this.setData({ notices: [] })
+    }
+  },
+
+  formatArticle(article) {
+    return {
+      ...article,
+      createdAtText: article.createdAt ? String(article.createdAt).slice(0, 10) : ''
     }
   },
 

@@ -3,6 +3,8 @@
     "pages/index/index",
     "pages/articles/articles",
     "pages/article-detail/article-detail",
+    "pages/article-collection/article-collection",
+    "pages/article-history/article-history",
     "pages/hot/hot",
     "pages/lottery/lottery",
     "pages/ai-chat/ai-chat",
@@ -11,7 +13,9 @@
     "pages/notice/notice",
     "pages/mine/mine",
     "pages/login/login",
-    "pages/tools/tools"
+    "pages/tools/tools",
+    "pages/about/about",
+    "pages/feedback/feedback"
   ],
   "subpackages": [
     {

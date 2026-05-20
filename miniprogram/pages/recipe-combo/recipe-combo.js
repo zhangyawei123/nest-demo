@@ -24,21 +24,17 @@ Page({
   startAnalyze() {
     if (!this.data.imagePath || this.data.loading) return
 
-    if (!app.globalData.token) {
-      wx.navigateTo({ url: '/pages/login/login' })
-      return
-    }
+    if (!app.requireLogin()) return
 
     this.setData({ loading: true })
 
     app.uploadFile({
       url: '/vision/recipe-combo',
-      filePath: this.data.imagePath
+      filePath: this.data.imagePath,
+      showLoading: false
     }).then(res => {
       this.setData({ result: res })
-    }).catch(() => {
-      wx.showToast({ title: '分析失败，请重试', icon: 'none' })
-    }).finally(() => {
+    }).catch(() => {}).finally(() => {
       this.setData({ loading: false })
     })
   },

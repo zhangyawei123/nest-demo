@@ -4,14 +4,16 @@
   padding-bottom: 44rpx;
   box-sizing: border-box;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  background: linear-gradient(180deg, #f2f6ff 0%, #f7f9fc 42%, #ffffff 100%);
 }
 
 .bg-orb {
-  position: absolute;
+  position: fixed;
   border-radius: 50%;
   filter: blur(18rpx);
   opacity: 0.55;
+  pointer-events: none;
 }
 
 .orb-1 {
@@ -118,6 +120,36 @@
   z-index: 1;
 }
 
+.login-guide {
+  margin-top: 22rpx;
+  padding: 18rpx 20rpx;
+  border-radius: 22rpx;
+  background: rgba(255,255,255,0.16);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.login-guide-text {
+  flex: 1;
+  font-size: 22rpx;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.88);
+}
+
+.login-guide-action {
+  flex-shrink: 0;
+  padding: 8rpx 18rpx;
+  border-radius: 999rpx;
+  background: rgba(255,255,255,0.92);
+  color: #4c8dff;
+  font-size: 22rpx;
+  font-weight: 700;
+}
+
 .hero-stats {
   display: flex;
   gap: 16rpx;
@@ -145,6 +177,48 @@
   font-size: 30rpx;
   font-weight: 700;
   color: #ffffff;
+}
+
+.highlight-card {
+  display: flex;
+  gap: 14rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.highlight-item {
+  flex: 1;
+  padding: 20rpx 14rpx;
+  border-radius: 24rpx;
+  background: #f6f9ff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.highlight-icon {
+  font-size: 38rpx;
+  margin-bottom: 12rpx;
+}
+
+.highlight-main {
+  min-width: 0;
+}
+
+.highlight-title {
+  display: block;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #25324a;
+}
+
+.highlight-desc {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 20rpx;
+  line-height: 1.4;
+  color: #8b95a7;
 }
 
 .notice-bar {
@@ -298,6 +372,13 @@
 .section {
   position: relative;
   z-index: 1;
+}
+
+.loading-line {
+  padding: 32rpx 0;
+  text-align: center;
+  color: #8b95a7;
+  font-size: 24rpx;
 }
 
 .article-card {

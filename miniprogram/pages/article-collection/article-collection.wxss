@@ -1,0 +1,17 @@
+@import "../articles/articles.wxss";
+
+.empty {
+  text-align: center;
+  padding: 120rpx 0;
+  color: #97a2b5;
+}
+
+.empty-icon {
+  display: block;
+  font-size: 72rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 26rpx;
+}

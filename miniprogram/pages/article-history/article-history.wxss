@@ -1,0 +1,21 @@
+@import "../articles/articles.wxss";
+
+.history-hero {
+  background: linear-gradient(135deg, rgba(120, 89, 255, 0.98) 0%, rgba(76, 141, 255, 0.9) 56%, rgba(99, 179, 255, 0.82) 100%);
+}
+
+.empty {
+  text-align: center;
+  padding: 120rpx 0;
+  color: #97a2b5;
+}
+
+.empty-icon {
+  display: block;
+  font-size: 72rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 26rpx;
+}

@@ -1,0 +1,35 @@
+<view class="articles-page">
+  <view class="bg-orb orb-1"></view>
+  <view class="bg-orb orb-2"></view>
+
+  <view class="hero-card">
+    <text class="hero-kicker">FAVORITES</text>
+    <text class="hero-title">我的收藏</text>
+    <text class="hero-desc">集中查看你收藏过的优质文章，方便随时继续阅读。</text>
+  </view>
+
+  <view class="article-list">
+    <view class="article-card card" wx:for="{{articles}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
+      <view class="article-cover" wx:if="{{item.coverImage}}">
+        <image src="{{item.coverImage}}" mode="aspectFill" class="cover-img" />
+      </view>
+      <view class="article-info">
+        <text class="article-badge">已收藏</text>
+        <text class="article-title">{{item.title}}</text>
+        <view class="article-meta">
+          <text class="meta-author">{{item.author.username || '匿名'}}</text>
+          <text class="meta-time">{{item.createdAtText}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{!loading && !articles.length}}">
+    <text class="empty-icon">⭐</text>
+    <text class="empty-text">暂无收藏文章</text>
+  </view>
+
+  <view class="loading-tip" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+</view>

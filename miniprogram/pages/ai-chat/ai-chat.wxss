@@ -3,14 +3,16 @@
   flex-direction: column;
   min-height: 100vh;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  background: linear-gradient(180deg, #f2f6ff 0%, #f7f9fc 42%, #ffffff 100%);
 }
 
 .bg-orb {
-  position: absolute;
+  position: fixed;
   border-radius: 50%;
   filter: blur(18rpx);
   opacity: 0.5;
+  pointer-events: none;
 }
 
 .orb-1 {
@@ -49,6 +51,20 @@
   background: rgba(255,255,255,0.12);
 }
 
+.hero-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
 .hero-kicker {
   display: block;
   font-size: 20rpx;
@@ -56,6 +72,24 @@
   color: rgba(255,255,255,0.72);
   position: relative;
   z-index: 1;
+}
+
+.clear-chat {
+  padding: 8rpx 18rpx;
+  border-radius: 999rpx;
+  background: rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.9);
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.new-chat {
+  padding: 8rpx 18rpx;
+  border-radius: 999rpx;
+  background: rgba(255,255,255,0.92);
+  color: #4c8dff;
+  font-size: 22rpx;
+  font-weight: 700;
 }
 
 .hero-title {
@@ -85,6 +119,86 @@
   padding: 0 0 20rpx;
   position: relative;
   z-index: 1;
+}
+
+.session-panel {
+  position: relative;
+  z-index: 1;
+  margin: 18rpx 24rpx 0;
+  padding: 20rpx;
+}
+
+.session-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
+.session-title {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #25324a;
+}
+
+.session-loading {
+  font-size: 22rpx;
+  color: #8b95a7;
+}
+
+.session-scroll {
+  white-space: nowrap;
+}
+
+.session-list {
+  display: flex;
+  gap: 14rpx;
+}
+
+.session-item {
+  max-width: 260rpx;
+  padding: 14rpx 18rpx;
+  border-radius: 999rpx;
+  background: #f1f5fb;
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  flex-shrink: 0;
+}
+
+.session-item.active {
+  background: linear-gradient(135deg, #4c8dff, #63b3ff);
+  color: #fff;
+}
+
+.session-name {
+  font-size: 24rpx;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.session-delete {
+  width: 30rpx;
+  height: 30rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.08);
+  font-size: 24rpx;
+  flex-shrink: 0;
+}
+
+.session-item.active .session-delete {
+  background: rgba(255,255,255,0.22);
+}
+
+.messages-loading {
+  padding: 80rpx 0;
+  text-align: center;
+  color: #8b95a7;
+  font-size: 24rpx;
 }
 
 .msg-empty {
@@ -172,8 +286,17 @@
   color: #24324a;
 }
 
+.msg-action {
+  display: block;
+  margin-top: 14rpx;
+  font-size: 22rpx;
+  color: #4c8dff;
+  font-weight: 600;
+}
+
 .chat-input-area {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto;
   align-items: center;
   margin: 16rpx 24rpx 24rpx;
   padding: 14rpx 16rpx;
@@ -184,6 +307,28 @@
   gap: 16rpx;
   position: relative;
   z-index: 1;
+}
+
+.suggestion-scroll {
+  grid-column: 1 / 3;
+  width: 100%;
+  white-space: nowrap;
+}
+
+.suggestion-list {
+  display: flex;
+  gap: 14rpx;
+  padding-bottom: 12rpx;
+}
+
+.suggestion-item {
+  display: inline-flex;
+  padding: 12rpx 20rpx;
+  border-radius: 999rpx;
+  background: #eef4ff;
+  color: #4c8dff;
+  font-size: 24rpx;
+  flex-shrink: 0;
 }
 
 .chat-input {

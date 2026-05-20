@@ -6,11 +6,11 @@ page {
   min-height: 100vh;
   padding: 40rpx 30rpx 60rpx;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .bg-orb {
-  position: absolute;
+  position: fixed;
   border-radius: 50%;
   filter: blur(80rpx);
   opacity: 0.5;

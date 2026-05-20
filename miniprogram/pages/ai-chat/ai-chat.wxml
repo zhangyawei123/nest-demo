@@ -3,13 +3,38 @@
   <view class="bg-orb orb-2"></view>
 
   <view class="chat-hero card">
-    <text class="hero-kicker">AI ASSISTANT</text>
+    <view class="hero-topline">
+      <text class="hero-kicker">AI ASSISTANT</text>
+      <view class="hero-actions">
+        <text class="new-chat" bindtap="startNewChat">新会话</text>
+        <text class="clear-chat" wx:if="{{messages.length}}" bindtap="clearMessages">清空</text>
+      </view>
+    </view>
     <text class="hero-title">智能对话</text>
     <text class="hero-desc">向 AI 提问、获取灵感、总结内容或即时解答你的问题。</text>
   </view>
 
+  <view class="session-panel card">
+    <view class="session-head">
+      <text class="session-title">历史会话</text>
+      <text class="session-loading" wx:if="{{sessionsLoading}}">加载中</text>
+    </view>
+    <scroll-view class="session-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="session-list">
+        <view class="session-item {{!currentSessionId ? 'active' : ''}}" bindtap="startNewChat">
+          <text class="session-name">新的提问</text>
+        </view>
+        <view class="session-item {{currentSessionId === item.id ? 'active' : ''}}" wx:for="{{sessions}}" wx:key="id" bindtap="switchSession" data-id="{{item.id}}">
+          <text class="session-name">{{item.title}}</text>
+          <text class="session-delete" catchtap="deleteSession" data-id="{{item.id}}">×</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
   <scroll-view class="chat-messages" scroll-y scroll-into-view="{{scrollToId}}" enhanced show-scrollbar="{{false}}">
-    <view class="msg-empty" wx:if="{{!messages.length}}">
+    <view class="messages-loading" wx:if="{{messagesLoading}}">消息加载中...</view>
+    <view class="msg-empty" wx:if="{{!messagesLoading && !messages.length}}">
       <text class="msg-empty-icon">🤖</text>
       <text class="msg-empty-title">AI 助手</text>
       <text class="msg-empty-desc">试试问我：帮我总结、写文案、解释概念、生成方案</text>
@@ -20,8 +45,9 @@
         <text wx:if="{{item.role === 'user'}}">👤</text>
         <text wx:else>🤖</text>
       </view>
-      <view class="msg-bubble">
+      <view class="msg-bubble" bindlongpress="copyMessage" data-content="{{item.content}}">
         <text class="msg-text">{{item.content}}</text>
+        <text class="msg-action" wx:if="{{item.role === 'assistant'}}" bindtap="copyMessage" data-content="{{item.content}}">复制</text>
       </view>
     </view>
 
@@ -34,6 +60,11 @@
   </scroll-view>
 
   <view class="chat-input-area">
+    <scroll-view class="suggestion-scroll" wx:if="{{!messages.length}}" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="suggestion-list">
+        <text class="suggestion-item" wx:for="{{suggestions}}" wx:key="*this" bindtap="useSuggestion" data-text="{{item}}">{{item}}</text>
+      </view>
+    </scroll-view>
     <input class="chat-input" placeholder="输入你的问题，按发送开始对话" value="{{inputText}}" bindinput="onInput" bindconfirm="sendMsg" confirm-type="send" />
     <view class="send-btn {{inputText ? 'active' : ''}}" bindtap="sendMsg">
       <text>发送</text>

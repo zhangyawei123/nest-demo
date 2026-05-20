@@ -11,12 +11,9 @@ Page({
   },
 
   loadNotices() {
-    if (!app.globalData.token) {
-      wx.navigateTo({ url: '/pages/login/login' })
-      return
-    }
+    if (!app.requireLogin()) return
     this.setData({ loading: true })
-    app.request({ url: '/notice/active' }).then(res => {
+    app.request({ url: '/notice/active', showLoading: false }).then(res => {
       this.setData({ notices: res || [] })
     }).catch(() => {}).finally(() => {
       this.setData({ loading: false })

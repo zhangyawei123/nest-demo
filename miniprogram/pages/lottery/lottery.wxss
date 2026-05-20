@@ -3,16 +3,17 @@
   padding: 24rpx;
   padding-bottom: 60rpx;
   box-sizing: border-box;
-  background: linear-gradient(180deg, #eef4ff 0%, #f7f9fc 36%, #ffffff 100%);
+  background: linear-gradient(180deg, #eef4ff 0%, #f7f9fc 42%, #ffffff 100%);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .bg-orb {
-  position: absolute;
+  position: fixed;
   border-radius: 50%;
   filter: blur(18rpx);
   opacity: 0.5;
+  pointer-events: none;
 }
 
 .orb-1 {

@@ -3,14 +3,16 @@
   flex-direction: column;
   min-height: 100vh;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  background: linear-gradient(180deg, #f2f6ff 0%, #f7f9fc 42%, #ffffff 100%);
 }
 
 .bg-orb {
-  position: absolute;
+  position: fixed;
   border-radius: 50%;
   filter: blur(18rpx);
   opacity: 0.5;
+  pointer-events: none;
 }
 
 .orb-1 {

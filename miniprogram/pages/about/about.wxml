@@ -1,0 +1,29 @@
+<view class="about-page">
+  <view class="about-hero">
+    <view class="app-logo">N</view>
+    <text class="app-name">NestDemo</text>
+    <text class="app-version">{{version}}</text>
+    <text class="app-desc">一个集合内容浏览、AI 对话、热点榜单和实用工具的小程序。</text>
+  </view>
+
+  <view class="card feature-card">
+    <view class="section-head">
+      <text class="section-title">核心能力</text>
+      <text class="section-subtitle">让常用信息和工具更容易获取</text>
+    </view>
+    <view class="feature-item" wx:for="{{features}}" wx:key="title">
+      <view class="feature-dot"></view>
+      <view class="feature-main">
+        <text class="feature-title">{{item.title}}</text>
+        <text class="feature-desc">{{item.desc}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card info-card">
+    <text class="info-title">隐私与数据</text>
+    <text class="info-text">图片识别和 AI 对话会把必要内容发送到服务端处理，仅用于完成当前功能。请勿上传敏感隐私信息。</text>
+  </view>
+
+  <button class="contact-btn" bindtap="copyContact">复制产品名称</button>
+</view>

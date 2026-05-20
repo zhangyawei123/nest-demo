@@ -16,6 +16,8 @@ import { DouyinHotModule } from './douyin-hot/douyin-hot.module';
 import { DouyinCommentModule } from './douyin-comment/douyin-comment.module';
 import { AiChatModule } from './ai-chat/ai-chat.module';
 import { VisionModule } from './vision/vision.module';
+import { FeedbackModule } from './feedback/feedback.module';
+import { ArticleInteractionModule } from './article-interaction/article-interaction.module';
 
 /**
  * 根模块 - 应用程序的入口模块
@@ -79,6 +81,8 @@ import { VisionModule } from './vision/vision.module';
     DouyinCommentModule,
     AiChatModule,
     VisionModule,
+    FeedbackModule,
+    ArticleInteractionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

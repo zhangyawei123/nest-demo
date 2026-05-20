@@ -28,7 +28,7 @@ Page({
   },
 
   refreshCaptcha() {
-    app.request({ url: '/auth/captcha' }).then(res => {
+    app.request({ url: '/auth/captcha', silent: true }).then(res => {
       // 后端返回 { captchaId, svg }，svg 是 SVG 字符串
       // 小程序 image 不能直接渲染 SVG 字符串，转 base64 data URI
       const base64 = 'data:image/svg+xml;base64,' + wx.arrayBufferToBase64(
@@ -64,8 +64,7 @@ Page({
       }
     }).then(res => {
       const token = res.access_token || res.token
-      wx.setStorageSync('token', token)
-      app.globalData.token = token
+      app.setLoginState(token)
       app.getUserInfo()
       wx.showToast({ title: '登录成功', icon: 'success' })
       setTimeout(() => {

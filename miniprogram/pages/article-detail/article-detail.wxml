@@ -7,7 +7,7 @@
     <text class="detail-title">{{article.title}}</text>
     <view class="detail-meta">
       <text class="meta-author">{{article.author.username || '匿名'}}</text>
-      <text class="meta-time">{{article.createdAt}}</text>
+      <text class="meta-time">{{article.createdAtText}}</text>
     </view>
   </view>
 
@@ -16,6 +16,11 @@
   </view>
 
   <view class="detail-content card">
+    <view class="detail-actions">
+      <button class="favorite-btn {{isFavorite ? 'active' : ''}}" loading="{{favoriteLoading}}" bindtap="toggleFavorite">
+        {{isFavorite ? '已收藏' : '收藏文章'}}
+      </button>
+    </view>
     <rich-text nodes="{{article.content}}"></rich-text>
   </view>
 </view>

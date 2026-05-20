@@ -21,10 +21,12 @@ Page({
   clearCache() {
     wx.showModal({
       title: '提示',
-      content: '确定要清除缓存吗？',
+      content: '确定要清除本地缓存吗？登录状态也会被清除。',
       success(res) {
         if (res.confirm) {
           wx.clearStorageSync()
+          app.globalData.token = ''
+          app.globalData.userInfo = null
           wx.showToast({ title: '缓存已清除', icon: 'success' })
         }
       }
@@ -37,9 +39,7 @@ Page({
       content: '确定要退出登录吗？',
       success: (res) => {
         if (res.confirm) {
-          wx.removeStorageSync('token')
-          app.globalData.token = ''
-          app.globalData.userInfo = null
+          app.clearLoginState()
           this.setData({ userInfo: null })
           wx.showToast({ title: '已退出', icon: 'success' })
         }

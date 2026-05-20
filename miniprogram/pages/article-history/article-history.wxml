@@ -1,0 +1,35 @@
+<view class="articles-page">
+  <view class="bg-orb orb-1"></view>
+  <view class="bg-orb orb-2"></view>
+
+  <view class="hero-card history-hero">
+    <text class="hero-kicker">READING HISTORY</text>
+    <text class="hero-title">阅读历史</text>
+    <text class="hero-desc">自动记录你读过的文章，快速找回最近浏览内容。</text>
+  </view>
+
+  <view class="article-list">
+    <view class="article-card card" wx:for="{{articles}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
+      <view class="article-cover" wx:if="{{item.coverImage}}">
+        <image src="{{item.coverImage}}" mode="aspectFill" class="cover-img" />
+      </view>
+      <view class="article-info">
+        <text class="article-badge">读过</text>
+        <text class="article-title">{{item.title}}</text>
+        <view class="article-meta">
+          <text class="meta-author">{{item.author.username || '匿名'}}</text>
+          <text class="meta-time">{{item.viewedAtText || item.createdAtText}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{!loading && !articles.length}}">
+    <text class="empty-icon">🕘</text>
+    <text class="empty-text">暂无阅读历史</text>
+  </view>
+
+  <view class="loading-tip" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+</view>
