@@ -85,6 +85,10 @@
       <view class="grid-icon grid-green">🤖</view>
       <text class="grid-label">AI 对话</text>
     </view>
+    <view class="grid-item" bindtap="goPage" data-url="/pages/ai-draw/ai-draw">
+      <view class="grid-icon grid-purple">🎨</view>
+      <text class="grid-label">AI 生图</text>
+    </view>
     <view class="grid-item" bindtap="goPage" data-url="/pages/face-detect/face-detect">
       <view class="grid-icon grid-cyan">🧑</view>
       <text class="grid-label">人脸识别</text>

@@ -63,6 +63,16 @@
         </template>
         <component :is="toolComponents.accountBook" v-if="activeNames.includes('accountBook')" />
       </el-collapse-item>
+
+      <el-collapse-item name="aiDraw">
+        <template #title>
+          <div class="tool-collapse-title">
+            <h3>AI 生图</h3>
+            <p>调用后端生图接口，支持设置模型、尺寸、参考图，返回结果会保存到数据库。</p>
+          </div>
+        </template>
+        <component :is="toolComponents.aiDraw" v-if="activeNames.includes('aiDraw')" />
+      </el-collapse-item>
     </el-collapse>
   </div>
 </template>
@@ -77,6 +87,7 @@ const toolComponents = {
   qrcode: defineAsyncComponent(() => import('./QrCodeTool.vue')),
   lottery: defineAsyncComponent(() => import('./LotteryTool.vue')),
   accountBook: defineAsyncComponent(() => import('./AccountBookTool.vue')),
+  aiDraw: defineAsyncComponent(() => import('./AiDrawTool.vue')),
 }
 </script>
 

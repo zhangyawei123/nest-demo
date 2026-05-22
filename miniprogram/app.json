@@ -8,6 +8,7 @@
     "pages/hot/hot",
     "pages/lottery/lottery",
     "pages/ai-chat/ai-chat",
+    "pages/ai-draw/ai-draw",
     "pages/face-detect/face-detect",
     "pages/recipe-combo/recipe-combo",
     "pages/notice/notice",

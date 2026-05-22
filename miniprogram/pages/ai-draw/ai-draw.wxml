@@ -1,0 +1,65 @@
+<view class="draw-page">
+  <view class="bg-orb orb-1"></view>
+  <view class="bg-orb orb-2"></view>
+
+  <view class="draw-hero card">
+    <text class="hero-kicker">AI IMAGE</text>
+    <text class="hero-title">AI 生图</text>
+    <text class="hero-desc">输入图片描述，由后端安全调用生图接口，生成结果会自动保存到数据库。</text>
+  </view>
+
+  <view class="form-card card">
+    <view class="field">
+      <text class="field-label">模型</text>
+      <input class="model-input" value="{{model}}" bindinput="onModelInput" placeholder="gpt-image-2" />
+    </view>
+
+    <view class="field">
+      <text class="field-label">图片比例</text>
+      <picker mode="selector" range="{{sizes}}" range-key="label" value="{{sizeIndex}}" bindchange="onSizeChange">
+        <view class="picker-value">{{sizes[sizeIndex].label}}</view>
+      </picker>
+    </view>
+
+    <view class="field">
+      <view class="prompt-header">
+        <text class="field-label">描述词</text>
+        <text class="clear-text" bindtap="clearPrompt">清空</text>
+      </view>
+      <textarea class="prompt-input" value="{{prompt}}" maxlength="3000" bindinput="onPromptInput" placeholder="请输入你想生成的图片内容" auto-height="false" />
+      <text class="prompt-count">{{prompt.length}} / 3000</text>
+    </view>
+  </view>
+
+  <view class="action-bar">
+    <view class="btn-primary {{prompt && !loading ? 'active' : ''}}" bindtap="generate">
+      <text>{{loading ? '生成中…' : '开始生成'}}</text>
+    </view>
+  </view>
+
+  <view class="loading-card card" wx:if="{{loading}}">
+    <text class="loading-icon">🎨</text>
+    <text class="loading-title">正在生成图片</text>
+    <text class="loading-desc">生图可能需要几十秒，请保持页面打开。</text>
+  </view>
+
+  <view class="result-section" wx:if="{{imageUrls.length}}">
+    <view class="result-card card">
+      <text class="result-title">生成结果</text>
+      <view class="image-list">
+        <view class="image-item" wx:for="{{imageUrls}}" wx:key="index">
+          <image class="result-image" src="{{item}}" mode="widthFix" bindtap="previewImage" data-url="{{item}}" />
+          <view class="image-actions">
+            <view class="small-btn" bindtap="previewImage" data-url="{{item}}">预览</view>
+            <view class="small-btn" bindtap="copyUrl" data-url="{{item}}">复制链接</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="raw-card card" wx:if="{{result && !imageUrls.length}}">
+    <text class="result-title">接口已返回</text>
+    <text class="raw-text">本次请求已保存到数据库，但返回中没有可展示的图片 URL。</text>
+  </view>
+</view>

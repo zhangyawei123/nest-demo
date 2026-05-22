@@ -1,0 +1,255 @@
+.draw-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+  overflow: visible;
+  background: linear-gradient(180deg, #f7f2ff 0%, #f7f9fc 42%, #ffffff 100%);
+}
+
+.bg-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(18rpx);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.orb-1 {
+  width: 260rpx;
+  height: 260rpx;
+  top: 10rpx;
+  right: -80rpx;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.28) 0%, rgba(139, 92, 246, 0) 72%);
+}
+
+.orb-2 {
+  width: 320rpx;
+  height: 320rpx;
+  left: -120rpx;
+  top: 360rpx;
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.16) 0%, rgba(236, 72, 153, 0) 76%);
+}
+
+.draw-hero {
+  position: relative;
+  z-index: 1;
+  margin: 24rpx 24rpx 0;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.98) 0%, rgba(168, 85, 247, 0.92) 56%, rgba(236, 72, 153, 0.78) 100%);
+  box-shadow: 0 18rpx 44rpx rgba(124, 58, 237, 0.18);
+  overflow: hidden;
+}
+
+.draw-hero::after {
+  content: '';
+  position: absolute;
+  width: 260rpx;
+  height: 260rpx;
+  border-radius: 50%;
+  top: -70rpx;
+  right: -60rpx;
+  background: rgba(255,255,255,0.12);
+}
+
+.hero-kicker {
+  display: block;
+  font-size: 20rpx;
+  letter-spacing: 4rpx;
+  color: rgba(255,255,255,0.72);
+  position: relative;
+  z-index: 1;
+}
+
+.hero-title {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 50rpx;
+  font-weight: 700;
+  color: #ffffff;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-desc {
+  display: block;
+  margin-top: 14rpx;
+  font-size: 24rpx;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.88);
+  position: relative;
+  z-index: 1;
+}
+
+.form-card {
+  margin: 24rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.field {
+  margin-bottom: 26rpx;
+}
+
+.field:last-child {
+  margin-bottom: 0;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 12rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #24324a;
+}
+
+.model-input,
+.picker-value {
+  min-height: 82rpx;
+  box-sizing: border-box;
+  padding: 20rpx 24rpx;
+  border-radius: 18rpx;
+  background: #f6f8fc;
+  font-size: 28rpx;
+  color: #24324a;
+}
+
+.prompt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.clear-text {
+  margin-bottom: 12rpx;
+  font-size: 24rpx;
+  color: #8b5cf6;
+}
+
+.prompt-input {
+  width: 100%;
+  height: 360rpx;
+  box-sizing: border-box;
+  padding: 22rpx 24rpx;
+  border-radius: 18rpx;
+  background: #f6f8fc;
+  font-size: 28rpx;
+  line-height: 1.65;
+  color: #24324a;
+}
+
+.prompt-count {
+  display: block;
+  margin-top: 10rpx;
+  text-align: right;
+  font-size: 22rpx;
+  color: #97a2b5;
+}
+
+.action-bar {
+  display: flex;
+  margin: 0 24rpx 24rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.btn-primary {
+  flex: 1;
+  text-align: center;
+  padding: 24rpx 0;
+  border-radius: 999rpx;
+  background: #dbe3ef;
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.btn-primary.active {
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  box-shadow: 0 10rpx 22rpx rgba(124, 58, 237, 0.2);
+}
+
+.loading-card,
+.result-card,
+.raw-card {
+  margin: 0 24rpx 24rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.loading-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.loading-icon {
+  font-size: 70rpx;
+  margin-bottom: 12rpx;
+}
+
+.loading-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #24324a;
+}
+
+.loading-desc {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  color: #8b95a7;
+}
+
+.result-section {
+  position: relative;
+  z-index: 1;
+}
+
+.result-title {
+  display: block;
+  margin-bottom: 20rpx;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #24324a;
+}
+
+.image-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.image-item {
+  overflow: hidden;
+  border-radius: 22rpx;
+  background: #f6f8fc;
+}
+
+.result-image {
+  display: block;
+  width: 100%;
+}
+
+.image-actions {
+  display: flex;
+  gap: 16rpx;
+  padding: 16rpx;
+}
+
+.small-btn {
+  flex: 1;
+  text-align: center;
+  padding: 18rpx 0;
+  border-radius: 999rpx;
+  background: #f1eaff;
+  color: #7c3aed;
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+.raw-text {
+  display: block;
+  font-size: 26rpx;
+  line-height: 1.7;
+  color: #4a5568;
+}

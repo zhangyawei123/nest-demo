@@ -18,6 +18,7 @@ import { AiChatModule } from './ai-chat/ai-chat.module';
 import { VisionModule } from './vision/vision.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { ArticleInteractionModule } from './article-interaction/article-interaction.module';
+import { DrawModule } from './draw/draw.module';
 
 /**
  * 根模块 - 应用程序的入口模块
@@ -83,6 +84,7 @@ import { ArticleInteractionModule } from './article-interaction/article-interact
     VisionModule,
     FeedbackModule,
     ArticleInteractionModule,
+    DrawModule,
   ],
   controllers: [AppController],
   providers: [AppService],
