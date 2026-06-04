@@ -18,7 +18,7 @@ REMOTE_FRONTEND="/var/www/nest-demo-frontend"
 
 # 需要从本地 .env 同步到服务器 .env 的变量白名单
 # 其他变量（如 DB_PASSWORD 等）保持服务器原值不变
-SYNC_ENV_KEYS=("AI_API_KEY")
+SYNC_ENV_KEYS=("AI_API_KEY" "DRAW_BASE_URL" "DRAW_API_PATH" "DRAW_API_KEY" "DRAW_MODEL" "PUBLIC_BASE_URL")
 
 # ---------- 读取密码 ----------
 if [ ! -f "$PASSWORD_FILE" ]; then
@@ -45,8 +45,17 @@ sshpass -e rsync -az --delete \
 sshpass -e scp $SSH_OPTS \
   "$PROJECT_DIR/package.json" \
   "$PROJECT_DIR/tsconfig.json" \
+  "$PROJECT_DIR/tsconfig.build.json" \
   "$PROJECT_DIR/nest-cli.json" \
   "${SERVER_USER}@${SERVER_IP}:${REMOTE_PROJECT}/" >/dev/null
+
+# ---------- 同步 Python 脚本（人脸检测等） ----------
+if [ -d "$PROJECT_DIR/scripts" ]; then
+  echo "📦 同步 scripts/ ..."
+  sshpass -e rsync -az --delete \
+    -e "ssh $SSH_OPTS" \
+    "$PROJECT_DIR/scripts/" "${SERVER_USER}@${SERVER_IP}:${REMOTE_PROJECT}/scripts/"
+fi
 
 # ---------- 同步前端源码 ----------
 echo "📦 同步前端源码..."

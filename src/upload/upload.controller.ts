@@ -6,6 +6,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ConfigService } from '@nestjs/config';
 import { ApiTags, ApiOperation, ApiConsumes } from '@nestjs/swagger';
 import { mkdir, writeFile } from 'fs/promises';
 import { extname, join } from 'path';
@@ -17,6 +18,8 @@ import { randomUUID } from 'crypto';
 @ApiTags('文件上传')
 @Controller('upload')
 export class UploadController {
+  constructor(private readonly configService: ConfigService) {}
+
   /**
    * 上传图片
    */
@@ -50,9 +53,16 @@ export class UploadController {
     const filepath = join(uploadDir, filename);
     await writeFile(filepath, file.buffer);
 
+    const relativeUrl = `/uploads/${filename}`;
+    const publicBaseUrl = this.configService
+      .get<string>('PUBLIC_BASE_URL', '')
+      .replace(/\/$/, '');
+    const publicUrl = publicBaseUrl ? `${publicBaseUrl}${relativeUrl}` : relativeUrl;
+
     return {
       filename,
-      url: `/uploads/${filename}`,
+      url: publicUrl,
+      relativeUrl,
       size: file.size,
       mimetype: file.mimetype,
     };

@@ -31,15 +31,18 @@ export class DrawService {
     );
     const apiKey = this.configService.get<string>('DRAW_API_KEY', '');
     const model = dto.model || this.configService.get<string>('DRAW_MODEL', 'gpt-image-2');
+    const apiPath = '/draw/v1/images/generations';
+    const publicBaseUrl = this.configService.get<string>('PUBLIC_BASE_URL', '');
 
     if (!apiKey) {
       throw new ServiceUnavailableException('未配置生图服务密钥');
     }
 
+    const rawImages = dto.image || [];
     const requestBody = {
       model,
       prompt: dto.prompt,
-      image: dto.image || [],
+      image: this.normalizeImageUrls(rawImages, publicBaseUrl),
       size: dto.size || '',
       response_format: dto.response_format || 'url',
     };
@@ -49,7 +52,7 @@ export class DrawService {
         userId,
         model: requestBody.model,
         prompt: requestBody.prompt,
-        image: requestBody.image,
+        image: rawImages,
         size: requestBody.size,
         responseFormat: requestBody.response_format,
         status: 'pending',
@@ -61,11 +64,15 @@ export class DrawService {
     );
 
     try {
-      const res = await fetch(`${baseUrl}/draw/v1/images/generations`, {
+      const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
+      const normalizedApiPath = apiPath.startsWith('/') ? apiPath : `/${apiPath}`;
+      const res = await fetch(`${normalizedBaseUrl}${normalizedApiPath}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${apiKey}`,
+          'User-Agent':
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
         },
         body: JSON.stringify(requestBody),
       });
@@ -80,7 +87,15 @@ export class DrawService {
       }
 
       if (!res.ok) {
-        const errorMessage = `生图服务请求失败 (${res.status})`;
+        const upstreamMessage =
+          typeof responseBody.message === 'string'
+            ? responseBody.message
+            : typeof responseBody.error === 'string'
+              ? responseBody.error
+              : null;
+        const errorMessage = upstreamMessage
+          ? `生图服务请求失败 (${res.status}): ${upstreamMessage}`
+          : `生图服务请求失败 (${res.status})`;
         record.status = 'failed';
         record.responseBody = responseBody as Record<string, unknown>;
         record.errorMessage = errorMessage;
@@ -115,5 +130,24 @@ export class DrawService {
       await this.drawGenerationRepo.save(record);
       throw new BadGatewayException('生图服务请求异常');
     }
+  }
+
+  private normalizeImageUrls(images: unknown[], publicBaseUrl: string) {
+    return images.map((image) => {
+      if (typeof image !== 'string') {
+        return image;
+      }
+
+      if (/^(https?:|data:)/i.test(image)) {
+        return image;
+      }
+
+      if (!image.startsWith('/')) {
+        return image;
+      }
+
+      const normalizedBaseUrl = publicBaseUrl.replace(/\/$/, '');
+      return normalizedBaseUrl ? `${normalizedBaseUrl}${image}` : image;
+    });
   }
 }
