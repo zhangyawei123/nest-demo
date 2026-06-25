@@ -1,4 +1,10 @@
-import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateDrawGenerationDto {
   @IsOptional()
@@ -20,4 +26,20 @@ export class CreateDrawGenerationDto {
   @IsOptional()
   @IsString()
   response_format?: string;
+}
+
+export class QueryDrawGenerationHistoryDto {
+  @IsOptional()
+  page?: string;
+
+  @IsOptional()
+  pageSize?: string;
+
+  @IsOptional()
+  @IsString()
+  keyword?: string;
+
+  @IsOptional()
+  @IsIn(['pending', 'success', 'failed'])
+  status?: string;
 }
