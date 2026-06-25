@@ -134,6 +134,7 @@ import { computed, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { UploadProps } from 'element-plus'
 import { generateImage, type GenerateImageResponse } from '@/api/draw'
+import { getUploadedAssetUrl, normalizeAssetUrl } from '@/utils/upload-url'
 
 const defaultForm = () => ({
   model: 'gpt-image-2',
@@ -172,10 +173,7 @@ const rawJson = computed(() => {
 })
 
 const resolveImageUrl = (url: string) => {
-  if (!url) return ''
-  if (/^(https?:|data:)/i.test(url)) return url
-  if (url.startsWith('/uploads')) return url
-  return url
+  return normalizeAssetUrl(url)
 }
 
 const onPresetChange = (value: string) => {
@@ -196,8 +194,7 @@ const beforeUpload: UploadProps['beforeUpload'] = (file) => {
 }
 
 const onUploadSuccess: UploadProps['onSuccess'] = (response) => {
-  const payload = response?.data || response
-  const url: string | undefined = payload?.url || payload?.path
+  const url = getUploadedAssetUrl(response)
   if (!url) {
     ElMessage.error('上传成功但未返回 URL')
     return

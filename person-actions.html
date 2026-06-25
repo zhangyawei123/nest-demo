@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>拿枪的人 - 多动作版本</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: sans-serif;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    .actions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+    .action-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    .action-card h2 {
+      text-align: center;
+      color: #333;
+      margin: 0 0 15px 0;
+      font-size: 20px;
+    }
+    svg {
+      display: block;
+      margin: 0 auto;
+      border: 2px solid #eee;
+      border-radius: 8px;
+      background: #f8f9fa;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔫 拿枪的人 - 动作集合</h1>
+    
+    <div class="actions-grid">
+      <!-- Standing pose -->
+      <div class="action-card">
+        <h2>🧍 站立姿势</h2>
+        <svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="shadow1" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" style="stop-color:#000;stop-opacity:0.2"/>
+              <stop offset="100%" style="stop-color:#000;stop-opacity:0"/>
+            </radialGradient>
+          </defs>
+          
+          <ellipse cx="200" cy="440" rx="80" ry="15" fill="url(#shadow1)"/>
+          
+          <circle cx="200" cy="80" r="40" fill="#FDB777" stroke="#000" stroke-width="2"/>
+          <path d="M 165 65 Q 160 50 170 45 Q 180 40 200 42 Q 220 40 230 45 Q 240 50 235 65 Z" fill="#2D1810" stroke="#000" stroke-width="1.5"/>
+          <ellipse cx="188" cy="78" rx="4" ry="5" fill="#000"/>
+          <ellipse cx="212" cy="78" rx="4" ry="5" fill="#000"/>
+          <path d="M 190 98 Q 200 102 210 98" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round"/>
+          
+          <rect x="185" y="115" width="30" height="15" fill="#FDB777" stroke="#000" stroke-width="1.5"/>
+          <rect x="175" y="130" width="50" height="110" fill="#4A5568" stroke="#000" stroke-width="2"/>
+          <rect x="175" y="235" width="50" height="8" fill="#654321" stroke="#000" stroke-width="1.5"/>
+          
+          <path d="M 175 140 Q 140 160 100 190" stroke="#FDB777" stroke-width="16" stroke-linecap="round" fill="none"/>
+          <ellipse cx="95" cy="195" rx="12" ry="8" fill="#FDB777" stroke="#000" stroke-width="1.5"/>
+          
+          <g transform="translate(15, 0)">
+            <rect x="20" y="185" width="80" height="10" fill="#1a202c" stroke="#000" stroke-width="1.5"/>
+            <rect x="90" y="175" width="40" height="30" fill="#1a202c" stroke="#000" stroke-width="1.5"/>
+            <path d="M 105 205 L 105 220 L 120 220 L 120 205" fill="none" stroke="#000" stroke-width="1.5"/>
+            <path d="M 110 205 L 105 240 L 125 240 L 120 205" fill="#3a2618" stroke="#000" stroke-width="1.5"/>
+          </g>
+          
+          <path d="M 225 140 Q 260 170 260 220" stroke="#FDB777" stroke-width="16" stroke-linecap="round" fill="none"/>
+          <ellipse cx="258" cy="225" rx="10" ry="12" fill="#FDB777" stroke="#000" stroke-width="1.5"/>
+          
+          <path d="M 190 243 Q 185 320 175 420" stroke="#2C5282" stroke-width="20" stroke-linecap="round" fill="none"/>
+          <path d="M 210 243 Q 215 320 225 420" stroke="#2C5282" stroke-width="20" stroke-linecap="round" fill="none"/>
+          
+          <ellipse cx="175" cy="432" rx="20" ry="10" fill="#2D2D2D" stroke="#000" stroke-width="1.5"/>
+          <ellipse cx="225" cy="432" rx="20" ry="10" fill="#2D2D2D" stroke="#000" stroke-width="1.5"/>
+        </svg>
+      </div>
+      
+      <!-- Moving left -->
+      <div class="action-card">
+        <h2>⬅️ 向左移动</h2>
+        <svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="shadow2" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" style="stop-color:#000;stop-opacity:0.2"/>
+              <stop offset="100%" style="stop-color:#000;stop-opacity:0"/>
+            </radialGradient>
+          </defs>
+          
+          <ellipse cx="200" cy="440" rx="70" ry="12" fill="url(#shadow2)"/>
+          
+          <!-- Head tilted -->
+          <ellipse cx="190" cy="85" rx="38" ry="42" fill="#FDB777" stroke="#000" stroke-width="2" transform="rotate(-15 190 85)"/>
+          <path d="M 155 70 Q 150 55 160 50 Q 170 45 190 47 Q 210 45 220 50 Q 230 55 225 70 Z" fill="#2D1810" stroke="#000" stroke-width="1.5"/>
+          <ellipse cx="178" cy="83" rx="4" ry="5" fill="#000"/>
+          <ellipse cx="200" cy="83" rx="4" ry="5" fill="#000"/>
+          <path d="M 180 100 Q 190 103 200 100" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round"/>
+          
+          <!-- Body leaning left -->
+          <rect x="175" y="120" width="30" height="15" fill="#FDB777" stroke="#000" stroke-width="1.5"/>
+          <path d="M 165 135 L 155 245 L 185 243 L 195 135 Z" fill="#4A5568" stroke="#000" stroke-width="2"/>
+          <rect x="155" y="238" width="30" height="8" fill="#654321" stroke="#000" stroke-width="1.5"/>
+          
+          <!-- Arms - left extended with gun -->
+          <path d="M 165 145 Q 120 150 80 165" stroke="#FDB777" stroke-width="16" stroke-linecap="round" fill="none"/>
+          <ellipse cx="75" cy="168" rx="12" ry="8" fill="#FDB777" stroke="#000" stroke-width="1.5"/>
+          
+          <g transform="translate(-15, -20) rotate(-10 100 180)">
+            <rect x="20" y="160" width="80" height="10" fill="#1a202c" stroke="#000" stroke-width="1.5"/>
+            <rect x="90" y="150" width="40" height="30" fill="#1a202c" stroke="#000" stroke-width="1.5"/>
+            <path d="M 105 180 L 105 195 L 120 195 L 120 180" fill="none" stroke="#000" stroke-width="1.5"/>
+            <path d="M 110 180 L 105 215 L 125 215 L 120 180" fill="#3a2618" stroke="#000" stroke-width="1.5"/>
+          </g>
+          
+          <path d="M 195 145 Q 220 170 210 220" stroke="#FDB777" stroke-width="16" stroke-linecap="round" fill="none"/>
+          <ellipse cx="208" cy="225" rx="10" ry="12" fill="#FDB777" stroke="#000" stroke-width="1.5"/>
+          
+          <!-- Legs - walking pose -->
+          <path d="M 170 246 Q 160 320 140 420" stroke="#2C5282" stroke-width="20" stroke-linecap="round" fill="none"/>
+          <path d="M 180 246 Q 185 320 195 420" stroke="#2C5282" stroke-width="20" stroke-linecap="round" fill="none"/>
+          
+          <ellipse cx="140" cy="432" rx="20" ry="10" fill="#2D2D2D" stroke="#000" stroke-width="1.5"/>
+          <ellipse cx="195" cy="432" rx="20" ry="10" fill="#2D2D2D" stroke="#000" stroke-width="1.5"/>
+        </svg>
+      </div>
+      
+      <!-- Moving right -->
+      <div class="action-card">
+        <h2>➡️ 向右移动</h2>
+        <svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="shadow3" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" style="stop-color:#000;stop-opacity:0.2"/>
+              <stop offset="100%" style="stop-color:#000;stop-opacity:0"/>
+            </radialGradient>
+          </defs>
+          
+          <ellipse cx="200" cy="440" rx="70" ry="12" fill="url(#shadow3)"/>
+          
+          <!-- Head tilted right -->
+          <ellipse cx="210" cy="85" rx="38" ry="42" fill="#FDB777" stroke="#000" stroke-width="2" transform="rotate(15 210 85)"/>
+          <path d="M 175 70 Q 170 55 180 50 Q 190 45 210 47 Q 230 45 240 50 Q 250 55 245 70 Z" fill="#2D1810" stroke="#000" stroke-width="1.5"/>
+          <ellipse cx="200" cy="83" rx="4" ry="5" fill="#000"/>
+          <ellipse cx="222" cy="83" rx="4" ry="5" fill="#000"/>
+          <path d="M 200 100 Q 210 103 220 100" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round"/>
+          
+          <!-- Body leaning right -->
+          <rect x="195" y="120" width="30" height="15" fill="#FDB777" stroke="#000" stroke-width="1.5"/>
+          <path d="M 205 135 L 215 243 L 245 245 L 235 135 Z" fill="#4A5568" stroke="#000" stroke-width="2"/>
+          <rect x="215" y="238" width="30" height="8" fill="#654321" stroke="#000" stroke-width="1.5"/>
+          
+          <!-- Arms - right extended with gun -->
+          <path d="M 235 145 Q 280 150 320 165" stroke="#FDB777" stroke-width="16" stroke-linecap="round" fill="none"/>
+          <ellipse cx="325" cy="168" rx="12" ry="8" fill="#FDB777" stroke="#000" stroke-width="1.5"/>
+          
+          <g transform="translate(190, -20) rotate(10 100 180)">
+            <rect x="20" y="160" width="80" height="10" fill="#1a202c" stroke="#000" stroke-width="1.5"/>
+            <rect x="90" y="150" width="40" height="30" fill="#1a202c" stroke="#000" stroke-width="1.5"/>
+            <path d="M 105 180 L 105 195 L 120 195 L 120 180" fill="none" stroke="#000" stroke-width="1.5"/>
+            <path d="M 110 180 L 105 215 L 125 215 L 120 180" fill="#3a2618" stroke="#000" stroke-width="1.5"/>
+          </g>
+          
+          <path d="M 205 145 Q 190 170 190 220" stroke="#FDB777" stroke-width="16" stroke-linecap="round" fill="none"/>
+          <ellipse cx="192" cy="225" rx="10" ry="12" fill="#FDB777" stroke="#000" stroke-width="1.5"/>
+          
+          <!-- Legs - walking pose -->
+          <path d="M 220 246 Q 210 320 205 420" stroke="#2C5282" stroke-width="20" stroke-linecap="round" fill="none"/>
+          <path d="M 230 246 Q 240 320 260 420" stroke="#2C5282" stroke-width="20" stroke-linecap="round" fill="none"/>
+          
+          <ellipse cx="205" cy="432" rx="20" ry="10" fill="#2D2D2D" stroke="#000" stroke-width="1.5"/>
+          <ellipse cx="260" cy="432" rx="20" ry="10" fill="#2D2D2D" stroke="#000" stroke-width="1.5"/>
+        </svg>
+      </div>
+      
+      <!-- Jumping -->
+      <div class="action-card">
+        <h2>⬆️ 跳跃动作</h2>
+        <svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="shadow4" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" style="stop-color:#000;stop-opacity:0.15"/>
+              <stop offset="100%" style="stop-color:#000;stop-opacity:0"/>
+            </radialGradient>
+          </defs>
+          
+          <!-- Shadow lower and smaller (person is in air) -->
+          <ellipse cx="200" cy="500" rx="60" ry="10" fill="url(#shadow4)"/>
+          
+          <!-- Motion lines -->
+          <line x1="150" y1="480" x2="150" y2="510" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+          <line x1="250" y1="480" x2="250" y2="510" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+          <line x1="200" y1="470" x2="200" y2="500" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+          
+          <!-- Head -->
+          <circle cx="200" cy="120" r="40" fill="#FDB777" stroke="#000" stroke-width="2"/>
+          <path d="M 165 105 Q 160 90 170 85 Q 180 80 200 82 Q 220 80 230 85 Q 240 90 235 105 Z" fill="#2D1810" stroke="#000" stroke-width="1.5"/>
+          <ellipse cx="188" cy="118" rx="4" ry="5" fill="#000"/>
+          <ellipse cx="212" cy="118" rx="4" ry="5" fill="#000"/>
+          <circle cx="200" cy="135" r="8" fill="none" stroke="#000" stroke-width="2"/>
+          
+          <!-- Body -->
+          <rect x="185" y="155" width="30" height="15" fill="#FDB777" stroke="#000" stroke-width="1.5"/>
+          <rect x="175" y="170" width="50" height="100" fill="#4A5568" stroke="#000" stroke-width="2"/>
+          <rect x="175" y="265" width="50" height="8" fill="#654321" stroke="#000" stroke-width="1.5"/>
+          
+          <!-- Arms - spread out -->
+          <path d="M 175 185 Q 140 175 110 160" stroke="#FDB777" stroke-width="16" stroke-linecap="round" fill="none"/>
+          <ellipse cx="105" cy="155" rx="12" ry="8" fill="#FDB777" stroke="#000" stroke-width="1.5"/>
+          
+          <g transform="translate(-5, -40) rotate(-25 100 180)">
+            <rect x="30" y="150" width="80" height="10" fill="#1a202c" stroke="#000" stroke-width="1.5"/>
+            <rect x="100" y="140" width="40" height="30" fill="#1a202c" stroke="#000" stroke-width="1.5"/>
+            <path d="M 115 170 L 115 185 L 130 185 L 130 170" fill="none" stroke="#000" stroke-width="1.5"/>
+            <path d="M 120 170 L 115 205 L 135 205 L 130 170" fill="#3a2618" stroke="#000" stroke-width="1.5"/>
+          </g>
+          
+          <path d="M 225 185 Q 260 175 290 160" stroke="#FDB777" stroke-width="16" stroke-linecap="round" fill="none"/>
+          <ellipse cx="295" cy="155" rx="12" ry="8" fill="#FDB777" stroke="#000" stroke-width="1.5"/>
+          
+          <!-- Legs - bent in jumping pose -->
+          <path d="M 190 273 Q 180 310 160 350" stroke="#2C5282" stroke-width="20" stroke-linecap="round" fill="none"/>
+          <path d="M 160 350 Q 155 370 145 390" stroke="#2C5282" stroke-width="18" stroke-linecap="round" fill="none"/>
+          
+          <path d="M 210 273 Q 220 310 240 350" stroke="#2C5282" stroke-width="20" stroke-linecap="round" fill="none"/>
+          <path d="M 240 350 Q 245 370 255 390" stroke="#2C5282" stroke-width="18" stroke-linecap="round" fill="none"/>
+          
+          <ellipse cx="145" cy="400" rx="20" ry="10" fill="#2D2D2D" stroke="#000" stroke-width="1.5" transform="rotate(-20 145 400)"/>
+          <ellipse cx="255" cy="400" rx="20" ry="10" fill="#2D2D2D" stroke="#000" stroke-width="1.5" transform="rotate(20 255 400)"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

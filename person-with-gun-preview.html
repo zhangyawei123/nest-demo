@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>拿枪的人 - SVG 预览</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: sans-serif;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    svg {
+      display: block;
+      margin: 0 auto;
+      border: 2px solid #eee;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Shadow gradient -->
+        <radialGradient id="shadow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" style="stop-color:#000;stop-opacity:0.2"/>
+          <stop offset="100%" style="stop-color:#000;stop-opacity:0"/>
+        </radialGradient>
+        <!-- Body shadow -->
+        <linearGradient id="bodyShade" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#3a4556;stop-opacity:1"/>
+          <stop offset="100%" style="stop-color:#4A5568;stop-opacity:1"/>
+        </linearGradient>
+      </defs>
+      
+      <!-- Ground shadow -->
+      <ellipse cx="200" cy="440" rx="80" ry="15" fill="url(#shadow)"/>
+      
+      <!-- Head -->
+      <circle cx="200" cy="80" r="40" fill="#FDB777" stroke="#000" stroke-width="2"/>
+      
+      <!-- Hair -->
+      <path d="M 165 65 Q 160 50 170 45 Q 180 40 200 42 Q 220 40 230 45 Q 240 50 235 65 Z" fill="#2D1810" stroke="#000" stroke-width="1.5"/>
+      <ellipse cx="170" cy="55" rx="8" ry="12" fill="#2D1810"/>
+      <ellipse cx="230" cy="55" rx="8" ry="12" fill="#2D1810"/>
+      
+      <!-- Ears -->
+      <ellipse cx="165" cy="80" rx="8" ry="12" fill="#FDB777" stroke="#000" stroke-width="1.5"/>
+      <ellipse cx="235" cy="80" rx="8" ry="12" fill="#FDB777" stroke="#000" stroke-width="1.5"/>
+      
+      <!-- Eyebrows -->
+      <path d="M 180 68 Q 190 66 195 67" fill="none" stroke="#2D1810" stroke-width="2" stroke-linecap="round"/>
+      <path d="M 205 67 Q 210 66 220 68" fill="none" stroke="#2D1810" stroke-width="2" stroke-linecap="round"/>
+      
+      <!-- Eyes -->
+      <circle cx="188" cy="78" r="4" fill="#FFF" stroke="#000" stroke-width="1"/>
+      <circle cx="190" cy="77" r="2.5" fill="#000"/>
+      <circle cx="212" cy="78" r="4" fill="#FFF" stroke="#000" stroke-width="1"/>
+      <circle cx="214" cy="77" r="2.5" fill="#000"/>
+      
+      <!-- Nose -->
+      <path d="M 200 85 L 198 92 L 202 92" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+      
+      <!-- Mouth -->
+      <path d="M 190 98 Q 200 102 210 98" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round"/>
+      
+      <!-- Neck -->
+      <rect x="185" y="115" width="30" height="15" fill="#FDB777" stroke="#000" stroke-width="1.5"/>
+      
+      <!-- Body/Shirt -->
+      <path d="M 170 130 L 170 240 L 185 238 L 185 130 Z" fill="url(#bodyShade)" stroke="#000" stroke-width="2"/>
+      <path d="M 215 130 L 215 238 L 230 240 L 230 130 Z" fill="#4A5568" stroke="#000" stroke-width="2"/>
+      <rect x="185" y="130" width="30" height="108" fill="#4A5568" stroke="#000" stroke-width="2"/>
+      
+      <!-- Shirt collar -->
+      <path d="M 185 130 L 195 135 L 200 130 L 205 135 L 215 130" fill="none" stroke="#000" stroke-width="2"/>
+      
+      <!-- Shirt pocket -->
+      <rect x="190" y="160" width="20" height="15" fill="none" stroke="#000" stroke-width="1.5" rx="2"/>
+      <line x1="200" y1="160" x2="200" y2="167" stroke="#000" stroke-width="1"/>
+      
+      <!-- Belt -->
+      <rect x="170" y="235" width="60" height="8" fill="#654321" stroke="#000" stroke-width="1.5"/>
+      <rect x="195" y="236" width="10" height="6" fill="#FFD700" stroke="#000" stroke-width="1"/>
+      
+      <!-- Left arm (holding gun) -->
+      <path d="M 170 140 Q 150 160 120 180" stroke="#FDB777" stroke-width="16" stroke-linecap="round" fill="none"/>
+      <path d="M 120 180 Q 100 190 85 200" stroke="#FDB777" stroke-width="13" stroke-linecap="round" fill="none"/>
+      
+      <!-- Left hand -->
+      <ellipse cx="82" cy="205" rx="12" ry="8" fill="#FDB777" stroke="#000" stroke-width="1.5"/>
+      <path d="M 75 205 L 70 208" stroke="#FDB777" stroke-width="3" stroke-linecap="round"/>
+      <path d="M 77 200 L 73 198" stroke="#FDB777" stroke-width="3" stroke-linecap="round"/>
+      <path d="M 87 200 L 90 198" stroke="#FDB777" stroke-width="3" stroke-linecap="round"/>
+      
+      <!-- Right arm -->
+      <path d="M 230 140 Q 250 170 265 195" stroke="#FDB777" stroke-width="16" stroke-linecap="round" fill="none"/>
+      <path d="M 265 195 Q 268 210 260 230" stroke="#FDB777" stroke-width="13" stroke-linecap="round" fill="none"/>
+      
+      <!-- Right hand -->
+      <ellipse cx="258" cy="235" rx="10" ry="12" fill="#FDB777" stroke="#000" stroke-width="1.5"/>
+      
+      <!-- Gun - Enhanced -->
+      <g id="gun">
+        <!-- Barrel with detail -->
+        <rect x="20" y="195" width="80" height="10" fill="#1a202c" stroke="#000" stroke-width="1.5"/>
+        <rect x="23" y="197" width="74" height="6" fill="#2D3748"/>
+        <line x1="30" y1="200" x2="90" y2="200" stroke="#4a5568" stroke-width="1" stroke-dasharray="3,3"/>
+        
+        <!-- Front sight -->
+        <rect x="22" y="192" width="3" height="5" fill="#000"/>
+        
+        <!-- Gun body/slide -->
+        <rect x="90" y="185" width="45" height="30" fill="#1a202c" stroke="#000" stroke-width="1.5"/>
+        <rect x="93" y="188" width="39" height="24" fill="#2D3748"/>
+        
+        <!-- Slide serrations -->
+        <line x1="95" y1="188" x2="95" y2="212" stroke="#000" stroke-width="1"/>
+        <line x1="99" y1="188" x2="99" y2="212" stroke="#000" stroke-width="1"/>
+        <line x1="103" y1="188" x2="103" y2="212" stroke="#000" stroke-width="1"/>
+        <line x1="107" y1="188" x2="107" y2="212" stroke="#000" stroke-width="1"/>
+        
+        <!-- Rear sight -->
+        <rect x="125" y="182" width="4" height="6" fill="#000"/>
+        
+        <!-- Trigger guard -->
+        <path d="M 105 215 L 105 232 Q 112 235 120 232 L 120 215" fill="none" stroke="#000" stroke-width="1.8"/>
+        
+        <!-- Trigger -->
+        <rect x="110" y="220" width="5" height="8" fill="#2D3748" stroke="#000" stroke-width="1" rx="1"/>
+        
+        <!-- Handle/Grip -->
+        <path d="M 110 215 L 103 252 Q 103 257 108 257 L 127 257 Q 132 257 132 252 L 120 215" fill="#3a2618" stroke="#000" stroke-width="1.5"/>
+        
+        <!-- Grip texture -->
+        <line x1="108" y1="220" x2="105" y2="245" stroke="#2D1810" stroke-width="0.8"/>
+        <line x1="112" y1="220" x2="109" y2="248" stroke="#2D1810" stroke-width="0.8"/>
+        <line x1="116" y1="220" x2="113" y2="250" stroke="#2D1810" stroke-width="0.8"/>
+        <line x1="120" y1="220" x2="117" y2="250" stroke="#2D1810" stroke-width="0.8"/>
+        <line x1="124" y1="220" x2="121" y2="252" stroke="#2D1810" stroke-width="0.8"/>
+        <line x1="128" y1="220" x2="125" y2="254" stroke="#2D1810" stroke-width="0.8"/>
+        
+        <!-- Magazine -->
+        <rect x="108" y="240" width="20" height="17" fill="#2D3748" stroke="#000" stroke-width="1"/>
+        
+        <!-- Hammer -->
+        <circle cx="122" cy="190" r="4" fill="#2D3748" stroke="#000" stroke-width="1"/>
+      </g>
+      
+      <!-- Pants details -->
+      <line x1="185" y1="243" x2="170" y2="350" stroke="#1a365d" stroke-width="2"/>
+      <line x1="215" y1="243" x2="230" y2="350" stroke="#1a365d" stroke-width="2"/>
+      
+      <!-- Left leg -->
+      <path d="M 185 243 Q 177 290 170 350" stroke="#2C5282" stroke-width="20" stroke-linecap="round" fill="none"/>
+      <path d="M 170 350 Q 165 385 160 420" stroke="#2C5282" stroke-width="18" stroke-linecap="round" fill="none"/>
+      
+      <!-- Right leg -->
+      <path d="M 215 243 Q 223 290 230 350" stroke="#2C5282" stroke-width="20" stroke-linecap="round" fill="none"/>
+      <path d="M 230 350 Q 235 385 240 420" stroke="#2C5282" stroke-width="18" stroke-linecap="round" fill="none"/>
+      
+      <!-- Shoes -->
+      <ellipse cx="160" cy="432" rx="22" ry="12" fill="#1a1a1a" stroke="#000" stroke-width="1.5"/>
+      <ellipse cx="160" cy="430" rx="20" ry="10" fill="#2D2D2D"/>
+      <path d="M 140 430 Q 145 425 155 426" fill="none" stroke="#000" stroke-width="1"/>
+      
+      <ellipse cx="240" cy="432" rx="22" ry="12" fill="#1a1a1a" stroke="#000" stroke-width="1.5"/>
+      <ellipse cx="240" cy="430" rx="20" ry="10" fill="#2D2D2D"/>
+      <path d="M 220 430 Q 225 425 235 426" fill="none" stroke="#000" stroke-width="1"/>
+    </svg>
+  </div>
+</body>
+</html>

@@ -85,10 +85,10 @@
               <template #default="{ row }">
                 <el-image
                   v-if="row.logo"
-                  :src="row.logo"
+                  :src="assetUrl(row.logo)"
                   fit="cover"
                   class="cover-thumb"
-                  :preview-src-list="[row.logo]"
+                  :preview-src-list="[assetUrl(row.logo)]"
                 />
                 <span v-else class="empty-cover">无封面</span>
               </template>
@@ -147,10 +147,10 @@
               <template #default="{ row }">
                 <el-image
                   v-if="row.logo"
-                  :src="row.logo"
+                  :src="assetUrl(row.logo)"
                   fit="cover"
                   class="cover-thumb"
-                  :preview-src-list="[row.logo]"
+                  :preview-src-list="[assetUrl(row.logo)]"
                 />
                 <span v-else class="empty-cover">无封面</span>
               </template>
@@ -189,6 +189,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Search, Document, TrendCharts, User } from '@element-plus/icons-vue'
 import { getArticleList, getMyArticles, deleteArticle } from '@/api/article'
+import { normalizeAssetUrl } from '@/utils/upload-url'
 
 const router = useRouter()
 
@@ -234,6 +235,8 @@ const overviewCards = computed(() => [
 ])
 
 const currentUserId = ref(0)
+
+const assetUrl = (url?: string) => normalizeAssetUrl(url)
 
 const fetchAllArticles = async () => {
   loading.value = true

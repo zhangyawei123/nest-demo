@@ -68,6 +68,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ArrowLeft, User, Clock, View } from '@element-plus/icons-vue'
 import { getArticleDetail, deleteArticle } from '@/api/article'
+import { normalizeAssetUrl, normalizeHtmlAssetUrls } from '@/utils/upload-url'
 
 const router = useRouter()
 const route = useRoute()
@@ -87,7 +88,11 @@ const fetchArticleDetail = async (id: number) => {
   loading.value = true
   try {
     const res: any = await getArticleDetail(id)
-    article.value = res
+    article.value = {
+      ...res,
+      logo: normalizeAssetUrl(res.logo),
+      content: normalizeHtmlAssetUrls(res.content),
+    }
     isMyArticle.value = res.authorId === currentUserId.value
   } catch (error) {
     ElMessage.error('获取文章详情失败')

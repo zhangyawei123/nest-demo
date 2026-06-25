@@ -28,6 +28,7 @@
 import { ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus, Edit } from '@element-plus/icons-vue'
+import { getUploadedAssetUrl, normalizeAssetUrl } from '@/utils/upload-url'
 
 const props = defineProps<{
   modelValue?: string
@@ -42,10 +43,10 @@ const headers = ref({
   Authorization: `Bearer ${localStorage.getItem('token')}`
 })
 
-const imageUrl = ref(props.modelValue || '')
+const imageUrl = ref(normalizeAssetUrl(props.modelValue))
 
 watch(() => props.modelValue, (newVal) => {
-  imageUrl.value = newVal || ''
+  imageUrl.value = normalizeAssetUrl(newVal)
 })
 
 const beforeUpload = (file: File) => {
@@ -64,15 +65,13 @@ const beforeUpload = (file: File) => {
 }
 
 const handleSuccess = (response: any) => {
-  // 后端统一响应格式：{ code: 200, data: { url: '...' } }
-  const fileUrl = response?.data?.url || response?.url
+  const fileUrl = getUploadedAssetUrl(response)
   if (!fileUrl) {
     ElMessage.error('上传失败：无法获取文件地址')
     return
   }
-  const url = `/api${fileUrl}`
-  imageUrl.value = url
-  emit('update:modelValue', url)
+  imageUrl.value = fileUrl
+  emit('update:modelValue', fileUrl)
   ElMessage.success('上传成功')
 }
 

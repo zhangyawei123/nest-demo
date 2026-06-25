@@ -121,6 +121,7 @@ import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import '@wangeditor/editor/dist/css/style.css'
 import { createArticle, updateArticle, getArticleDetail } from '@/api/article'
 import ImageUpload from '@/components/ImageUpload.vue'
+import { getUploadedAssetUrl, normalizeAssetUrl, normalizeHtmlAssetUrls } from '@/utils/upload-url'
 
 const router = useRouter()
 const route = useRoute()
@@ -166,9 +167,11 @@ const editorConfig = {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       },
       customInsert(res: any, insertFn: any) {
-        // 后端统一响应格式：{ code: 200, data: { url: '...' } }
-        const fileUrl = res?.data?.url || res?.url
-        const url = `/api${fileUrl}`
+        const url = getUploadedAssetUrl(res)
+        if (!url) {
+          ElMessage.error('上传成功但未返回图片地址')
+          return
+        }
         insertFn(url, '', url)
       }
     }
@@ -219,8 +222,8 @@ const fetchArticleDetail = async (id: number) => {
   try {
     const res: any = await getArticleDetail(id)
     form.title = res.title
-    form.logo = res.logo || ''
-    form.content = res.content
+    form.logo = normalizeAssetUrl(res.logo)
+    form.content = normalizeHtmlAssetUrls(res.content)
   } catch (error) {
     ElMessage.error('获取文章详情失败')
     router.push('/articles')

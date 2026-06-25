@@ -25,6 +25,10 @@ export class DrawService {
   ) {}
 
   async generate(userId: number, dto: CreateDrawGenerationDto) {
+    if (!userId) {
+      throw new ServiceUnavailableException('用户身份无效');
+    }
+
     const baseUrl = this.configService.get<string>(
       'DRAW_BASE_URL',
       'https://www.right.codes',
@@ -47,21 +51,28 @@ export class DrawService {
       response_format: dto.response_format || 'url',
     };
 
-    const record = await this.drawGenerationRepo.save(
-      this.drawGenerationRepo.create({
-        userId,
-        model: requestBody.model,
-        prompt: requestBody.prompt,
-        image: rawImages,
-        size: requestBody.size,
-        responseFormat: requestBody.response_format,
-        status: 'pending',
-        requestBody,
-        responseBody: null,
-        generatedUrls: null,
-        errorMessage: null,
-      }),
-    );
+    let record: DrawGeneration;
+
+    try {
+      record = await this.drawGenerationRepo.save(
+        this.drawGenerationRepo.create({
+          userId,
+          model: requestBody.model,
+          prompt: requestBody.prompt,
+          image: rawImages,
+          size: requestBody.size,
+          responseFormat: requestBody.response_format,
+          status: 'pending',
+          requestBody,
+          responseBody: null,
+          generatedUrls: null,
+          errorMessage: null,
+        }),
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '创建生图记录失败';
+      throw new ServiceUnavailableException(`数据库操作失败: ${message}`);
+    }
 
     try {
       const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
