@@ -38,7 +38,13 @@
         <el-table-column prop="nickname" label="用户" width="150">
           <template #default="{ row }">
             <div style="display: flex; align-items: center; gap: 8px">
-              <el-avatar :size="32" :src="row.avatarUrl" />
+              <LoadingImage
+                v-if="row.avatarUrl"
+                :src="row.avatarUrl"
+                fit="cover"
+                class="comment-avatar"
+              />
+              <el-avatar v-else :size="32">?</el-avatar>
               <span>{{ row.nickname || '匿名用户' }}</span>
             </div>
           </template>
@@ -67,6 +73,7 @@ import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Download } from '@element-plus/icons-vue'
 import { getComments, fetchComments, type DouyinCommentItem } from '@/api/douyin-comment'
+import LoadingImage from '@/components/LoadingImage.vue'
 
 const videoUrl = ref('')
 const currentUrl = ref('')
@@ -130,5 +137,13 @@ const formatDate = (dateStr: string) => {
   margin: 0;
   font-size: 20px;
   font-weight: 600;
+}
+
+.comment-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #f5f7fa;
 }
 </style>

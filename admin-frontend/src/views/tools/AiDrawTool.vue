@@ -75,7 +75,7 @@
               :key="url + index"
               class="image-item"
             >
-              <el-image
+              <LoadingImage
                 :src="resolveImageUrl(url)"
                 fit="cover"
                 class="image-thumb"
@@ -128,7 +128,7 @@
           :key="url + index"
           class="result-card"
         >
-          <el-image
+          <LoadingImage
             :src="resolveImageUrl(url)"
             fit="contain"
             class="result-image"
@@ -220,7 +220,7 @@
             class="history-item"
           >
             <div class="history-thumb-wrap">
-              <el-image
+              <LoadingImage
                 v-if="record.generatedUrls?.length"
                 :src="firstRecordUrl(record)"
                 fit="cover"
@@ -317,6 +317,7 @@ import {
   type DrawGenerationRecord,
   type GenerateImageResponse,
 } from '@/api/draw';
+import LoadingImage from '@/components/LoadingImage.vue';
 import { getUploadedAssetUrl, normalizeAssetUrl } from '@/utils/upload-url';
 
 const defaultForm = () => ({
@@ -643,6 +644,7 @@ onMounted(() => {
 
 .result-image {
   width: 100%;
+  min-height: 220px;
   max-height: 360px;
   background: #f5f7fa;
   border-radius: 8px;

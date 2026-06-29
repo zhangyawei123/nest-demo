@@ -10,7 +10,7 @@
       accept="image/*"
     >
       <div v-if="imageUrl" class="image-preview">
-        <el-image :src="imageUrl" fit="cover" />
+        <LoadingImage :src="imageUrl" fit="cover" />
         <div class="image-mask">
           <el-icon class="mask-icon"><Edit /></el-icon>
         </div>
@@ -28,6 +28,7 @@
 import { ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus, Edit } from '@element-plus/icons-vue'
+import LoadingImage from '@/components/LoadingImage.vue'
 import { getUploadedAssetUrl, normalizeAssetUrl } from '@/utils/upload-url'
 
 const props = defineProps<{

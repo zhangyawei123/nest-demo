@@ -7,6 +7,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from '../role/role.entity';
 
+const ADMIN_INITIAL_POINTS = 1000;
+
 /**
  * 用户服务 - 处理用户相关的业务逻辑
  */
@@ -39,6 +41,7 @@ export class UserService {
     const user = this.userRepository.create({
       ...createUserDto,
       password: await this.hashPassword(createUserDto.password),
+      points: this.getInitialPoints(createUserDto.username),
     });
 
     return this.userRepository.save(user);
@@ -177,5 +180,9 @@ export class UserService {
 
   private hashPassword(password: string) {
     return bcrypt.hash(password, 10);
+  }
+
+  private getInitialPoints(username: string) {
+    return username.trim().toLowerCase() === 'admin' ? ADMIN_INITIAL_POINTS : 0;
   }
 }

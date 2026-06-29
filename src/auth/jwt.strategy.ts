@@ -42,6 +42,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: any) {
     const user = await this.authService.validateUser(payload.sub);
     // 返回的对象会成为 req.user，不包含敏感字段（如密码）
-    return { userId: user.id, username: user.username };
+    return {
+      userId: user.id,
+      username: user.username,
+      points: user.points || 0,
+      makeupSignInChances: user.makeupSignInChances || 0,
+    };
   }
 }

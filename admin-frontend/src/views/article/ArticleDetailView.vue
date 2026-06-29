@@ -54,20 +54,22 @@
       </div>
 
       <div v-if="article.logo" class="article-cover">
-        <el-image :src="article.logo" fit="cover" />
+        <LoadingImage :src="article.logo" fit="cover" />
       </div>
 
-      <div class="article-content" v-html="article.content"></div>
+      <div ref="articleContentRef" class="article-content" v-html="article.content"></div>
     </el-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed, nextTick, ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ArrowLeft, User, Clock, View } from '@element-plus/icons-vue'
 import { getArticleDetail, deleteArticle } from '@/api/article'
+import LoadingImage from '@/components/LoadingImage.vue'
+import { decorateRichImages } from '@/utils/image-loading'
 import { normalizeAssetUrl, normalizeHtmlAssetUrls } from '@/utils/upload-url'
 
 const router = useRouter()
@@ -76,6 +78,7 @@ const route = useRoute()
 const loading = ref(false)
 const article = ref<any>({})
 const currentUserId = ref(0)
+const articleContentRef = ref<HTMLElement | null>(null)
 
 const isMyArticle = ref(false)
 
@@ -94,6 +97,8 @@ const fetchArticleDetail = async (id: number) => {
       content: normalizeHtmlAssetUrls(res.content),
     }
     isMyArticle.value = res.authorId === currentUserId.value
+    await nextTick()
+    decorateRichImages(articleContentRef.value)
   } catch (error) {
     ElMessage.error('获取文章详情失败')
     router.push('/articles')
@@ -305,6 +310,7 @@ onMounted(() => {
 
 .article-cover :deep(.el-image) {
   width: 100%;
+  min-height: 260px;
   max-height: 540px;
 }
 
@@ -323,6 +329,10 @@ onMounted(() => {
   border-radius: 18px;
   margin: 20px 0;
   box-shadow: 0 12px 28px rgba(95, 124, 170, 0.12);
+}
+
+.article-content :deep(.rich-image-frame img) {
+  margin: 0;
 }
 
 .article-content :deep(p) {

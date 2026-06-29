@@ -4,9 +4,13 @@ import { AiChatService } from './ai-chat.service';
 import { AiChatController } from './ai-chat.controller';
 import { ChatSession } from './chat-session.entity';
 import { ChatMessageEntity } from './chat-message.entity';
+import { PointsModule } from '../points/points.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ChatSession, ChatMessageEntity])],
+  imports: [
+    TypeOrmModule.forFeature([ChatSession, ChatMessageEntity]),
+    PointsModule,
+  ],
   providers: [AiChatService],
   controllers: [AiChatController],
 })

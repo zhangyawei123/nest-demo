@@ -19,6 +19,7 @@ import { VisionModule } from './vision/vision.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { ArticleInteractionModule } from './article-interaction/article-interaction.module';
 import { DrawModule } from './draw/draw.module';
+import { PointsModule } from './points/points.module';
 
 /**
  * 根模块 - 应用程序的入口模块
@@ -33,7 +34,7 @@ import { DrawModule } from './draw/draw.module';
  *   DB_HOST     = 127.0.0.1
  *   DB_PORT     = 3306
  *   DB_USERNAME = root
- *   DB_PASSWORD = 
+ *   DB_PASSWORD =
  *   DB_DATABASE = nest_demo
  */
 @Module({
@@ -60,9 +61,10 @@ import { DrawModule } from './draw/draw.module';
           // 自动扫描所有 *.entity.ts / *.entity.js 文件
           entities: [__dirname + '/**/*.entity{.ts,.js}'],
           // 开发环境默认开启，生产环境默认关闭，可通过 DB_SYNCHRONIZE 显式覆盖
-          synchronize: enableDbSync !== undefined
-            ? enableDbSync === 'true'
-            : nodeEnv !== 'production',
+          synchronize:
+            enableDbSync !== undefined
+              ? enableDbSync === 'true'
+              : nodeEnv !== 'production',
         };
       },
       inject: [ConfigService],
@@ -85,6 +87,7 @@ import { DrawModule } from './draw/draw.module';
     FeedbackModule,
     ArticleInteractionModule,
     DrawModule,
+    PointsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

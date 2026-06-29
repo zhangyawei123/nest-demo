@@ -80,6 +80,8 @@ export class AuthService {
       user: {
         id: user.id,
         username: user.username,
+        points: user.points || 0,
+        makeupSignInChances: user.makeupSignInChances || 0,
       },
     };
   }

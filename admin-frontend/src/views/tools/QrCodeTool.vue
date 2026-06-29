@@ -29,7 +29,7 @@
       </div>
 
       <div v-if="qrCodeUrl" class="preview-box">
-        <img :src="qrCodeUrl" alt="二维码预览" class="qr-image" />
+        <LoadingImage :src="qrCodeUrl" fit="contain" alt="二维码预览" class="qr-image" />
       </div>
     </div>
 
@@ -46,7 +46,7 @@
       </div>
 
       <div v-if="decodePreviewUrl" class="preview-box">
-        <img :src="decodePreviewUrl" alt="待解析二维码" class="decode-image" />
+        <LoadingImage :src="decodePreviewUrl" fit="contain" alt="待解析二维码" class="decode-image" />
       </div>
 
       <el-alert v-if="errorMessage" :title="errorMessage" type="error" :closable="false" show-icon />
@@ -73,6 +73,7 @@ import { ElMessage } from 'element-plus'
 import type { UploadFile } from 'element-plus'
 import QRCode from 'qrcode'
 import jsQR from 'jsqr'
+import LoadingImage from '@/components/LoadingImage.vue'
 
 type ErrorLevel = 'L' | 'M' | 'Q' | 'H'
 
@@ -230,11 +231,14 @@ const isLink = (value: string) => /^https?:\/\//i.test(value)
 
 .qr-image {
   width: 260px;
+  height: 260px;
   max-width: 100%;
   border-radius: 10px;
 }
 
 .decode-image {
+  width: min(100%, 420px);
+  min-height: 180px;
   max-width: 100%;
   max-height: 320px;
   border-radius: 10px;

@@ -1,17 +1,20 @@
 <template>
-  <div class="markdown-body" v-html="html"></div>
+  <div ref="markdownBodyRef" class="markdown-body" v-html="html"></div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
 import DOMPurify from 'dompurify'
 import 'highlight.js/styles/github.css'
+import { decorateRichImages } from '@/utils/image-loading'
 
 const props = defineProps<{
   content: string
 }>()
+
+const markdownBodyRef = ref<HTMLElement | null>(null)
 
 const escapeHtml = (text: string) =>
   text
@@ -43,6 +46,15 @@ const html = computed(() => {
   if (!props.content) return ''
   return DOMPurify.sanitize(md.render(props.content))
 })
+
+const decorateImages = async () => {
+  await nextTick()
+  decorateRichImages(markdownBodyRef.value)
+}
+
+watch(html, decorateImages)
+
+onMounted(decorateImages)
 </script>
 
 <style scoped>
@@ -113,6 +125,10 @@ const html = computed(() => {
 .markdown-body :deep(img) {
   max-width: 100%;
   border-radius: 6px;
+}
+
+.markdown-body :deep(.rich-image-frame img) {
+  margin: 0;
 }
 
 /* 代码块 */

@@ -10,11 +10,15 @@ import {
 import type { Response } from 'express';
 import { AiChatService, ChatMessage } from './ai-chat.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { POINT_COSTS, PointsService } from '../points/points.service';
 
 @Controller('ai-chat')
 @UseGuards(JwtAuthGuard)
 export class AiChatController {
-  constructor(private readonly aiChatService: AiChatService) {}
+  constructor(
+    private readonly aiChatService: AiChatService,
+    private readonly pointsService: PointsService,
+  ) {}
 
   // ─── 会话 CRUD ───
 
@@ -79,28 +83,42 @@ export class AiChatController {
 
     // 验证会话归属
     await this.aiChatService.getSession(sessionId, userId);
+    await this.pointsService.spend(userId, POINT_COSTS.AI_CHAT, {
+      scene: 'ai_chat',
+      description: 'AI 聊天',
+      refType: 'chat_session',
+      refId: sessionId,
+    });
+    let shouldRefundPoints = true;
 
-    // 存用户消息
-    const savedUserMsg = await this.aiChatService.saveMessage(
-      sessionId,
-      'user',
-      content,
-    );
+    let savedUserMsg: { id: number };
+    let chatMessages: ChatMessage[];
+    try {
+      // 存用户消息
+      savedUserMsg = await this.aiChatService.saveMessage(
+        sessionId,
+        'user',
+        content,
+      );
 
-    // 如果是第一条消息，自动设置标题
-    const allMessages = await this.aiChatService.getMessages(
-      sessionId,
-      userId,
-    );
-    if (allMessages.length === 1) {
-      await this.aiChatService.autoTitle(sessionId, content);
+      // 如果是第一条消息，自动设置标题
+      const allMessages = await this.aiChatService.getMessages(
+        sessionId,
+        userId,
+      );
+      if (allMessages.length === 1) {
+        await this.aiChatService.autoTitle(sessionId, content);
+      }
+
+      // 构建完整消息历史发给 AI
+      chatMessages = allMessages.map((m) => ({
+        role: m.role as ChatMessage['role'],
+        content: m.content,
+      }));
+    } catch (error) {
+      await this.refundAiChatPoints(userId, sessionId);
+      throw error;
     }
-
-    // 构建完整消息历史发给 AI
-    const chatMessages: ChatMessage[] = allMessages.map((m) => ({
-      role: m.role as ChatMessage['role'],
-      content: m.content,
-    }));
 
     // SSE 响应
     res.setHeader('Content-Type', 'text/event-stream');
@@ -128,11 +146,15 @@ export class AiChatController {
         'assistant',
         fullReply,
       );
+      shouldRefundPoints = false;
       res.write(
         `data: ${JSON.stringify({ type: 'assistant_msg', id: savedAssistantMsg.id })}\n\n`,
       );
       res.write('data: [DONE]\n\n');
     } catch (err: any) {
+      if (shouldRefundPoints) {
+        await this.refundAiChatPoints(userId, sessionId);
+      }
       res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
     } finally {
       res.end();
@@ -153,52 +175,85 @@ export class AiChatController {
     }
 
     await this.aiChatService.getSession(sessionId, userId);
+    await this.pointsService.spend(userId, POINT_COSTS.AI_CHAT, {
+      scene: 'ai_chat',
+      description: 'AI 聊天',
+      refType: 'chat_session',
+      refId: sessionId,
+    });
+    let shouldRefundPoints = true;
 
-    const savedUserMsg = await this.aiChatService.saveMessage(
-      sessionId,
-      'user',
-      content,
-    );
+    try {
+      const savedUserMsg = await this.aiChatService.saveMessage(
+        sessionId,
+        'user',
+        content,
+      );
 
-    const allMessages = await this.aiChatService.getMessages(
-      sessionId,
-      userId,
-    );
-    if (allMessages.length === 1) {
-      await this.aiChatService.autoTitle(sessionId, content);
+      const allMessages = await this.aiChatService.getMessages(
+        sessionId,
+        userId,
+      );
+      if (allMessages.length === 1) {
+        await this.aiChatService.autoTitle(sessionId, content);
+      }
+
+      const chatMessages: ChatMessage[] = allMessages.map((m) => ({
+        role: m.role as ChatMessage['role'],
+        content: m.content,
+      }));
+      const reply = await this.aiChatService.chat(chatMessages);
+      const savedAssistantMsg = await this.aiChatService.saveMessage(
+        sessionId,
+        'assistant',
+        reply,
+      );
+      shouldRefundPoints = false;
+
+      return {
+        reply,
+        userMessage: savedUserMsg,
+        assistantMessage: savedAssistantMsg,
+      };
+    } catch (error) {
+      if (shouldRefundPoints) {
+        await this.refundAiChatPoints(userId, sessionId);
+      }
+      throw error;
     }
-
-    const chatMessages: ChatMessage[] = allMessages.map((m) => ({
-      role: m.role as ChatMessage['role'],
-      content: m.content,
-    }));
-    const reply = await this.aiChatService.chat(chatMessages);
-    const savedAssistantMsg = await this.aiChatService.saveMessage(
-      sessionId,
-      'assistant',
-      reply,
-    );
-
-    return {
-      reply,
-      userMessage: savedUserMsg,
-      assistantMessage: savedAssistantMsg,
-    };
   }
 
   // ─── 旧接口（兼容）───
 
   @Post()
-  async chat(@Body('messages') messages: ChatMessage[]) {
-    const reply = await this.aiChatService.chat(messages);
-    return { reply };
+  async chat(@Body('messages') messages: ChatMessage[], @Request() req) {
+    const userId = req.user.userId;
+    await this.pointsService.spend(userId, POINT_COSTS.AI_CHAT, {
+      scene: 'ai_chat',
+      description: 'AI 聊天',
+    });
+    try {
+      const reply = await this.aiChatService.chat(messages);
+      return { reply };
+    } catch (error) {
+      await this.refundAiChatPoints(userId);
+      throw error;
+    }
   }
 
   @Post('stream')
   async chatStream(
     @Body('messages') messages: ChatMessage[],
+    @Request() req,
     @Res() res: Response,
   ) {
+    const userId = req.user.userId;
+    await this.pointsService.spend(userId, POINT_COSTS.AI_CHAT, {
+      scene: 'ai_chat',
+      description: 'AI 聊天',
+    });
+    let shouldRefundPoints = true;
+
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
@@ -208,11 +263,24 @@ export class AiChatController {
       for await (const chunk of this.aiChatService.chatStream(messages)) {
         res.write(`data: ${JSON.stringify({ content: chunk })}\n\n`);
       }
+      shouldRefundPoints = false;
       res.write('data: [DONE]\n\n');
     } catch (err: any) {
+      if (shouldRefundPoints) {
+        await this.refundAiChatPoints(userId);
+      }
       res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
     } finally {
       res.end();
     }
+  }
+
+  private refundAiChatPoints(userId: number, sessionId?: number) {
+    return this.pointsService.refund(userId, POINT_COSTS.AI_CHAT, {
+      scene: 'ai_chat_refund',
+      description: 'AI 聊天失败退回',
+      refType: sessionId ? 'chat_session' : undefined,
+      refId: sessionId,
+    });
   }
 }

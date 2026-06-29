@@ -20,6 +20,12 @@ export class User {
   @Column({ length: 255 })
   password: string;
 
+  @Column({ type: 'int', default: 0 })
+  points: number;
+
+  @Column({ name: 'makeup_sign_in_chances', type: 'int', default: 0 })
+  makeupSignInChances: number;
+
   @ManyToMany(() => Role)
   @JoinTable({ name: 'user_roles' })
   roles: Role[];

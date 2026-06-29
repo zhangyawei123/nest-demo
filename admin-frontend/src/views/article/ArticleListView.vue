@@ -83,7 +83,7 @@
             </el-table-column>
             <el-table-column label="封面" width="120">
               <template #default="{ row }">
-                <el-image
+                <LoadingImage
                   v-if="row.logo"
                   :src="assetUrl(row.logo)"
                   fit="cover"
@@ -145,7 +145,7 @@
             </el-table-column>
             <el-table-column label="封面" width="120">
               <template #default="{ row }">
-                <el-image
+                <LoadingImage
                   v-if="row.logo"
                   :src="assetUrl(row.logo)"
                   fit="cover"
@@ -189,6 +189,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Search, Document, TrendCharts, User } from '@element-plus/icons-vue'
 import { getArticleList, getMyArticles, deleteArticle } from '@/api/article'
+import LoadingImage from '@/components/LoadingImage.vue'
 import { normalizeAssetUrl } from '@/utils/upload-url'
 
 const router = useRouter()

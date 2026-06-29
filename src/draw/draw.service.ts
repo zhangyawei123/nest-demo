@@ -1,5 +1,6 @@
 import {
   BadGatewayException,
+  HttpException,
   Injectable,
   NotFoundException,
   ServiceUnavailableException,
@@ -15,6 +16,7 @@ import {
   QueryDrawGenerationHistoryDto,
 } from './draw.dto';
 import { DrawGeneration } from './draw-generation.entity';
+import { POINT_COSTS, PointsService } from '../points/points.service';
 
 interface DrawApiResponse {
   created?: number;
@@ -38,6 +40,7 @@ export class DrawService {
     private readonly configService: ConfigService,
     @InjectRepository(DrawGeneration)
     private readonly drawGenerationRepo: Repository<DrawGeneration>,
+    private readonly pointsService: PointsService,
   ) {}
 
   async generate(userId: number, dto: CreateDrawGenerationDto) {
@@ -69,6 +72,7 @@ export class DrawService {
     };
 
     let record: DrawGeneration;
+    let pointsSpent = false;
 
     try {
       record = await this.drawGenerationRepo.save(
@@ -93,6 +97,14 @@ export class DrawService {
     }
 
     try {
+      await this.pointsService.spend(userId, POINT_COSTS.DRAW_GENERATION, {
+        scene: 'draw_generation',
+        description: 'AI 生图',
+        refType: 'draw_generation',
+        refId: record.id,
+      });
+      pointsSpent = true;
+
       const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
       const normalizedApiPath = apiPath.startsWith('/')
         ? apiPath
@@ -151,6 +163,18 @@ export class DrawService {
       };
     } catch (error) {
       if (error instanceof BadGatewayException) {
+        await this.markRecordFailed(record, error);
+        if (pointsSpent) {
+          await this.refundDrawPoints(userId, record.id);
+        }
+        throw error;
+      }
+
+      if (error instanceof HttpException) {
+        await this.markRecordFailed(record, error);
+        if (pointsSpent) {
+          await this.refundDrawPoints(userId, record.id);
+        }
         throw error;
       }
 
@@ -159,8 +183,37 @@ export class DrawService {
       record.status = 'failed';
       record.errorMessage = message;
       await this.drawGenerationRepo.save(record);
+      if (pointsSpent) {
+        await this.refundDrawPoints(userId, record.id);
+      }
       throw new BadGatewayException('生图服务请求异常');
     }
+  }
+
+  private async markRecordFailed(record: DrawGeneration, error: unknown) {
+    record.status = 'failed';
+    record.errorMessage = this.extractErrorMessage(error);
+    await this.drawGenerationRepo.save(record);
+  }
+
+  private extractErrorMessage(error: unknown) {
+    if (error instanceof HttpException) {
+      const response = error.getResponse();
+      if (typeof response === 'string') return response;
+      const message = (response as any)?.message;
+      return Array.isArray(message) ? message[0] : message || error.message;
+    }
+
+    return error instanceof Error ? error.message : '生图服务请求异常';
+  }
+
+  private refundDrawPoints(userId: number, recordId: number) {
+    return this.pointsService.refund(userId, POINT_COSTS.DRAW_GENERATION, {
+      scene: 'draw_generation_refund',
+      description: 'AI 生图失败退回',
+      refType: 'draw_generation',
+      refId: recordId,
+    });
   }
 
   async findHistory(userId: number, query: QueryDrawGenerationHistoryDto) {

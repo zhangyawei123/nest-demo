@@ -25,7 +25,7 @@
     </div>
 
     <div v-if="previewUrl" class="preview-area">
-      <img :src="previewUrl" alt="预览" class="preview-img" />
+      <LoadingImage :src="previewUrl" fit="contain" alt="预览" class="preview-img" />
     </div>
 
     <el-alert v-if="errorMsg" :title="errorMsg" type="error" :closable="false" show-icon />
@@ -46,6 +46,7 @@
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { UploadFile } from 'element-plus'
+import LoadingImage from '@/components/LoadingImage.vue'
 import request from '@/utils/request'
 
 const selectedFile = ref<File | null>(null)
@@ -109,6 +110,8 @@ const copyText = async (text: string) => {
   justify-content: center;
 }
 .preview-img {
+  width: min(100%, 480px);
+  min-height: 220px;
   max-width: 100%;
   max-height: 300px;
   border-radius: 12px;

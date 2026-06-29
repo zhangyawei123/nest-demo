@@ -116,6 +116,7 @@ export class UserController {
       { name: 'AI 对话', path: '/ai-chat', component: 'ai-chat/AiChatView', icon: 'ChatDotRound', sort: 9 },
       { name: '意见反馈', path: '/feedback', component: 'feedback/FeedbackView', icon: 'ChatLineRound', sort: 10 },
       { name: '小功能', path: '/tools', component: 'tools/ToolsView', icon: 'Setting', sort: 11 },
+      { name: '小游戏', path: '/games', component: 'games/GamesView', icon: 'Trophy', sort: 12 },
     ];
 
     const savedMenus: Menu[] = [];

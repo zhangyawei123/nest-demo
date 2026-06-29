@@ -58,7 +58,7 @@
     </div>
 
     <div v-if="screenshotUrl" class="screenshot-result">
-      <img :src="screenshotUrl" alt="截图" class="screenshot-img" />
+      <LoadingImage :src="screenshotUrl" fit="contain" alt="截图" class="screenshot-img" />
       <el-button @click="downloadScreenshot">下载截图</el-button>
     </div>
   </div>
@@ -68,6 +68,7 @@
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import html2canvas from 'html2canvas'
+import LoadingImage from '@/components/LoadingImage.vue'
 
 interface ChatMsg {
   side: 'left' | 'right'
@@ -279,6 +280,8 @@ const downloadScreenshot = () => {
   gap: 12px;
 }
 .screenshot-img {
+  width: min(100%, 375px);
+  min-height: 260px;
   max-width: 375px;
   border-radius: 12px;
   border: 1px solid #ebeef5;
