@@ -18,7 +18,7 @@ REMOTE_FRONTEND="/var/www/nest-demo-frontend"
 
 # 需要从本地 .env 同步到服务器 .env 的变量白名单
 # 其他变量（如 DB_PASSWORD 等）保持服务器原值不变
-SYNC_ENV_KEYS=("AI_API_KEY" "DRAW_BASE_URL" "DRAW_API_PATH" "DRAW_API_KEY" "DRAW_MODEL" "PUBLIC_BASE_URL")
+SYNC_ENV_KEYS=("AI_BASE_URL" "AI_API_KEY" "AI_MODEL" "DRAW_BASE_URL" "DRAW_API_PATH" "DRAW_API_KEY" "DRAW_MODEL" "PUBLIC_BASE_URL")
 
 # ---------- 读取密码 ----------
 if [ ! -f "$PASSWORD_FILE" ]; then
