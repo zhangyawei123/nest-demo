@@ -38,7 +38,7 @@
               <span class="points-chip-copy">
                 <span class="points-chip-label">积分</span>
                 <strong class="points-chip-value">{{
-                  pointsProfile.points
+                  pointsBalanceText
                 }}</strong>
               </span>
             </button>
@@ -70,7 +70,7 @@
             <div class="points-balance-row">
               <div class="points-balance-card">
                 <span>当前余额</span>
-                <strong>{{ pointsProfile.points }}</strong>
+                <strong>{{ pointsBalanceText }}</strong>
               </div>
               <div class="points-rule-card">
                 <span>连续签到</span>
@@ -78,15 +78,15 @@
               </div>
               <div class="points-rule-card">
                 <span>补签机会</span>
-                <strong>{{ pointsProfile.makeupSignInChances }}</strong>
+                <strong>{{ makeupChanceText }}</strong>
               </div>
               <div class="points-rule-card">
                 <span>AI 聊天</span>
-                <strong>-{{ pointsProfile.costs.aiChat }}</strong>
+                <strong>{{ costText(pointsProfile.costs.aiChat) }}</strong>
               </div>
               <div class="points-rule-card">
                 <span>AI 生图</span>
-                <strong>-{{ pointsProfile.costs.drawGeneration }}</strong>
+                <strong>{{ costText(pointsProfile.costs.drawGeneration) }}</strong>
               </div>
             </div>
 
@@ -256,6 +256,7 @@ const calendarMonth = ref(new Date().toISOString().slice(0, 7));
 const weekdays = ['一', '二', '三', '四', '五', '六', '日'];
 const pointsProfile = reactive({
   points: 0,
+  isUnlimited: false,
   makeupSignInChances: 0,
   signedInToday: false,
   currentStreak: 0,
@@ -269,6 +270,12 @@ const calendar = reactive({
   month: calendarMonth.value,
   days: [] as SignInCalendarDay[],
 });
+const pointsBalanceText = computed(() =>
+  pointsProfile.isUnlimited ? '无限' : pointsProfile.points,
+);
+const makeupChanceText = computed(() =>
+  pointsProfile.isUnlimited ? '无限' : pointsProfile.makeupSignInChances,
+);
 const calendarLeadingBlanks = computed(() => {
   if (!calendar.days.length) return 0;
   const firstDay = new Date(`${calendar.month}-01T00:00:00`).getDay();
@@ -295,6 +302,7 @@ const loadPointsProfile = async () => {
   try {
     const profile = await getPointsProfile();
     pointsProfile.points = profile.points ?? 0;
+    pointsProfile.isUnlimited = !!profile.isUnlimited;
     pointsProfile.makeupSignInChances = profile.makeupSignInChances ?? 0;
     pointsProfile.signedInToday = !!profile.signedInToday;
     pointsProfile.currentStreak = profile.currentStreak ?? 0;
@@ -324,6 +332,7 @@ const loadCalendar = async () => {
     calendar.month = res.month;
     calendar.days = res.days || [];
     pointsProfile.points = res.points ?? pointsProfile.points;
+    pointsProfile.isUnlimited = !!res.isUnlimited;
     pointsProfile.makeupSignInChances =
       res.makeupSignInChances ?? pointsProfile.makeupSignInChances;
     pointsProfile.currentStreak = res.currentStreak ?? 0;
@@ -341,6 +350,7 @@ const handleSignIn = async () => {
   try {
     const res = await signIn();
     pointsProfile.points = res.points;
+    pointsProfile.isUnlimited = !!res.isUnlimited;
     pointsProfile.signedInToday = true;
     pointsProfile.currentStreak =
       res.currentStreak ?? pointsProfile.currentStreak;
@@ -367,6 +377,7 @@ const handleMakeupSignIn = async (date: string) => {
   try {
     const res = await makeupSignIn(date);
     pointsProfile.points = res.points;
+    pointsProfile.isUnlimited = !!res.isUnlimited;
     pointsProfile.makeupSignInChances = res.makeupSignInChances;
     pointsProfile.currentStreak =
       res.currentStreak ?? pointsProfile.currentStreak;
@@ -396,6 +407,8 @@ const changeCalendarMonth = (offset: number) => {
 const canMakeup = (day: SignInCalendarDay) => {
   return day.isPast && !day.signedIn && pointsProfile.makeupSignInChances > 0;
 };
+
+const costText = (value: number) => (pointsProfile.isUnlimited ? '免费' : `-${value}`);
 
 const calendarDayTitle = (day: SignInCalendarDay) => {
   if (day.signedIn) return day.isMakeup ? '已补签' : '已签到';

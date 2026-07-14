@@ -1,4 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 
 @Entity('menus')
 export class Menu {
@@ -26,11 +35,11 @@ export class Menu {
   @Column({ nullable: true })
   parentId: number;
 
-  @ManyToOne(() => Menu, menu => menu.children, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Menu, (menu) => menu.children, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'parentId' })
   parent: Menu;
 
-  @OneToMany(() => Menu, menu => menu.parent)
+  @OneToMany(() => Menu, (menu) => menu.parent)
   children: Menu[];
 
   @CreateDateColumn()

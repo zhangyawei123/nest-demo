@@ -1,8 +1,11 @@
 node_modules
 dist
 .env
+.jd_cookie.txt
+.jd_trend_risk_cooldown
 uploads
 *.log
+.playwright-cli/
 
 # deploy secrets
 deploy/.server-password

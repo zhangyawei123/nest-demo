@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { LotteryService } from './lottery.service';
@@ -51,10 +60,7 @@ export class LotteryController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('records')
-  getRecords(
-    @Query('page') page: string,
-    @Query('pageSize') pageSize: string,
-  ) {
+  getRecords(@Query('page') page: string, @Query('pageSize') pageSize: string) {
     return this.lotteryService.getRecords(+page || 1, +pageSize || 10);
   }
 }

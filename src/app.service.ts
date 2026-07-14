@@ -32,20 +32,27 @@ export class AppService {
     const roleRepository = this.dataSource.getRepository(Role);
     const menuRepository = this.dataSource.getRepository(Menu);
 
-    const [currentUser, userCount, articleCount, roleCount, menuCount, myArticleCount, recentArticles] =
-      await Promise.all([
-        userRepository.findOne({ where: { id: userId } }),
-        userRepository.count(),
-        articleRepository.count(),
-        roleRepository.count(),
-        menuRepository.count(),
-        articleRepository.count({ where: { authorId: userId } }),
-        articleRepository.find({
-          relations: ['author'],
-          order: { createdAt: 'DESC' },
-          take: 5,
-        }),
-      ]);
+    const [
+      currentUser,
+      userCount,
+      articleCount,
+      roleCount,
+      menuCount,
+      myArticleCount,
+      recentArticles,
+    ] = await Promise.all([
+      userRepository.findOne({ where: { id: userId } }),
+      userRepository.count(),
+      articleRepository.count(),
+      roleRepository.count(),
+      menuRepository.count(),
+      articleRepository.count({ where: { authorId: userId } }),
+      articleRepository.find({
+        relations: ['author'],
+        order: { createdAt: 'DESC' },
+        take: 5,
+      }),
+    ]);
 
     return {
       user: {

@@ -2,13 +2,13 @@
   <div class="tool-panel-content ai-draw-tool">
     <el-form :model="form" label-width="92px" label-position="left">
       <el-form-item label="模型">
-        <el-input v-model="form.model" placeholder="gpt-image-2" />
+        <el-input v-model="form.model" placeholder="draw-image" />
       </el-form-item>
 
       <el-form-item label="图片尺寸">
         <el-input
           v-model="form.size"
-          placeholder="例如 1024x1024 / 1024x1536，留空表示模型默认"
+          placeholder="例如 1:1 / 16:9 / 9:16，留空表示模型默认"
         >
           <template #append>
             <el-select
@@ -18,21 +18,26 @@
               @change="onPresetChange"
             >
               <el-option label="留空" value="" />
-              <el-option label="1024x1024" value="1024x1024" />
-              <el-option label="1024x1536" value="1024x1536" />
-              <el-option label="1536x1024" value="1536x1024" />
-              <el-option label="768x1344" value="768x1344" />
-              <el-option label="1344x768" value="1344x768" />
+              <el-option label="1:1 方图" value="1:1" />
+              <el-option label="16:9 横图" value="16:9" />
+              <el-option label="9:16 竖图" value="9:16" />
+              <el-option label="4:3 横图" value="4:3" />
+              <el-option label="3:4 竖图" value="3:4" />
             </el-select>
           </template>
         </el-input>
       </el-form-item>
 
-      <el-form-item label="返回格式">
-        <el-radio-group v-model="form.response_format">
-          <el-radio value="url">URL</el-radio>
-          <el-radio value="b64_json">Base64</el-radio>
-        </el-radio-group>
+      <el-form-item label="清晰度">
+        <el-select v-model="form.resolution" placeholder="默认">
+          <el-option label="默认" value="" />
+          <el-option label="2K" value="2K" />
+          <el-option label="4K" value="4K" />
+        </el-select>
+      </el-form-item>
+
+      <el-form-item label="生成数量">
+        <el-input-number v-model="form.count" :min="1" :max="5" />
       </el-form-item>
 
       <el-form-item label="参考图">
@@ -151,7 +156,7 @@
       type="warning"
       :closable="false"
       show-icon
-      title="接口已返回，但没有可展示的图片 URL，可能返回了 b64_json，请切换返回格式或查看原始响应。"
+      title="接口已返回，但没有可展示的图片 URL，请查看原始响应。"
       style="margin-top: 16px"
     />
 
@@ -301,7 +306,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import type { UploadProps } from 'element-plus';
 import {
@@ -321,15 +326,17 @@ import LoadingImage from '@/components/LoadingImage.vue';
 import { getUploadedAssetUrl, normalizeAssetUrl } from '@/utils/upload-url';
 
 const defaultForm = () => ({
-  model: 'gpt-image-2',
+  model: 'draw-image',
   prompt: '生成一张边牧与古牧正在抖音直播间直播带货截图',
   image: [] as string[],
-  size: '1024x1024',
+  size: '1:1',
+  count: 1,
+  resolution: '2K',
   response_format: 'url',
 });
 
 const form = reactive(defaultForm());
-const sizePreset = ref('1024x1024');
+const sizePreset = ref('1:1');
 const manualUrl = ref('');
 const loading = ref(false);
 const resultRaw = ref<GenerateImageResponse | null>(null);
@@ -338,6 +345,8 @@ const rawCollapse = ref<string[]>([]);
 const historyLoading = ref(false);
 const historyList = ref<DrawGenerationRecord[]>([]);
 const historyTotal = ref(0);
+let historyPollTimer: ReturnType<typeof setInterval> | null = null;
+let historyPolling = false;
 const historyQuery = reactive({
   page: 1,
   pageSize: 8,
@@ -354,7 +363,7 @@ const resultUrls = computed(() => {
   const data = resultRaw.value?.data;
   if (!Array.isArray(data)) return [] as string[];
   return data
-    .map((item) => item?.url)
+    .map((item) => item?.url || item?.thumbnail_url)
     .filter((url): url is string => Boolean(url));
 });
 
@@ -443,10 +452,12 @@ const handleGenerate = async () => {
 
   try {
     const resp = await generateImage({
-      model: form.model.trim() || 'gpt-image-2',
+      model: form.model.trim() || 'draw-image',
       prompt,
       image: form.image.length ? form.image.slice() : [],
       size: form.size.trim(),
+      count: form.count,
+      resolution: form.resolution || undefined,
       response_format: form.response_format || 'url',
     });
     const data = resp as unknown as GenerateImageResponse;
@@ -455,8 +466,11 @@ const handleGenerate = async () => {
     if (!resultUrls.value.length) {
       rawCollapse.value = ['raw'];
     }
-    ElMessage.success('生成完成');
-    fetchHistory();
+    ElMessage.success(resultUrls.value.length ? '生成完成' : '任务已提交，图片生成中，请稍后刷新历史');
+    await fetchHistory();
+    if (!resultUrls.value.length) {
+      startHistoryPolling(lastRecordId.value);
+    }
   } catch (e: any) {
     const message = e?.response?.data?.message || e?.message || '生图失败';
     ElMessage.error(message);
@@ -465,9 +479,43 @@ const handleGenerate = async () => {
   }
 };
 
+const stopHistoryPolling = () => {
+  if (!historyPollTimer) return;
+  clearInterval(historyPollTimer);
+  historyPollTimer = null;
+  historyPolling = false;
+};
+
+const startHistoryPolling = (recordId: number | null) => {
+  if (!recordId) return;
+  stopHistoryPolling();
+  let attempts = 0;
+  historyPollTimer = setInterval(async () => {
+    if (historyPolling) return;
+    historyPolling = true;
+    attempts += 1;
+    try {
+      await fetchHistory();
+      const record = historyList.value.find((item) => item.id === recordId);
+      if (record && record.status !== 'pending') {
+        stopHistoryPolling();
+        if (record.status === 'success') {
+          ElMessage.success('图片已生成并保存到历史');
+        } else {
+          ElMessage.error(record.errorMessage || '生图失败');
+        }
+      } else if (attempts >= 60) {
+        stopHistoryPolling();
+      }
+    } finally {
+      historyPolling = false;
+    }
+  }, 5000);
+};
+
 const handleReset = () => {
   Object.assign(form, defaultForm());
-  sizePreset.value = '1024x1024';
+  sizePreset.value = '1:1';
   manualUrl.value = '';
   resultRaw.value = null;
   lastRecordId.value = null;
@@ -481,9 +529,10 @@ const fetchHistory = async () => {
       pageSize: historyQuery.pageSize,
       keyword: historyQuery.keyword.trim() || undefined,
       status: historyQuery.status || undefined,
-    });
-    historyList.value = res?.list || [];
-    historyTotal.value = res?.total || 0;
+    }) as any;
+    const historyData = res?.data || res;
+    historyList.value = historyData?.list || [];
+    historyTotal.value = historyData?.total || 0;
   } catch (e: any) {
     const message =
       e?.response?.data?.message || e?.message || '获取历史生图失败';
@@ -504,7 +553,7 @@ const handleHistorySizeChange = () => {
 };
 
 const reuseRecord = (record: DrawGenerationRecord) => {
-  form.model = record.model || 'gpt-image-2';
+  form.model = record.model || 'draw-image';
   form.prompt = record.prompt || '';
   form.image = Array.isArray(record.image)
     ? record.image.filter((item): item is string => typeof item === 'string')
@@ -548,6 +597,10 @@ const formatTime = (value: string) => {
 
 onMounted(() => {
   fetchHistory();
+});
+
+onUnmounted(() => {
+  stopHistoryPolling();
 });
 </script>
 

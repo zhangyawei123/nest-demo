@@ -15,10 +15,11 @@ SERVER_USER="root"
 SERVER_IP="111.229.210.78"
 REMOTE_PROJECT="/opt/nest-demo"
 REMOTE_FRONTEND="/var/www/nest-demo-frontend"
+REMOTE_WEBSITE="/var/www/nest-demo-website"
 
 # 需要从本地 .env 同步到服务器 .env 的变量白名单
 # 其他变量（如 DB_PASSWORD 等）保持服务器原值不变
-SYNC_ENV_KEYS=("AI_BASE_URL" "AI_API_KEY" "AI_MODEL" "DRAW_BASE_URL" "DRAW_API_PATH" "DRAW_API_KEY" "DRAW_MODEL" "PUBLIC_BASE_URL")
+SYNC_ENV_KEYS=("AI_BASE_URL" "AI_API_KEY" "AI_MODEL" "DRAW_BASE_URL" "DRAW_API_PATH" "DRAW_API_KEY" "DRAW_MODEL" "PUBLIC_BASE_URL" "JD_COOKIE" "JD_COOKIE_FILE" "JD_CHROME_EXECUTABLE" "JD_TREND_INTERVAL_HOURS" "JD_TREND_REPORT_HOUR" "JD_TREND_DELAY_SECONDS" "JD_TREND_JITTER_SECONDS" "JD_TREND_TIMEOUT_MS" "JD_TREND_RISK_COOLDOWN_HOURS" "JD_TREND_NOTIFY_REPORT" "DINGTALK_WEBHOOK_URL" "DINGTALK_SECRET" "WECOM_WEBHOOK_URL")
 
 # ---------- 读取密码 ----------
 if [ ! -f "$PASSWORD_FILE" ]; then
@@ -57,12 +58,32 @@ if [ -d "$PROJECT_DIR/scripts" ]; then
     "$PROJECT_DIR/scripts/" "${SERVER_USER}@${SERVER_IP}:${REMOTE_PROJECT}/scripts/"
 fi
 
+if [ -d "$PROJECT_DIR/deploy/sql" ]; then
+  echo "📦 同步 deploy/sql/ ..."
+  remote "mkdir -p ${REMOTE_PROJECT}/deploy/sql"
+  sshpass -e rsync -az --delete \
+    -e "ssh $SSH_OPTS" \
+    "$PROJECT_DIR/deploy/sql/" "${SERVER_USER}@${SERVER_IP}:${REMOTE_PROJECT}/deploy/sql/"
+  sshpass -e scp $SSH_OPTS \
+    "$PROJECT_DIR/deploy/apply-jd-trend-migration.js" \
+    "$PROJECT_DIR/deploy/install-chromium.sh" \
+    "${SERVER_USER}@${SERVER_IP}:${REMOTE_PROJECT}/deploy/" >/dev/null
+fi
+
 # ---------- 同步前端源码 ----------
 echo "📦 同步前端源码..."
 sshpass -e rsync -az --delete \
   --exclude node_modules --exclude dist \
   -e "ssh $SSH_OPTS" \
   "$PROJECT_DIR/admin-frontend/" "${SERVER_USER}@${SERVER_IP}:${REMOTE_PROJECT}/admin-frontend/"
+
+if [ -d "$PROJECT_DIR/website-frontend" ]; then
+  echo "📦 同步官网源码..."
+  sshpass -e rsync -az --delete \
+    --exclude node_modules --exclude dist \
+    -e "ssh $SSH_OPTS" \
+    "$PROJECT_DIR/website-frontend/" "${SERVER_USER}@${SERVER_IP}:${REMOTE_PROJECT}/website-frontend/"
+fi
 
 # ---------- 远程构建 & 部署 ----------
 echo "🔨 远程构建后端..."
@@ -73,6 +94,14 @@ remote "cd ${REMOTE_PROJECT}/admin-frontend && npm install --silent --no-audit -
 
 echo "🚀 部署前端静态文件..."
 remote "rm -rf ${REMOTE_FRONTEND}/* && cp -r ${REMOTE_PROJECT}/admin-frontend/dist/* ${REMOTE_FRONTEND}/"
+
+if [ -d "$PROJECT_DIR/website-frontend" ]; then
+  echo "🔨 远程构建官网..."
+  remote "cd ${REMOTE_PROJECT}/website-frontend && npm install --silent --no-audit --no-fund && npm run build-only"
+
+  echo "🚀 部署官网静态文件..."
+  remote "mkdir -p ${REMOTE_WEBSITE} && rm -rf ${REMOTE_WEBSITE}/* && cp -r ${REMOTE_PROJECT}/website-frontend/dist/* ${REMOTE_WEBSITE}/"
+fi
 
 # ---------- 同步 .env 白名单变量 ----------
 if [ -f "$PROJECT_DIR/.env" ] && [ ${#SYNC_ENV_KEYS[@]} -gt 0 ]; then
@@ -102,19 +131,31 @@ if [ -f "$PROJECT_DIR/.env" ] && [ ${#SYNC_ENV_KEYS[@]} -gt 0 ]; then
   fi
 fi
 
+if [ -s "$PROJECT_DIR/.jd_cookie.txt" ]; then
+  echo "🔐 同步京东 Cookie 文件..."
+  sshpass -e scp $SSH_OPTS \
+    "$PROJECT_DIR/.jd_cookie.txt" \
+    "${SERVER_USER}@${SERVER_IP}:${REMOTE_PROJECT}/.jd_cookie.txt" >/dev/null
+  remote "chmod 600 ${REMOTE_PROJECT}/.jd_cookie.txt"
+fi
+
 echo "🔄 重启后端服务..."
+remote "bash ${REMOTE_PROJECT}/deploy/install-chromium.sh"
+remote "cd ${REMOTE_PROJECT} && node deploy/apply-jd-trend-migration.js"
 remote "pm2 restart nest-demo --update-env"
 
 # ---------- 健康检查 ----------
 echo "⏳ 等待服务启动..."
 sleep 3
-BACKEND=$(remote "curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/auth/captcha" || echo "000")
-FRONTEND=$(remote "curl -s -o /dev/null -w '%{http_code}' http://localhost:80" || echo "000")
+BACKEND=$(remote "curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/auth/captcha || true")
+FRONTEND=$(remote "curl -s -o /dev/null -w '%{http_code}' http://localhost:80 || true")
+WEBSITE=$(remote "test -f ${REMOTE_WEBSITE}/index.html && echo 200 || echo 000" || echo "000")
 
 echo ""
 echo "============================================"
 echo "  后端 API:  $BACKEND"
 echo "  前端页面:  $FRONTEND"
+echo "  官网文件:  $WEBSITE"
 if [ "$BACKEND" = "200" ] && [ "$FRONTEND" = "200" ]; then
   echo "  ✅ 部署成功！"
 else

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Article } from './article.entity';
@@ -18,7 +22,10 @@ export class ArticleService {
   /**
    * 创建文章
    */
-  async create(createArticleDto: CreateArticleDto, authorId: number): Promise<Article> {
+  async create(
+    createArticleDto: CreateArticleDto,
+    authorId: number,
+  ): Promise<Article> {
     const article = this.articleRepository.create({
       ...createArticleDto,
       authorId,
@@ -36,9 +43,12 @@ export class ArticleService {
       .orderBy('article.createdAt', 'DESC');
 
     if (keyword?.trim()) {
-      queryBuilder.andWhere('(article.title LIKE :keyword OR article.content LIKE :keyword)', {
-        keyword: `%${keyword.trim()}%`,
-      });
+      queryBuilder.andWhere(
+        '(article.title LIKE :keyword OR article.content LIKE :keyword)',
+        {
+          keyword: `%${keyword.trim()}%`,
+        },
+      );
     }
 
     return queryBuilder.getMany();
@@ -73,9 +83,12 @@ export class ArticleService {
       .orderBy('article.createdAt', 'DESC');
 
     if (keyword?.trim()) {
-      queryBuilder.andWhere('(article.title LIKE :keyword OR article.content LIKE :keyword)', {
-        keyword: `%${keyword.trim()}%`,
-      });
+      queryBuilder.andWhere(
+        '(article.title LIKE :keyword OR article.content LIKE :keyword)',
+        {
+          keyword: `%${keyword.trim()}%`,
+        },
+      );
     }
 
     return queryBuilder.getMany();
@@ -84,7 +97,11 @@ export class ArticleService {
   /**
    * 更新文章
    */
-  async update(id: number, updateArticleDto: UpdateArticleDto, userId: number): Promise<Article> {
+  async update(
+    id: number,
+    updateArticleDto: UpdateArticleDto,
+    userId: number,
+  ): Promise<Article> {
     const article = await this.findOne(id);
 
     // 只能修改自己的文章

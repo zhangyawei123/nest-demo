@@ -28,6 +28,10 @@ else
 fi
 npm run build
 
+# ---- 京东趋势监控依赖与数据库迁移 ----
+bash $PROJECT_DIR/deploy/install-chromium.sh
+node $PROJECT_DIR/deploy/apply-jd-trend-migration.js
+
 # ---- 前端部署 ----
 echo "[3/5] 安装前端依赖并构建..."
 cd $PROJECT_DIR/admin-frontend

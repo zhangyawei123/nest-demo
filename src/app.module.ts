@@ -20,6 +20,9 @@ import { FeedbackModule } from './feedback/feedback.module';
 import { ArticleInteractionModule } from './article-interaction/article-interaction.module';
 import { DrawModule } from './draw/draw.module';
 import { PointsModule } from './points/points.module';
+import { RechargeModule } from './recharge/recharge.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { JdTrendModule } from './jd-trend/jd-trend.module';
 
 /**
  * 根模块 - 应用程序的入口模块
@@ -44,6 +47,7 @@ import { PointsModule } from './points/points.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    ScheduleModule.forRoot(),
     // 数据库模块 - 异步读取环境变量后再连接 MySQL
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -60,11 +64,8 @@ import { PointsModule } from './points/points.module';
           database: configService.get('DB_DATABASE'),
           // 自动扫描所有 *.entity.ts / *.entity.js 文件
           entities: [__dirname + '/**/*.entity{.ts,.js}'],
-          // 开发环境默认开启，生产环境默认关闭，可通过 DB_SYNCHRONIZE 显式覆盖
-          synchronize:
-            enableDbSync !== undefined
-              ? enableDbSync === 'true'
-              : nodeEnv !== 'production',
+          // 账务、积分等表结构必须通过显式 SQL/迁移维护，避免自动同步误改外键和索引。
+          synchronize: enableDbSync === 'true',
         };
       },
       inject: [ConfigService],
@@ -88,6 +89,8 @@ import { PointsModule } from './points/points.module';
     ArticleInteractionModule,
     DrawModule,
     PointsModule,
+    RechargeModule,
+    JdTrendModule,
   ],
   controllers: [AppController],
   providers: [AppService],

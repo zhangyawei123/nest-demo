@@ -17,6 +17,8 @@ export const POINT_COSTS = {
   DAILY_SIGN_IN: 2,
 } as const;
 
+const ADMIN_UNLIMITED_POINTS = 999999999;
+
 interface PointChangeOptions {
   scene: string;
   description?: string;
@@ -38,15 +40,19 @@ export class PointsService {
 
   async getProfile(userId: number) {
     const user = await this.findUser(userId);
+    const admin = this.isAdminUser(user);
     const today = this.todayInShanghai();
     const signedInToday = await this.signInRepo.exist({
       where: { userId, signDate: today },
     });
 
     return {
-      points: user.points || 0,
-      makeupSignInChances: user.makeupSignInChances || 0,
-      signedInToday,
+      points: admin ? ADMIN_UNLIMITED_POINTS : user.points || 0,
+      isUnlimited: admin,
+      makeupSignInChances: admin
+        ? ADMIN_UNLIMITED_POINTS
+        : user.makeupSignInChances || 0,
+      signedInToday: admin ? true : signedInToday,
       currentStreak: await this.calculateCurrentStreak(
         this.signInRepo.manager,
         userId,
@@ -64,6 +70,20 @@ export class PointsService {
 
     return this.dataSource.transaction(async (manager) => {
       const user = await this.findUserForUpdate(manager, userId);
+      if (this.isAdminUser(user)) {
+        return {
+          signedIn: true,
+          alreadySignedIn: true,
+          points: ADMIN_UNLIMITED_POINTS,
+          isUnlimited: true,
+          earned: 0,
+          signDate: today,
+          currentStreak: 0,
+          awardedMakeupChance: false,
+          makeupSignInChances: ADMIN_UNLIMITED_POINTS,
+        };
+      }
+
       const existed = await manager.findOne(DailySignIn, {
         where: { userId, signDate: today },
       });
@@ -131,6 +151,19 @@ export class PointsService {
 
     return this.dataSource.transaction(async (manager) => {
       const user = await this.findUserForUpdate(manager, userId);
+      if (this.isAdminUser(user)) {
+        return {
+          signedIn: true,
+          makeup: true,
+          signDate: normalizedDate,
+          points: ADMIN_UNLIMITED_POINTS,
+          isUnlimited: true,
+          earned: 0,
+          makeupSignInChances: ADMIN_UNLIMITED_POINTS,
+          currentStreak: 0,
+        };
+      }
+
       if ((user.makeupSignInChances || 0) <= 0) {
         throw new BadRequestException('暂无补签机会');
       }
@@ -214,8 +247,13 @@ export class PointsService {
 
     return {
       month: targetMonth,
-      points: user.points || 0,
-      makeupSignInChances: user.makeupSignInChances || 0,
+      points: this.isAdminUser(user)
+        ? ADMIN_UNLIMITED_POINTS
+        : user.points || 0,
+      isUnlimited: this.isAdminUser(user),
+      makeupSignInChances: this.isAdminUser(user)
+        ? ADMIN_UNLIMITED_POINTS
+        : user.makeupSignInChances || 0,
       currentStreak: await this.calculateCurrentStreak(
         this.signInRepo.manager,
         userId,
@@ -251,25 +289,46 @@ export class PointsService {
       throw new BadRequestException('积分消耗数量必须大于 0');
     }
 
-    return this.dataSource.transaction(async (manager) => {
-      const user = await this.findUserForUpdate(manager, userId);
-      const currentPoints = user.points || 0;
-      if (currentPoints < amount) {
-        throw new HttpException(
-          `积分不足，当前 ${currentPoints} 积分，需要 ${amount} 积分`,
-          HttpStatus.PAYMENT_REQUIRED,
-        );
-      }
+    return this.dataSource.transaction((manager) =>
+      this.spendWithManager(manager, userId, amount, options),
+    );
+  }
 
-      user.points = currentPoints - amount;
-      await manager.save(User, user);
-      await this.createLog(manager, user, -amount, {
-        ...options,
-        type: 'spend',
-      });
+  async spendWithManager(
+    manager: EntityManager,
+    userId: number,
+    amount: number,
+    options: PointChangeOptions,
+  ) {
+    if (amount <= 0) {
+      throw new BadRequestException('积分消耗数量必须大于 0');
+    }
 
-      return { points: user.points, spent: amount };
+    const user = await this.findUserForUpdate(manager, userId);
+    if (this.isAdminUser(user)) {
+      return {
+        points: ADMIN_UNLIMITED_POINTS,
+        isUnlimited: true,
+        spent: 0,
+      };
+    }
+
+    const currentPoints = user.points || 0;
+    if (currentPoints < amount) {
+      throw new HttpException(
+        `积分不足，当前 ${currentPoints} 积分，需要 ${amount} 积分`,
+        HttpStatus.PAYMENT_REQUIRED,
+      );
+    }
+
+    user.points = currentPoints - amount;
+    await manager.save(User, user);
+    await this.createLog(manager, user, -amount, {
+      ...options,
+      type: 'spend',
     });
+
+    return { points: user.points, spent: amount };
   }
 
   async refund(userId: number, amount: number, options: PointChangeOptions) {
@@ -277,6 +336,14 @@ export class PointsService {
 
     return this.dataSource.transaction(async (manager) => {
       const user = await this.findUserForUpdate(manager, userId);
+      if (this.isAdminUser(user)) {
+        return {
+          points: ADMIN_UNLIMITED_POINTS,
+          isUnlimited: true,
+          refunded: 0,
+        };
+      }
+
       user.points = (user.points || 0) + amount;
       await manager.save(User, user);
       await this.createLog(manager, user, amount, {
@@ -286,6 +353,41 @@ export class PointsService {
 
       return { points: user.points, refunded: amount };
     });
+  }
+
+  async earn(userId: number, amount: number, options: PointChangeOptions) {
+    return this.dataSource.transaction((manager) =>
+      this.earnWithManager(manager, userId, amount, options),
+    );
+  }
+
+  async earnWithManager(
+    manager: EntityManager,
+    userId: number,
+    amount: number,
+    options: PointChangeOptions,
+  ) {
+    if (amount <= 0) {
+      throw new BadRequestException('积分增加数量必须大于 0');
+    }
+
+    const user = await this.findUserForUpdate(manager, userId);
+    if (this.isAdminUser(user)) {
+      return {
+        points: ADMIN_UNLIMITED_POINTS,
+        isUnlimited: true,
+        earned: 0,
+      };
+    }
+
+    user.points = (user.points || 0) + amount;
+    await manager.save(User, user);
+    await this.createLog(manager, user, amount, {
+      ...options,
+      type: 'earn',
+    });
+
+    return { points: user.points, earned: amount };
   }
 
   private async findUser(userId: number) {
@@ -305,6 +407,10 @@ export class PointsService {
       throw new NotFoundException('用户不存在');
     }
     return user;
+  }
+
+  private isAdminUser(user: User) {
+    return user.username?.trim().toLowerCase() === 'admin';
   }
 
   private createLog(

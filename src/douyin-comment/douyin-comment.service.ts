@@ -24,11 +24,15 @@ export class DouyinCommentService {
 
     await this.commentRepository.delete({ videoUrl });
 
-    const entities = comments.map((c) => this.commentRepository.create({ ...c, videoUrl }));
-    return this.commentRepository.save(entities) as Promise<DouyinComment[]>;
+    const entities = comments.map((c) =>
+      this.commentRepository.create({ ...c, videoUrl }),
+    );
+    return this.commentRepository.save(entities);
   }
 
-  private async crawlComments(videoUrl: string): Promise<Partial<DouyinComment>[]> {
+  private async crawlComments(
+    videoUrl: string,
+  ): Promise<Partial<DouyinComment>[]> {
     // 可执行路径优先读取环境变量 PUPPETEER_EXECUTABLE_PATH
     // 方便本地（macOS Chrome）和服务器（Linux Chromium）在不同环境下部署
     const executablePath =
@@ -37,7 +41,11 @@ export class DouyinCommentService {
     const browser = await puppeteer.launch({
       executablePath,
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+      ],
     });
 
     try {
@@ -49,22 +57,38 @@ export class DouyinCommentService {
       await page.goto(videoUrl, { waitUntil: 'networkidle2', timeout: 30000 });
 
       // 等待评论区加载
-      await page.waitForSelector('[data-e2e="comment-list"]', { timeout: 15000 }).catch(() => {});
+      await page
+        .waitForSelector('[data-e2e="comment-list"]', { timeout: 15000 })
+        .catch(() => {});
 
       // 滚动加载更多评论
       await page.evaluate(() => {
         window.scrollTo(0, document.body.scrollHeight / 2);
       });
-      await new Promise(r => setTimeout(r, 2000));
+      await new Promise((r) => setTimeout(r, 2000));
 
       const comments = await page.evaluate(() => {
         const items: any[] = [];
-        const commentEls = document.querySelectorAll('[data-e2e="comment-list"] [data-e2e="comment-item"]');
-        commentEls.forEach(el => {
-          const nickname = el.querySelector('[data-e2e="comment-user-nickname"]')?.textContent?.trim() || '';
-          const content = el.querySelector('[data-e2e="comment-content"]')?.textContent?.trim() || '';
-          const likeText = el.querySelector('[data-e2e="comment-like-count"]')?.textContent?.trim() || '0';
-          const avatarUrl = el.querySelector('img[data-e2e="user-avatar"]')?.getAttribute('src') || '';
+        const commentEls = document.querySelectorAll(
+          '[data-e2e="comment-list"] [data-e2e="comment-item"]',
+        );
+        commentEls.forEach((el) => {
+          const nickname =
+            el
+              .querySelector('[data-e2e="comment-user-nickname"]')
+              ?.textContent?.trim() || '';
+          const content =
+            el
+              .querySelector('[data-e2e="comment-content"]')
+              ?.textContent?.trim() || '';
+          const likeText =
+            el
+              .querySelector('[data-e2e="comment-like-count"]')
+              ?.textContent?.trim() || '0';
+          const avatarUrl =
+            el
+              .querySelector('img[data-e2e="user-avatar"]')
+              ?.getAttribute('src') || '';
           const likeCount = parseInt(likeText.replace(/[^0-9]/g, '')) || 0;
           if (content) {
             items.push({ nickname, content, likeCount, avatarUrl });

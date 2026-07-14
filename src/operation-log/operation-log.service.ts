@@ -16,11 +16,16 @@ export class OperationLogService {
   }
 
   async findAll(page = 1, pageSize = 20, keyword?: string) {
-    const qb = this.repo.createQueryBuilder('log').orderBy('log.createdAt', 'DESC');
+    const qb = this.repo
+      .createQueryBuilder('log')
+      .orderBy('log.createdAt', 'DESC');
     if (keyword?.trim()) {
-      qb.where('(log.username LIKE :kw OR log.module LIKE :kw OR log.action LIKE :kw)', {
-        kw: `%${keyword.trim()}%`,
-      });
+      qb.where(
+        '(log.username LIKE :kw OR log.module LIKE :kw OR log.action LIKE :kw)',
+        {
+          kw: `%${keyword.trim()}%`,
+        },
+      );
     }
     const [list, total] = await qb
       .skip((page - 1) * pageSize)

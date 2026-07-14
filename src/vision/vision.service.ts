@@ -35,9 +35,7 @@ export class VisionService {
             : '未检测到清晰人脸，请更换正面照片后重试',
       };
     } catch (error: any) {
-      throw new InternalServerErrorException(
-        error?.message || '人脸识别失败',
-      );
+      throw new InternalServerErrorException(error?.message || '人脸识别失败');
     } finally {
       await fs.unlink(imagePath).catch(() => undefined);
     }
@@ -137,7 +135,8 @@ export class VisionService {
         name: String(parsed?.recommendedCombo?.name || '智能推荐套餐'),
         items: this.normalizeStringArray(parsed?.recommendedCombo?.items),
         reason: String(
-          parsed?.recommendedCombo?.reason || '根据图片中的内容做了均衡搭配建议',
+          parsed?.recommendedCombo?.reason ||
+            '根据图片中的内容做了均衡搭配建议',
         ),
       },
       nutritionTips: this.normalizeStringArray(parsed.nutritionTips),
@@ -151,10 +150,7 @@ export class VisionService {
     try {
       const parsed = JSON.parse(raw);
       const message =
-        parsed?.error?.message ||
-        parsed?.message ||
-        parsed?.detail ||
-        raw;
+        parsed?.error?.message || parsed?.message || parsed?.detail || raw;
       return `图片分析请求失败 (${status}): ${message}`;
     } catch {
       return `图片分析请求失败 (${status}): ${raw || '上游模型返回异常'}`;
@@ -244,8 +240,6 @@ export class VisionService {
       return [];
     }
 
-    return value
-      .map((item) => String(item || '').trim())
-      .filter(Boolean);
+    return value.map((item) => String(item || '').trim()).filter(Boolean);
   }
 }

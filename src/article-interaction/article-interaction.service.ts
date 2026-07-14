@@ -60,17 +60,21 @@ export class ArticleInteractionService {
       .andWhere('interaction.viewedAt IS NOT NULL')
       .orderBy('interaction.viewedAt', 'DESC')
       .getMany();
-    return list.map((item) => ({
-      ...item.article,
-      viewedAt: item.viewedAt,
-    })).filter((item) => item.id);
+    return list
+      .map((item) => ({
+        ...item.article,
+        viewedAt: item.viewedAt,
+      }))
+      .filter((item) => item.id);
   }
 
   private async ensureArticle(articleId: number) {
     if (!articleId || Number.isNaN(articleId)) {
       throw new NotFoundException('文章不存在');
     }
-    const article = await this.articleRepo.findOne({ where: { id: articleId } });
+    const article = await this.articleRepo.findOne({
+      where: { id: articleId },
+    });
     if (!article) {
       throw new NotFoundException('文章不存在');
     }

@@ -45,8 +45,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     return {
       userId: user.id,
       username: user.username,
-      points: user.points || 0,
-      makeupSignInChances: user.makeupSignInChances || 0,
+      points: this.isAdminUser(user.username) ? 999999999 : user.points || 0,
+      isUnlimited: this.isAdminUser(user.username),
+      makeupSignInChances: this.isAdminUser(user.username)
+        ? 999999999
+        : user.makeupSignInChances || 0,
     };
+  }
+
+  private isAdminUser(username: string) {
+    return username?.trim().toLowerCase() === 'admin';
   }
 }

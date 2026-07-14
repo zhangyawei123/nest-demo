@@ -25,7 +25,8 @@ async function bootstrap() {
 
   // 启用 CORS（允许前端跨域访问）
   app.enableCors({
-    origin: !isProduction || allowedOrigins.length === 0 ? true : allowedOrigins,
+    origin:
+      !isProduction || allowedOrigins.length === 0 ? true : allowedOrigins,
     credentials: true,
   });
 
@@ -55,10 +56,11 @@ async function bootstrap() {
   // Apifox 导入方式：项目 → 导入 → URL 导入 → 填入上方 JSON 地址
   // ────────────────────────────────────────────────────────────
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('NestJS Demo API')          // 项目名称
+    .setTitle('NestJS Demo API') // 项目名称
     .setDescription('用户认证与管理接口文档') // 项目描述
-    .setVersion('1.0')                    // 版本号
-    .addBearerAuth(                       // 支持 JWT Bearer Token 认证
+    .setVersion('1.0') // 版本号
+    .addBearerAuth(
+      // 支持 JWT Bearer Token 认证
       {
         type: 'http',
         scheme: 'bearer',
@@ -83,7 +85,9 @@ async function bootstrap() {
   console.log(`🚀 Application is running on: http://localhost:${port}`);
   if (!isProduction || process.env.ENABLE_SWAGGER === 'true') {
     console.log(`📖 Swagger UI:  http://localhost:${port}/api-docs`);
-    console.log(`📋 OpenAPI JSON（Apifox 导入地址）: http://localhost:${port}/api-docs-json`);
+    console.log(
+      `📋 OpenAPI JSON（Apifox 导入地址）: http://localhost:${port}/api-docs-json`,
+    );
   }
 }
 bootstrap();

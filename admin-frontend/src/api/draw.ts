@@ -5,11 +5,14 @@ export interface GenerateImageDto {
   prompt: string;
   image?: string[];
   size?: string;
+  count?: number;
+  resolution?: string;
   response_format?: string;
 }
 
 export interface GenerateImageItem {
   url?: string;
+  thumbnail_url?: string;
   [key: string]: unknown;
 }
 
@@ -57,7 +60,7 @@ export const generateImage = (data: GenerateImageDto) => {
     url: '/draw/v1/images/generations',
     method: 'post',
     data,
-    timeout: 120000,
+    timeout: 0,
   }) as unknown as Promise<GenerateImageResponse>;
 };
 
@@ -68,6 +71,7 @@ export const getDrawGenerationHistory = (
     url: '/draw/v1/images/generations/history',
     method: 'get',
     params,
+    timeout: 0,
   }) as unknown as Promise<DrawGenerationHistoryResponse>;
 };
 
@@ -75,5 +79,6 @@ export const getDrawGenerationDetail = (id: number) => {
   return request<DrawGenerationRecord>({
     url: `/draw/v1/images/generations/${id}`,
     method: 'get',
+    timeout: 0,
   }) as unknown as Promise<DrawGenerationRecord>;
 };

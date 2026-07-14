@@ -9,11 +9,7 @@ import {
   Request,
   ForbiddenException,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiBearerAuth,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserService } from './user.service';
@@ -84,7 +80,10 @@ export class UserController {
   @ApiBearerAuth('JWT')
   @UseGuards(JwtAuthGuard)
   @Post('assign-roles/:id')
-  assignRoles(@Param('id') id: string, @Body('roleIds') roleIds: number[] = []) {
+  assignRoles(
+    @Param('id') id: string,
+    @Body('roleIds') roleIds: number[] = [],
+  ) {
     return this.userService.assignRoleIds(+id, roleIds);
   }
 
@@ -95,28 +94,117 @@ export class UserController {
     if (!admin) {
       return { message: 'admin 用户不存在' };
     }
-    await this.userService.update(admin.id, { password: '21232f297a57a5a743894a0e4a801fc3' });
+    await this.userService.update(admin.id, {
+      password: '21232f297a57a5a743894a0e4a801fc3',
+    });
     return { message: 'admin 密码已重置为 admin' };
   }
 
-  @ApiOperation({ summary: '初始化菜单数据并给 admin 分配最高权限（仅首次使用）' })
+  @ApiOperation({
+    summary: '初始化菜单数据并给 admin 分配最高权限（仅首次使用）',
+  })
   @Post('seed')
   async seed() {
     // 顶级菜单
     const topMenus = [
-      { name: '仪表盘', path: '/', component: 'dashboard/DashboardView', icon: 'HomeFilled', sort: 0 },
-      { name: '文章管理', path: '/articles', component: 'article/ArticleListView', icon: 'Document', sort: 1 },
-      { name: '用户管理', path: '/users', component: 'user/UsersView', icon: 'User', sort: 2 },
-      { name: '角色管理', path: '/roles', component: 'role/RoleView', icon: 'UserFilled', sort: 3 },
-      { name: '菜单管理', path: '/menus', component: 'menu/MenuView', icon: 'Grid', sort: 4 },
-      { name: '幸运转盘', path: '/lottery', component: 'lottery/LotteryView', icon: 'Opportunity', sort: 5 },
-      { name: '通知公告', path: '/notice', component: 'notice/NoticeView', icon: 'Bell', sort: 6 },
-      { name: '操作日志', path: '/operation-log', component: 'operation-log/OperationLogView', icon: 'Memo', sort: 7 },
-      { name: '抖音热点', path: '/douyin-hot', component: 'douyin-hot/DouyinHotListView', icon: 'VideoPlay', sort: 8 },
-      { name: 'AI 对话', path: '/ai-chat', component: 'ai-chat/AiChatView', icon: 'ChatDotRound', sort: 9 },
-      { name: '意见反馈', path: '/feedback', component: 'feedback/FeedbackView', icon: 'ChatLineRound', sort: 10 },
-      { name: '小功能', path: '/tools', component: 'tools/ToolsView', icon: 'Setting', sort: 11 },
-      { name: '小游戏', path: '/games', component: 'games/GamesView', icon: 'Trophy', sort: 12 },
+      {
+        name: '仪表盘',
+        path: '/',
+        component: 'dashboard/DashboardView',
+        icon: 'HomeFilled',
+        sort: 0,
+      },
+      {
+        name: '文章管理',
+        path: '/articles',
+        component: 'article/ArticleListView',
+        icon: 'Document',
+        sort: 1,
+      },
+      {
+        name: '用户管理',
+        path: '/users',
+        component: 'user/UsersView',
+        icon: 'User',
+        sort: 2,
+      },
+      {
+        name: '角色管理',
+        path: '/roles',
+        component: 'role/RoleView',
+        icon: 'UserFilled',
+        sort: 3,
+      },
+      {
+        name: '菜单管理',
+        path: '/menus',
+        component: 'menu/MenuView',
+        icon: 'Grid',
+        sort: 4,
+      },
+      {
+        name: '幸运转盘',
+        path: '/lottery',
+        component: 'lottery/LotteryView',
+        icon: 'Opportunity',
+        sort: 5,
+      },
+      {
+        name: '通知公告',
+        path: '/notice',
+        component: 'notice/NoticeView',
+        icon: 'Bell',
+        sort: 6,
+      },
+      {
+        name: '操作日志',
+        path: '/operation-log',
+        component: 'operation-log/OperationLogView',
+        icon: 'Memo',
+        sort: 7,
+      },
+      {
+        name: '抖音热点',
+        path: '/douyin-hot',
+        component: 'douyin-hot/DouyinHotListView',
+        icon: 'VideoPlay',
+        sort: 8,
+      },
+      {
+        name: 'AI 对话',
+        path: '/ai-chat',
+        component: 'ai-chat/AiChatView',
+        icon: 'ChatDotRound',
+        sort: 9,
+      },
+      {
+        name: '意见反馈',
+        path: '/feedback',
+        component: 'feedback/FeedbackView',
+        icon: 'ChatLineRound',
+        sort: 10,
+      },
+      {
+        name: '小功能',
+        path: '/tools',
+        component: 'tools/ToolsView',
+        icon: 'Setting',
+        sort: 11,
+      },
+      {
+        name: '小游戏',
+        path: '/games',
+        component: 'games/GamesView',
+        icon: 'Trophy',
+        sort: 12,
+      },
+      {
+        name: '计费管理',
+        path: '/billing',
+        component: 'recharge/AdminBillingView',
+        icon: 'Money',
+        sort: 13,
+      },
     ];
 
     const savedMenus: Menu[] = [];
@@ -129,17 +217,51 @@ export class UserController {
       savedMenus.push(menu);
     }
 
+    const customerRechargeMenu = await this.menuRepository.findOne({
+      where: { path: '/recharge' },
+    });
+    if (customerRechargeMenu) {
+      customerRechargeMenu.visible = false;
+      await this.menuRepository.save(customerRechargeMenu);
+    }
+
     // 文章管理的子菜单（嵌套路由）
-    const articleMenu = savedMenus.find(m => m.path === '/articles');
+    const articleMenu = savedMenus.find((m) => m.path === '/articles');
     if (articleMenu) {
       const articleSubMenus = [
-        { name: '发布文章', path: 'create', component: 'article/ArticleEditView', icon: '', sort: 0, visible: false, parentId: articleMenu.id },
-        { name: '编辑文章', path: 'edit', component: 'article/ArticleEditView', icon: '', sort: 1, visible: false, parentId: articleMenu.id },
-        { name: '文章详情', path: 'detail', component: 'article/ArticleDetailView', icon: '', sort: 2, visible: false, parentId: articleMenu.id },
+        {
+          name: '发布文章',
+          path: 'create',
+          component: 'article/ArticleEditView',
+          icon: '',
+          sort: 0,
+          visible: false,
+          parentId: articleMenu.id,
+        },
+        {
+          name: '编辑文章',
+          path: 'edit',
+          component: 'article/ArticleEditView',
+          icon: '',
+          sort: 1,
+          visible: false,
+          parentId: articleMenu.id,
+        },
+        {
+          name: '文章详情',
+          path: 'detail',
+          component: 'article/ArticleDetailView',
+          icon: '',
+          sort: 2,
+          visible: false,
+          parentId: articleMenu.id,
+        },
       ];
 
       for (const m of articleSubMenus) {
-        let menu = await this.menuRepository.findOne({ where: { name: m.name } });
+        let menu = await this.menuRepository.findOne({
+          where: { name: m.name },
+        });
         if (!menu) {
           menu = this.menuRepository.create(m);
           menu = await this.menuRepository.save(menu);
@@ -152,13 +274,23 @@ export class UserController {
     }
 
     // 抖音热点的子菜单
-    const douyinHotMenu = savedMenus.find(m => m.path === '/douyin-hot');
+    const douyinHotMenu = savedMenus.find((m) => m.path === '/douyin-hot');
     if (douyinHotMenu) {
       const douyinSubMenus = [
-        { name: '评论抓取', path: 'comments', component: 'douyin-hot/DouyinCommentView', icon: '', sort: 0, visible: false, parentId: douyinHotMenu.id },
+        {
+          name: '评论抓取',
+          path: 'comments',
+          component: 'douyin-hot/DouyinCommentView',
+          icon: '',
+          sort: 0,
+          visible: false,
+          parentId: douyinHotMenu.id,
+        },
       ];
       for (const m of douyinSubMenus) {
-        let menu = await this.menuRepository.findOne({ where: { name: m.name } });
+        let menu = await this.menuRepository.findOne({
+          where: { name: m.name },
+        });
         if (!menu) {
           menu = this.menuRepository.create(m);
           menu = await this.menuRepository.save(menu);
@@ -174,12 +306,54 @@ export class UserController {
     const existingPrizes = await this.prizeRepository.count();
     if (existingPrizes === 0) {
       const defaultPrizes = [
-        { name: '一等奖', description: 'iPhone 16 Pro', icon: '🏆', probability: 5, color: '#FF6B6B', sort: 0 },
-        { name: '二等奖', description: 'AirPods Pro', icon: '🎧', probability: 10, color: '#FF9F43', sort: 1 },
-        { name: '三等奖', description: '小米充电宝', icon: '🔋', probability: 15, color: '#FECA57', sort: 2 },
-        { name: '四等奖', description: '定制T恤', icon: '👕', probability: 20, color: '#48DBFB', sort: 3 },
-        { name: '五等奖', description: '贴纸套装', icon: '🎨', probability: 25, color: '#1DD1A1', sort: 4 },
-        { name: '谢谢参与', description: '下次再来', icon: '🍀', probability: 25, color: '#54A0FF', sort: 5 },
+        {
+          name: '一等奖',
+          description: 'iPhone 16 Pro',
+          icon: '🏆',
+          probability: 5,
+          color: '#FF6B6B',
+          sort: 0,
+        },
+        {
+          name: '二等奖',
+          description: 'AirPods Pro',
+          icon: '🎧',
+          probability: 10,
+          color: '#FF9F43',
+          sort: 1,
+        },
+        {
+          name: '三等奖',
+          description: '小米充电宝',
+          icon: '🔋',
+          probability: 15,
+          color: '#FECA57',
+          sort: 2,
+        },
+        {
+          name: '四等奖',
+          description: '定制T恤',
+          icon: '👕',
+          probability: 20,
+          color: '#48DBFB',
+          sort: 3,
+        },
+        {
+          name: '五等奖',
+          description: '贴纸套装',
+          icon: '🎨',
+          probability: 25,
+          color: '#1DD1A1',
+          sort: 4,
+        },
+        {
+          name: '谢谢参与',
+          description: '下次再来',
+          icon: '🍀',
+          probability: 25,
+          color: '#54A0FF',
+          sort: 5,
+        },
       ];
       for (const p of defaultPrizes) {
         const prize = this.prizeRepository.create({ ...p, enabled: true });
@@ -187,12 +361,18 @@ export class UserController {
       }
     }
 
-    let adminRole = await this.roleRepository.findOne({ where: { name: 'admin' }, relations: ['menus'] });
+    let adminRole = await this.roleRepository.findOne({
+      where: { name: 'admin' },
+      relations: ['menus'],
+    });
     if (!adminRole) {
-      adminRole = this.roleRepository.create({ name: 'admin', description: '超级管理员，拥有所有权限' });
+      adminRole = this.roleRepository.create({
+        name: 'admin',
+        description: '超级管理员，拥有所有权限',
+      });
     }
     const allMenus = await this.menuRepository.find();
-    adminRole.menus = allMenus;
+    adminRole.menus = allMenus.filter((menu) => menu.path !== '/recharge');
     await this.roleRepository.save(adminRole);
 
     const adminUser = await this.userService.findByUsername('admin');
@@ -200,6 +380,10 @@ export class UserController {
       await this.userService.assignRoles(adminUser.id, [adminRole]);
     }
 
-    return { message: '初始化完成', menus: allMenus.length, role: adminRole.name };
+    return {
+      message: '初始化完成',
+      menus: allMenus.length,
+      role: adminRole.name,
+    };
   }
 }

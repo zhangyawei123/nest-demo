@@ -80,8 +80,11 @@ export class AuthService {
       user: {
         id: user.id,
         username: user.username,
-        points: user.points || 0,
-        makeupSignInChances: user.makeupSignInChances || 0,
+        points: this.isAdminUser(user.username) ? 999999999 : user.points || 0,
+        isUnlimited: this.isAdminUser(user.username),
+        makeupSignInChances: this.isAdminUser(user.username)
+          ? 999999999
+          : user.makeupSignInChances || 0,
       },
     };
   }
@@ -93,5 +96,9 @@ export class AuthService {
    */
   async validateUser(userId: number) {
     return this.userService.findById(userId);
+  }
+
+  private isAdminUser(username: string) {
+    return username?.trim().toLowerCase() === 'admin';
   }
 }

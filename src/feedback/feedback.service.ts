@@ -26,19 +26,27 @@ export class FeedbackService {
   async findAll(query: QueryFeedbackDto) {
     const page = Number(query.page) || 1;
     const pageSize = Number(query.pageSize) || 10;
-    const qb = this.repo.createQueryBuilder('feedback').orderBy('feedback.createdAt', 'DESC');
+    const qb = this.repo
+      .createQueryBuilder('feedback')
+      .orderBy('feedback.createdAt', 'DESC');
 
     if (query.status) {
       qb.andWhere('feedback.status = :status', { status: query.status });
     }
 
     if (query.keyword?.trim()) {
-      qb.andWhere('(feedback.content LIKE :keyword OR COALESCE(feedback.contact, \'\') LIKE :keyword OR COALESCE(feedback.username, \'\') LIKE :keyword)', {
-        keyword: `%${query.keyword.trim()}%`,
-      });
+      qb.andWhere(
+        "(feedback.content LIKE :keyword OR COALESCE(feedback.contact, '') LIKE :keyword OR COALESCE(feedback.username, '') LIKE :keyword)",
+        {
+          keyword: `%${query.keyword.trim()}%`,
+        },
+      );
     }
 
-    const [list, total] = await qb.skip((page - 1) * pageSize).take(pageSize).getManyAndCount();
+    const [list, total] = await qb
+      .skip((page - 1) * pageSize)
+      .take(pageSize)
+      .getManyAndCount();
     return { list, total, page, pageSize };
   }
 

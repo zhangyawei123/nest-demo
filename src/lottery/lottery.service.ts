@@ -29,7 +29,10 @@ export class LotteryService {
     return this.prizeRepository.save(prize);
   }
 
-  async updatePrize(id: number, dto: Partial<CreatePrizeDto>): Promise<LotteryPrize> {
+  async updatePrize(
+    id: number,
+    dto: Partial<CreatePrizeDto>,
+  ): Promise<LotteryPrize> {
     await this.findOnePrize(id);
     await this.prizeRepository.update(id, dto);
     return this.findOnePrize(id);

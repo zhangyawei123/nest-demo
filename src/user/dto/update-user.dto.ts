@@ -7,7 +7,12 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
  */
 export class UpdateUserDto {
   /** 新用户名（可选）：3-50 位字符 */
-  @ApiPropertyOptional({ description: '新用户名', example: 'newname', minLength: 3, maxLength: 50 })
+  @ApiPropertyOptional({
+    description: '新用户名',
+    example: 'newname',
+    minLength: 3,
+    maxLength: 50,
+  })
   @IsOptional()
   @IsString()
   @MinLength(3, { message: '用户名至少3位' })
@@ -15,7 +20,11 @@ export class UpdateUserDto {
   username?: string;
 
   /** 新密码（可选）：至少 6 位 */
-  @ApiPropertyOptional({ description: '新密码（至少6位）', example: 'newpass123', minLength: 6 })
+  @ApiPropertyOptional({
+    description: '新密码（至少6位）',
+    example: 'newpass123',
+    minLength: 6,
+  })
   @IsOptional()
   @IsString()
   @MinLength(6, { message: '密码至少6位' })

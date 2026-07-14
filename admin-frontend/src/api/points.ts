@@ -2,6 +2,7 @@ import request from '@/utils/request';
 
 export interface PointsProfile {
   points: number;
+  isUnlimited?: boolean;
   makeupSignInChances: number;
   signedInToday: boolean;
   currentStreak: number;
@@ -26,6 +27,7 @@ export interface SignInCalendarDay {
 export interface SignInCalendarResponse {
   month: string;
   points: number;
+  isUnlimited?: boolean;
   makeupSignInChances: number;
   currentStreak: number;
   days: SignInCalendarDay[];
@@ -57,6 +59,7 @@ export const signIn = () => {
     signedIn: boolean;
     alreadySignedIn: boolean;
     points: number;
+    isUnlimited?: boolean;
     earned: number;
     signDate: string;
     currentStreak: number;
@@ -73,6 +76,7 @@ export const makeupSignIn = (date: string) => {
     makeup: boolean;
     signDate: string;
     points: number;
+    isUnlimited?: boolean;
     earned: number;
     makeupSignInChances: number;
     currentStreak: number;

@@ -4,19 +4,22 @@ import {
   UploadedFile,
   UseInterceptors,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
 import { ApiTags, ApiOperation, ApiConsumes } from '@nestjs/swagger';
 import { mkdir, writeFile } from 'fs/promises';
-import { extname, join } from 'path';
+import { join } from 'path';
 import { randomUUID } from 'crypto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 /**
  * 文件上传控制器
  */
 @ApiTags('文件上传')
 @Controller('upload')
+@UseGuards(JwtAuthGuard)
 export class UploadController {
   constructor(private readonly configService: ConfigService) {}
 
@@ -43,7 +46,15 @@ export class UploadController {
     }
 
     // 生成安全随机文件名
-    const filename = `${randomUUID()}${extname(file.originalname)}`;
+    const extension =
+      file.mimetype === 'image/png'
+        ? '.png'
+        : file.mimetype === 'image/webp'
+          ? '.webp'
+          : file.mimetype === 'image/gif'
+            ? '.gif'
+            : '.jpg';
+    const filename = `${randomUUID()}${extension}`;
 
     // 确保 uploads 目录存在
     const uploadDir = join(process.cwd(), 'uploads');
@@ -57,7 +68,9 @@ export class UploadController {
     const publicBaseUrl = this.configService
       .get<string>('PUBLIC_BASE_URL', '')
       .replace(/\/$/, '');
-    const publicUrl = publicBaseUrl ? `${publicBaseUrl}${relativeUrl}` : relativeUrl;
+    const publicUrl = publicBaseUrl
+      ? `${publicBaseUrl}${relativeUrl}`
+      : relativeUrl;
 
     return {
       filename,

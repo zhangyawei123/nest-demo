@@ -111,9 +111,7 @@ export class AiChatService {
 
   async autoTitle(sessionId: number, firstUserMsg: string): Promise<void> {
     const title =
-      firstUserMsg.length > 30
-        ? firstUserMsg.slice(0, 30) + '…'
-        : firstUserMsg;
+      firstUserMsg.length > 30 ? firstUserMsg.slice(0, 30) + '…' : firstUserMsg;
     await this.sessionRepo.update(sessionId, { title });
   }
 
@@ -126,7 +124,7 @@ export class AiChatService {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.apiKey}`,
+        Authorization: `Bearer ${this.apiKey}`,
       },
       body: JSON.stringify({
         model: this.model,
@@ -151,7 +149,7 @@ export class AiChatService {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.apiKey}`,
+        Authorization: `Bearer ${this.apiKey}`,
       },
       body: JSON.stringify({
         model: this.model,

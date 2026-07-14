@@ -33,12 +33,16 @@ export class DouyinHotService {
   }
 
   private async fetchRealHotList(): Promise<any[]> {
-    const res = await fetch('https://www.iesdouyin.com/web/api/v2/hotsearch/billboard/word/', {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Referer': 'https://www.douyin.com/',
+    const res = await fetch(
+      'https://www.iesdouyin.com/web/api/v2/hotsearch/billboard/word/',
+      {
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          Referer: 'https://www.douyin.com/',
+        },
       },
-    });
+    );
 
     if (!res.ok) {
       throw new Error(`请求失败: ${res.status}`);

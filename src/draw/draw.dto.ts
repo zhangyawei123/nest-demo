@@ -1,10 +1,14 @@
 import {
   IsArray,
+  IsInt,
   IsIn,
   IsNotEmpty,
   IsOptional,
   IsString,
+  Max,
+  Min,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateDrawGenerationDto {
   @IsOptional()
@@ -22,6 +26,17 @@ export class CreateDrawGenerationDto {
   @IsOptional()
   @IsString()
   size?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(5)
+  count?: number;
+
+  @IsOptional()
+  @IsString()
+  resolution?: string;
 
   @IsOptional()
   @IsString()

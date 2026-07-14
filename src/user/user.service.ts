@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -53,7 +57,10 @@ export class UserService {
    * @returns 用户实体，不存在则返回 null
    */
   async findByUsername(username: string): Promise<User | null> {
-    return this.userRepository.findOne({ where: { username }, relations: ['roles', 'roles.menus'] });
+    return this.userRepository.findOne({
+      where: { username },
+      relations: ['roles', 'roles.menus'],
+    });
   }
 
   /**
@@ -63,7 +70,10 @@ export class UserService {
    * @throws NotFoundException 用户不存在时抛出 404
    */
   async findById(id: number): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id }, relations: ['roles', 'roles.menus'] });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['roles', 'roles.menus'],
+    });
     if (!user) {
       throw new NotFoundException('用户不存在');
     }
@@ -89,24 +99,24 @@ export class UserService {
   async getMenusByUserId(id: number) {
     const user = await this.findById(id);
     const menuMap = new Map<number, any>();
-    for (const role of (user.roles || [])) {
-      for (const menu of (role.menus || [])) {
+    for (const role of user.roles || []) {
+      for (const menu of role.menus || []) {
         menuMap.set(menu.id, menu);
       }
     }
     const allMenus = Array.from(menuMap.values());
     allMenus.sort((a, b) => a.sort - b.sort);
-    
+
     // 构建树形结构
     return this.buildMenuTree(allMenus);
   }
 
   private buildMenuTree(menus: any[], parentId: number | null = null): any[] {
     return menus
-      .filter(menu => menu.parentId === parentId)
-      .map(menu => ({
+      .filter((menu) => menu.parentId === parentId)
+      .map((menu) => ({
         ...menu,
-        children: this.buildMenuTree(menus, menu.id)
+        children: this.buildMenuTree(menus, menu.id),
       }));
   }
 
@@ -118,7 +128,9 @@ export class UserService {
 
   async assignRoleIds(id: number, roleIds: number[]) {
     const user = await this.findById(id);
-    user.roles = roleIds.length ? await this.roleRepository.findBy({ id: In(roleIds) }) : [];
+    user.roles = roleIds.length
+      ? await this.roleRepository.findBy({ id: In(roleIds) })
+      : [];
     await this.userRepository.save(user);
     return this.sanitizeUser(await this.findById(id));
   }
@@ -151,7 +163,10 @@ export class UserService {
    * @param storedPassword 数据库中存储的 MD5 密码
    * @returns 匹配返回 true，不匹配返回 false
    */
-  async validatePassword(md5Password: string, storedPassword: string): Promise<boolean> {
+  async validatePassword(
+    md5Password: string,
+    storedPassword: string,
+  ): Promise<boolean> {
     if (this.isBcryptHash(storedPassword)) {
       return bcrypt.compare(md5Password, storedPassword);
     }
@@ -159,8 +174,15 @@ export class UserService {
     return md5Password === storedPassword;
   }
 
-  async migratePasswordHashIfNeeded(user: User, md5Password: string): Promise<void> {
-    if (!user.password || this.isBcryptHash(user.password) || user.password !== md5Password) {
+  async migratePasswordHashIfNeeded(
+    user: User,
+    md5Password: string,
+  ): Promise<void> {
+    if (
+      !user.password ||
+      this.isBcryptHash(user.password) ||
+      user.password !== md5Password
+    ) {
       return;
     }
 

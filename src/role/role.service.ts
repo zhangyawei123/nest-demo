@@ -19,13 +19,19 @@ export class RoleService {
   }
 
   async findOne(id: number): Promise<Role> {
-    const role = await this.roleRepository.findOne({ where: { id }, relations: ['menus'] });
+    const role = await this.roleRepository.findOne({
+      where: { id },
+      relations: ['menus'],
+    });
     if (!role) throw new NotFoundException('角色不存在');
     return role;
   }
 
   async create(dto: CreateRoleDto): Promise<Role> {
-    const role = this.roleRepository.create({ name: dto.name, description: dto.description });
+    const role = this.roleRepository.create({
+      name: dto.name,
+      description: dto.description,
+    });
     if (dto.menuIds?.length) {
       role.menus = await this.menuRepository.findBy({ id: In(dto.menuIds) });
     } else {

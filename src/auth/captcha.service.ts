@@ -18,7 +18,10 @@ export class CaptchaService {
    * key:   captchaId（随机字符串，发给客户端）
    * value: { text: 验证码文本, expireAt: 过期时间戳 }
    */
-  private readonly store = new Map<string, { text: string; expireAt: number }>();
+  private readonly store = new Map<
+    string,
+    { text: string; expireAt: number }
+  >();
 
   /** 验证码有效期：5 分钟（毫秒） */
   private readonly TTL = 5 * 60 * 1000;
@@ -32,9 +35,9 @@ export class CaptchaService {
   generate(): { captchaId: string; svg: string } {
     // 生成含 4 位字母数字的 SVG 验证码
     const captcha = svgCaptcha.create({
-      size: 4,          // 验证码字符数
-      noise: 0,         // 干扰线条数
-      color: true,      // 彩色字符
+      size: 4, // 验证码字符数
+      noise: 0, // 干扰线条数
+      color: true, // 彩色字符
       background: '#f0f0f0',
       width: 120,
       height: 40,

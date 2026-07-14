@@ -20,7 +20,10 @@ export class NoticeService {
   }
 
   async findEnabled() {
-    return this.repo.find({ where: { enabled: true }, order: { createdAt: 'DESC' } });
+    return this.repo.find({
+      where: { enabled: true },
+      order: { createdAt: 'DESC' },
+    });
   }
 
   async create(data: Partial<Notice>) {

@@ -1,4 +1,10 @@
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateMenuDto {
@@ -12,7 +18,10 @@ export class CreateMenuDto {
   @IsOptional()
   path?: string;
 
-  @ApiPropertyOptional({ description: '前端组件路径', example: 'article/ArticleListView' })
+  @ApiPropertyOptional({
+    description: '前端组件路径',
+    example: 'article/ArticleListView',
+  })
   @IsString()
   @IsOptional()
   component?: string;

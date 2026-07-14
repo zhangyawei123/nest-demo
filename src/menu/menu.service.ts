@@ -19,16 +19,18 @@ export class MenuService {
   }
 
   async findTree(): Promise<Menu[]> {
-    const allMenus = await this.menuRepository.find({ order: { sort: 'ASC', id: 'ASC' } });
+    const allMenus = await this.menuRepository.find({
+      order: { sort: 'ASC', id: 'ASC' },
+    });
     return this.buildTree(allMenus);
   }
 
   private buildTree(menus: Menu[], parentId: number | null = null): Menu[] {
     return menus
-      .filter(menu => menu.parentId === parentId)
-      .map(menu => ({
+      .filter((menu) => menu.parentId === parentId)
+      .map((menu) => ({
         ...menu,
-        children: this.buildTree(menus, menu.id)
+        children: this.buildTree(menus, menu.id),
       }));
   }
 
@@ -58,7 +60,10 @@ export class MenuService {
   }
 
   private async syncAdminMenus(): Promise<void> {
-    const adminRole = await this.roleRepository.findOne({ where: { name: 'admin' }, relations: ['menus'] });
+    const adminRole = await this.roleRepository.findOne({
+      where: { name: 'admin' },
+      relations: ['menus'],
+    });
     if (!adminRole) return;
     adminRole.menus = await this.menuRepository.find();
     await this.roleRepository.save(adminRole);

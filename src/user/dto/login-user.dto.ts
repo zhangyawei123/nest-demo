@@ -22,13 +22,19 @@ export class LoginUserDto {
   password: string;
 
   /** 验证码 ID（由 GET /auth/captcha 接口返回） */
-  @ApiProperty({ description: '验证码 ID，先请求 GET /auth/captcha 获得', example: '1710000000000-abc123' })
+  @ApiProperty({
+    description: '验证码 ID，先请求 GET /auth/captcha 获得',
+    example: '1710000000000-abc123',
+  })
   @IsString()
   @IsNotEmpty({ message: '验证码 ID 不能为空' })
   captchaId: string;
 
   /** 用户输入的验证码文本（不区分大小写） */
-  @ApiProperty({ description: '图片验证码内容（不区分大小写）', example: 'ab3k' })
+  @ApiProperty({
+    description: '图片验证码内容（不区分大小写）',
+    example: 'ab3k',
+  })
   @IsString()
   @IsNotEmpty({ message: '验证码不能为空' })
   captchaCode: string;

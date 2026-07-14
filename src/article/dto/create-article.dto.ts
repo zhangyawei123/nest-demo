@@ -11,13 +11,20 @@ export class CreateArticleDto {
   @MaxLength(200, { message: '标题最多200个字符' })
   title: string;
 
-  @ApiProperty({ description: '文章封面图 URL', example: 'https://example.com/logo.jpg', required: false })
+  @ApiProperty({
+    description: '文章封面图 URL',
+    example: 'https://example.com/logo.jpg',
+    required: false,
+  })
   @IsString()
   @IsOptional()
   @MaxLength(500, { message: 'Logo URL 最多500个字符' })
   logo?: string;
 
-  @ApiProperty({ description: '文章内容（富文本 HTML）', example: '<p>这是文章内容</p>' })
+  @ApiProperty({
+    description: '文章内容（富文本 HTML）',
+    example: '<p>这是文章内容</p>',
+  })
   @IsString()
   @IsNotEmpty({ message: '内容不能为空' })
   content: string;
